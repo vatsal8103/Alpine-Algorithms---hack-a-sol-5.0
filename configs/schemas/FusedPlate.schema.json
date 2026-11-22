@@ -1,0 +1,149 @@
+{
+  "$defs": {
+    "FrameVote": {
+      "description": "Vote contribution from a specific frame for a character position.",
+      "properties": {
+        "frame_no": {
+          "description": "Frame index that cast this vote",
+          "title": "Frame No",
+          "type": "integer"
+        },
+        "char": {
+          "description": "Character voted for",
+          "title": "Char",
+          "type": "string"
+        },
+        "prob": {
+          "description": "Calibrated character probability in frame",
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Prob",
+          "type": "number"
+        },
+        "weight": {
+          "description": "Normalized weight assigned to this frame",
+          "minimum": 0.0,
+          "title": "Weight",
+          "type": "number"
+        }
+      },
+      "required": [
+        "frame_no",
+        "char",
+        "prob",
+        "weight"
+      ],
+      "title": "FrameVote",
+      "type": "object"
+    },
+    "PositionVote": {
+      "description": "Aggregated evidence for a single character slot across all frames.",
+      "properties": {
+        "index": {
+          "description": "0-indexed position along plate string",
+          "minimum": 0,
+          "title": "Index",
+          "type": "integer"
+        },
+        "char_or_?": {
+          "description": "Consensus character or '?' if confidence/margin insufficient",
+          "maxLength": 1,
+          "minLength": 1,
+          "title": "Char Or ?",
+          "type": "string"
+        },
+        "confidence": {
+          "description": "Posterior probability for accepted character, or margin confidence",
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Confidence",
+          "type": "number"
+        },
+        "votes": {
+          "description": "Breakdown of individual frame votes contributing to this position",
+          "items": {
+            "$ref": "#/$defs/FrameVote"
+          },
+          "title": "Votes",
+          "type": "array"
+        },
+        "explanation": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Human-readable reason if marked '?' (e.g. margin < threshold)",
+          "title": "Explanation"
+        }
+      },
+      "required": [
+        "index",
+        "char_or_?",
+        "confidence"
+      ],
+      "title": "PositionVote",
+      "type": "object"
+    }
+  },
+  "description": "Final consensus plate produced by multi-frame fusion.",
+  "properties": {
+    "text": {
+      "description": "Fused plate text with '?' for uncertain characters",
+      "title": "Text",
+      "type": "string"
+    },
+    "per_position": {
+      "description": "Evidence and vote breakdown per position",
+      "items": {
+        "$ref": "#/$defs/PositionVote"
+      },
+      "title": "Per Position",
+      "type": "array"
+    },
+    "format_valid": {
+      "default": false,
+      "description": "Whether plate text conforms to Indian license plate grammar",
+      "title": "Format Valid",
+      "type": "boolean"
+    },
+    "frames_used": {
+      "default": 0,
+      "description": "Count of high-quality frames accepted into fusion",
+      "minimum": 0,
+      "title": "Frames Used",
+      "type": "integer"
+    },
+    "mean_confidence": {
+      "default": 0.0,
+      "description": "Mean confidence across known positions",
+      "maximum": 1.0,
+      "minimum": 0.0,
+      "title": "Mean Confidence",
+      "type": "number"
+    },
+    "known_count": {
+      "default": 0,
+      "description": "Number of resolved characters",
+      "minimum": 0,
+      "title": "Known Count",
+      "type": "integer"
+    },
+    "unknown_count": {
+      "default": 0,
+      "description": "Number of '?' positions",
+      "minimum": 0,
+      "title": "Unknown Count",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "text"
+  ],
+  "title": "FusedPlate",
+  "type": "object"
+}

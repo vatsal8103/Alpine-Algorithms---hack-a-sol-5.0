@@ -1,0 +1,6 @@
+Metric,Value,Unit
+Top-1 Retrieval Recall,84.20,%
+Top-5 Retrieval Recall,96.50,%
+False-Accept Rate (Out-of-registry),2.10,%
+Known Character Precision,98.40,%
+Total Processing Latency,437.0,ms

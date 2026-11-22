@@ -1,0 +1,11 @@
+clip_name,true_plate,colour,body_type,in_registry,camera_id,notes
+jh05ab6799_camA.mp4,JH05AB6799,white,suv,True,cam-A,Daylight clip of Mahindra Scorpio white SUV
+jh05ab6799_camB.mp4,JH05AB6799,white,suv,True,cam-B,Cross-camera tracking second vantage of same vehicle
+mh12de1433_camA.mp4,MH12DE1433,silver,hatchback,True,cam-A,Silver Maruti Swift hatchback moderate motion blur
+ka03mn4821_camA.mp4,KA03MN4821,black,two-wheeler,True,cam-A,Black Royal Enfield motorcycle high vibration
+cg04tr7788_camA.mp4,CG04TR7788,yellow,auto-rickshaw,True,cam-A,Yellow Bajaj RE auto-rickshaw commercial plate
+up32kl9021_camA.mp4,UP32KL9021,blue,truck,True,cam-A,Blue Tata 407 cargo truck distance shot
+dl8caf1234_camA.mp4,DL08CA1234,white,sedan,True,cam-A,White Honda City sedan night lighting
+jh05ab6798_nomatch.mp4,JH05AB6798,white,suv,False,cam-A,Hard negative: plate differs by 1 digit not in registry
+tn09zz4321_nomatch.mp4,TN09ZZ4321,red,hatchback,False,cam-A,Stolen/unregistered out-of-registry red car
+wb02xx0000_unreadable.mp4,WB02XX0000,black,sedan,False,cam-A,Deliberately blurred plate unreadable zero confident match

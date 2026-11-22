@@ -1,0 +1,26 @@
+vehicle_id,registration_number,colour,body_type,make,model,fuel,year,owner_city
+out-target-000,AP37HL8517,blue,two-wheeler,Hero,Splendor,petrol,2021,Visakhapatnam
+out-target-001,KA17N4610,white,two-wheeler,Honda,Activa,petrol,2020,Bengaluru
+out-target-002,TS34Y5314,white,sedan,Maruti Suzuki,Ciaz,petrol,2015,Hyderabad
+out-target-003,UP31MG5408,black,hatchback,Maruti Suzuki,Baleno,petrol,2021,Lucknow
+out-target-004,WB16JG4755,white,hatchback,Renault,Kwid,petrol,2019,Kolkata
+out-target-005,TN07C9071,black,suv,Toyota,Fortuner,diesel,2014,Chennai
+out-target-006,PB24RU5501,green,suv,Toyota,Fortuner,diesel,2018,Ludhiana
+out-target-007,AP15BS7933,grey,suv,Toyota,Fortuner,diesel,2019,Visakhapatnam
+out-target-008,AP44QD9490,black,suv,Mahindra,Scorpio,diesel,2024,Visakhapatnam
+out-target-009,WB25L6924,white,suv,Toyota,Fortuner,diesel,2018,Kolkata
+out-target-010,GJ18VL6995,silver,hatchback,Tata,Altroz,diesel,2019,Ahmedabad
+out-target-011,TS26QF3148,black,bus,Tata,Starbus,diesel,2018,Hyderabad
+out-target-012,GJ36NG3389,black,two-wheeler,TVS,Apache,petrol,2014,Ahmedabad
+out-target-013,UP27EW9470,white,suv,Kia,Seltos,diesel,2018,Lucknow
+out-target-014,CG36N2621,white,two-wheeler,Honda,Activa,petrol,2021,Raipur
+out-target-015,KA29JM6903,blue,suv,Hyundai,Creta,petrol,2019,Bengaluru
+out-target-016,JH27M4259,grey,suv,Toyota,Fortuner,diesel,2016,Ranchi
+out-target-017,MP23XS8987,silver,two-wheeler,Hero,Splendor,petrol,2020,Indore
+out-target-018,MP30FW6527,grey,suv,Kia,Seltos,diesel,2015,Indore
+out-target-019,DL11HL6191,black,two-wheeler,Royal Enfield,Classic 350,petrol,2024,Delhi
+out-target-020,AP18MZ9535,silver,bus,Tata,Starbus,diesel,2014,Visakhapatnam
+out-target-021,TN16ZY2311,silver,hatchback,Maruti Suzuki,Swift,petrol,2015,Chennai
+out-target-022,PB36A7504,brown,suv,Mahindra,Scorpio,diesel,2018,Ludhiana
+out-target-023,TN06KH5053,silver,two-wheeler,Bajaj,Pulsar,petrol,2016,Chennai
+out-target-024,UP02X6846,silver,auto-rickshaw,Piaggio,Ape City,cng,2021,Lucknow
