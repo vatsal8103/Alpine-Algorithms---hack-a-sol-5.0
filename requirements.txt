@@ -1,0 +1,34 @@
+# ---- Core web + reporting ----
+fastapi>=0.110
+uvicorn[standard]>=0.29
+python-multipart>=0.0.9
+jinja2>=3.1
+pydantic>=2.6
+reportlab>=4.1
+streamlit>=1.30
+
+# ---- Computer vision ----
+numpy>=1.26
+opencv-python-headless>=4.9
+pillow>=10.2
+
+# ---- Pretrained detectors (recommended for real CCTV) ----
+# Ultralytics YOLO is used for vehicle detection. If it is not installed,
+# TRACE-X falls back to a heuristic plate localiser and records a warning.
+ultralytics>=8.2
+torch>=2.2
+torchvision>=0.17
+
+# ---- Pretrained OCR (recommended for real CCTV) ----
+# PaddleOCR is the primary OCR backend. Install it separately because the
+# paddlepaddle wheel is platform-specific:
+#   pip install paddlepaddle==2.6.2
+#   pip install "paddleocr>=2.7,<3"
+# If PaddleOCR is unavailable, TRACE-X uses the built-in template OCR
+# backend (works on the synthetic demo, not production footage).
+# paddlepaddle==2.6.2
+# paddleocr>=2.7,<3
+
+# ---- Dev / evaluation ----
+pytest>=8.0
+httpx>=0.27

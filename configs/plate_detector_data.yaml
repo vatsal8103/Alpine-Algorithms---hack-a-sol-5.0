@@ -1,0 +1,8 @@
+# Indian License Plate YOLOv8 Dataset Configuration
+path: data/plate_detection
+train: images/train
+val: images/val
+test: images/test
+
+names:
+  0: license_plate

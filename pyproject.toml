@@ -1,0 +1,34 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tracex"
+version = "0.1.0"
+description = "TRACE-X: explainable partial-number-plate vehicle shortlisting from CCTV"
+requires-python = ">=3.10"
+dependencies = [
+  "fastapi>=0.110",
+  "uvicorn[standard]>=0.29",
+  "python-multipart>=0.0.9",
+  "jinja2>=3.1",
+  "pydantic>=2.6",
+  "reportlab>=4.1",
+  "numpy>=1.26",
+  "opencv-python-headless>=4.9",
+  "pillow>=10.2",
+]
+
+[project.optional-dependencies]
+yolo = ["ultralytics>=8.2", "torch>=2.2", "torchvision>=0.17"]
+paddle = ["paddleocr>=2.7,<3"]
+dev = ["pytest>=8.0", "httpx>=0.27"]
+
+[project.scripts]
+tracex = "tracex.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["tracex*"]
+
+[tool.setuptools.package-data]
+tracex = ["templates/*.html", "static/*"]

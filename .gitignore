@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.env
+
+# Runtime artefacts
+runs/
+data/demo/clips/
+data/demo/frames/
+*.mp4
+*.avi
+*.mov
+*.mkv
+
+# Model weights
+*.pt
+*.onnx
+*.pth
+models/*.pt
+
+# OS / editors
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

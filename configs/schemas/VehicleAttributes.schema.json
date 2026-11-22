@@ -1,0 +1,92 @@
+{
+  "description": "Extracted visual attributes for a detected vehicle.",
+  "properties": {
+    "colour": {
+      "description": "Dominant detected vehicle colour name",
+      "title": "Colour",
+      "type": "string"
+    },
+    "colour_conf": {
+      "description": "Confidence in detected colour",
+      "maximum": 1.0,
+      "minimum": 0.0,
+      "title": "Colour Conf",
+      "type": "number"
+    },
+    "body_type": {
+      "description": "Classified body type (hatchback, sedan, SUV, two-wheeler, auto-rickshaw, truck, bus)",
+      "title": "Body Type",
+      "type": "string"
+    },
+    "body_conf": {
+      "description": "Confidence in classified body type",
+      "maximum": 1.0,
+      "minimum": 0.0,
+      "title": "Body Conf",
+      "type": "number"
+    },
+    "make": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Predicted manufacturer/make if identified",
+      "title": "Make"
+    },
+    "model": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Predicted vehicle model if identified",
+      "title": "Model"
+    },
+    "colour_distribution": {
+      "additionalProperties": {
+        "type": "number"
+      },
+      "description": "Probability distribution across candidate colours",
+      "title": "Colour Distribution",
+      "type": "object"
+    },
+    "body_distribution": {
+      "additionalProperties": {
+        "type": "number"
+      },
+      "description": "Probability distribution across candidate body types",
+      "title": "Body Distribution",
+      "type": "object"
+    },
+    "plate_style": {
+      "default": "white",
+      "description": "Detected plate background style (white, yellow, green, black)",
+      "title": "Plate Style",
+      "type": "string"
+    },
+    "plate_style_conf": {
+      "default": 0.0,
+      "maximum": 1.0,
+      "minimum": 0.0,
+      "title": "Plate Style Conf",
+      "type": "number"
+    }
+  },
+  "required": [
+    "colour",
+    "colour_conf",
+    "body_type",
+    "body_conf"
+  ],
+  "title": "VehicleAttributes",
+  "type": "object"
+}

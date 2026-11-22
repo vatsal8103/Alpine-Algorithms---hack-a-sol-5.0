@@ -1,0 +1,86 @@
+{
+  "description": "A vehicle entry in the regional registration database.",
+  "properties": {
+    "vehicle_id": {
+      "description": "Unique registry database primary key",
+      "title": "Vehicle Id",
+      "type": "string"
+    },
+    "registration_number": {
+      "description": "Standard registration plate string (e.g. JH05AB6799)",
+      "title": "Registration Number",
+      "type": "string"
+    },
+    "colour": {
+      "description": "Registered body colour",
+      "title": "Colour",
+      "type": "string"
+    },
+    "body_type": {
+      "description": "Registered vehicle body type",
+      "title": "Body Type",
+      "type": "string"
+    },
+    "make": {
+      "description": "Registered vehicle make",
+      "title": "Make",
+      "type": "string"
+    },
+    "model": {
+      "description": "Registered vehicle model",
+      "title": "Model",
+      "type": "string"
+    },
+    "fuel": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Fuel type (petrol, diesel, cng, electric)",
+      "title": "Fuel"
+    },
+    "year": {
+      "anyOf": [
+        {
+          "maximum": 2030,
+          "minimum": 1970,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Year of registration",
+      "title": "Year"
+    },
+    "owner_city": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "City / RTO jurisdiction",
+      "title": "Owner City"
+    }
+  },
+  "required": [
+    "vehicle_id",
+    "registration_number",
+    "colour",
+    "body_type",
+    "make",
+    "model"
+  ],
+  "title": "RegistryRecord",
+  "type": "object"
+}

@@ -1,0 +1,156 @@
+# ==============================================================================
+# TRACE-X Master Configuration
+# Problem Statement: AIML-01 (Hackasol 5.0)
+# All tunable hyperparameters, thresholds, model weights, and matrix paths live here.
+# ==============================================================================
+
+project:
+  name: "TRACE-X"
+  version: "1.0.0"
+  hackathon: "Hackasol 5.0 - Track 2 (AIML-01)"
+  seed: 42
+  disclaimer: >-
+    Highest-ranked candidate based on the evidence. Decision-support only.
+    Results are never a definitive identification. Never use as sole proof.
+
+# File and Directory Paths
+paths:
+  registry_csv: "data/registry/vehicles.csv"
+  registry_db: "data/registry/vehicles.sqlite"
+  clips_dir: "data/clips"
+  synth_plates_dir: "data/plates_synth"
+  labels_dir: "data/labels"
+  ground_truth_csv: "data/labels/ground_truth.csv"
+  runs_dir: "runs"
+  models_dir: "models"
+  colour_similarity_path: "configs/colour_similarity.json"
+  body_type_partial_credit_path: "configs/body_type_similarity.json"
+
+# Video Processing & Frame Extraction
+video:
+  frame_sampling_rate: 5          # Target extraction FPS (or sampling every N-th frame)
+  max_frames_to_process: 60       # Maximum frames to buffer per clip
+  min_sharpness: 25.0             # Minimum variance of Laplacian to retain frame
+  best_n_frames: 12               # Top N sharpest/largest-plate frames retained per track
+  min_plate_area_px: 600.0        # Minimum plate area (width * height) in pixels
+  jpeg_quality: 92                # Quality of saved visual crop artifacts
+  dedup_iou_threshold: 0.85       # Drop near-identical consecutive frames
+
+# Vehicle & Plate Detection & Tracking
+detector:
+  vehicle_model: "yolov8s.pt"     # Pretrained COCO YOLO model
+  plate_model: "models/plate_yolov8s.pt" # Fine-tuned Indian plate detector
+  vehicle_conf: 0.25              # Minimum confidence for vehicle detection
+  plate_conf: 0.25                # Minimum confidence for plate detection
+  iou_threshold: 0.45             # NMS IoU threshold
+  imgsz: 640                      # Inference image size
+  device: "cpu"                   # 'cpu' or 'cuda:0'
+  target_classes:                 # COCO vehicle classes: car, motorcycle, bus, truck
+    - 2  # car
+    - 3  # motorcycle
+    - 5  # bus
+    - 7  # truck
+  tracker: "bytetrack.yaml"       # ByteTrack configuration
+  track_high_thresh: 0.50
+  track_low_thresh: 0.10
+  new_track_thresh: 0.60
+  track_buffer: 30
+  match_thresh: 0.80
+
+# Plate OCR Inference & Calibration
+ocr:
+  backend: "auto"                 # 'paddle' | 'template' | 'auto'
+  lang: "en"
+  char_whitelist: "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+  min_char_conf: 0.28             # Individual character acceptance threshold
+  min_line_conf: 0.20             # Minimum average line confidence
+  temperature: 1.0                # Calibrated temperature scaling parameter
+  upscale_factor: 3.0             # Bilinear/Lanczos upscale factor for small plates
+  top_k_alternatives: 3           # Top alternative characters to retain from CTC head
+
+# Multi-Frame Fusion (Original Algorithm)
+fusion:
+  fusion_accept_threshold: 0.50   # Minimum posterior probability to accept a character
+  margin_threshold: 0.12          # Min margin (top_prob - runner_up_prob) to avoid '?'
+  weights:
+    sharpness: 0.35               # Weight exponent for frame sharpness
+    plate_area: 0.25              # Weight exponent for plate bounding box area
+    ocr_confidence: 0.40          # Weight exponent for frame mean OCR confidence
+  alternative_char_weight: 0.30   # Weight discount for CTC runner-up alternatives
+  apply_grammar_prior: true       # Enforce Indian vehicle registration syntax
+  min_frames_for_fusion: 1        # Minimum frames required to run fusion
+  max_plate_length: 10            # Standard length (e.g. JH05AB6799)
+  min_plate_length: 8             # Vintage / short series length
+
+# Character Confusion Pairs (O/0, B/8, I/1, S/5, Z/2, D/0, G/6, T/7, V/U)
+confusable_pairs:
+  - ["O", "0"]
+  - ["B", "8"]
+  - ["I", "1"]
+  - ["S", "5"]
+  - ["Z", "2"]
+  - ["D", "0"]
+  - ["G", "6"]
+  - ["T", "7"]
+  - ["V", "U"]
+  - ["Q", "0"]
+
+# Attribute Extraction
+attributes:
+  min_colour_conf: 0.30
+  min_body_conf: 0.35
+  colour_crop_region:             # Fractional vehicle bbox to crop (exclude glass/wheels)
+    ymin: 0.35
+    ymax: 0.80
+    xmin: 0.15
+    xmax: 0.85
+  body_classes:
+    - "hatchback"
+    - "sedan"
+    - "suv"
+    - "two-wheeler"
+    - "auto-rickshaw"
+    - "truck"
+    - "bus"
+
+# Registry Matching & Ranking Engine (Original Algorithm)
+ranking:
+  weights:
+    plate: 0.65                   # Weight of partial-plate positional match
+    colour: 0.15                  # Weight of body colour similarity
+    body: 0.12                    # Weight of body-type probability compatibility
+    visual: 0.08                  # Weight of visual appearance embedding (optional)
+  top_k: 5                        # Shortlist length
+  no_match_threshold: 0.52        # Scores below this trigger NO_CONFIDENT_MATCH
+  margin_threshold: 0.06          # Margin between #1 and #2 required when plate has '?'
+  max_plate_uncertainty: 0.40     # Max fraction of '?' allowed before margin check triggers
+  high_conf_char_threshold: 0.60  # Threshold above which character mismatch is hard contradiction
+  penalties:
+    known_mismatch: 1.00          # Penalty for mismatch of high-confidence character
+    confusable_mismatch: 0.35     # Reduced penalty if mismatch is a known confusion pair
+    wildcard_char: 0.05           # Minor penalty per unknown '?' character
+    length_mismatch: 0.40         # Gap penalty per character length delta
+
+# Backend API & Server
+api:
+  host: "0.0.0.0"
+  port: 8000
+  cors_origins: ["*"]
+  max_upload_mb: 200
+  task_timeout_seconds: 300
+  retention_hours: 24
+
+# UI Configuration
+ui:
+  theme: "dark"
+  primary_color: "#1e293b"
+  accent_color: "#3b82f6"
+  success_color: "#10b981"
+  warning_color: "#f59e0b"
+  danger_color: "#ef4444"
+
+# Report Generation
+report:
+  engine: "html_and_pdf"          # Jinja2 HTML with WeasyPrint/ReportLab PDF export
+  max_evidence_frames: 12
+  output_dir: "reports/output"

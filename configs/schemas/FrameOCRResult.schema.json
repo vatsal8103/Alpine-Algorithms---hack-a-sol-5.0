@@ -1,0 +1,131 @@
+{
+  "$defs": {
+    "CharAlternative": {
+      "description": "An alternative character prediction from the CTC or recognition model.",
+      "properties": {
+        "char": {
+          "description": "Single alphanumeric character or symbol",
+          "title": "Char",
+          "type": "string"
+        },
+        "prob": {
+          "description": "Calibrated probability",
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Prob",
+          "type": "number"
+        }
+      },
+      "required": [
+        "char",
+        "prob"
+      ],
+      "title": "CharAlternative",
+      "type": "object"
+    },
+    "CharCandidate": {
+      "description": "A character candidate at a specific position in an OCR reading.",
+      "properties": {
+        "char": {
+          "description": "Top predicted character",
+          "title": "Char",
+          "type": "string"
+        },
+        "prob": {
+          "description": "Calibrated confidence of top character",
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Prob",
+          "type": "number"
+        },
+        "alternatives": {
+          "description": "Top-N alternative candidates at this position",
+          "items": {
+            "$ref": "#/$defs/CharAlternative"
+          },
+          "title": "Alternatives",
+          "type": "array"
+        }
+      },
+      "required": [
+        "char",
+        "prob"
+      ],
+      "title": "CharCandidate",
+      "type": "object"
+    }
+  },
+  "description": "OCR inference output for a single video frame and tracked vehicle.",
+  "properties": {
+    "track_id": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "ByteTrack vehicle track ID",
+      "title": "Track Id"
+    },
+    "frame_no": {
+      "description": "Zero-indexed frame number in video",
+      "minimum": 0,
+      "title": "Frame No",
+      "type": "integer"
+    },
+    "timestamp": {
+      "description": "Timestamp in seconds from video start",
+      "minimum": 0.0,
+      "title": "Timestamp",
+      "type": "number"
+    },
+    "bbox": {
+      "description": "Bounding box [x1, y1, x2, y2] in pixels of vehicle or plate",
+      "items": {
+        "type": "number"
+      },
+      "maxItems": 4,
+      "minItems": 4,
+      "title": "Bbox",
+      "type": "array"
+    },
+    "plate_crop_path": {
+      "description": "Path to cropped plate image artifact",
+      "title": "Plate Crop Path",
+      "type": "string"
+    },
+    "sharpness": {
+      "description": "Variance of Laplacian sharpness score",
+      "minimum": 0.0,
+      "title": "Sharpness",
+      "type": "number"
+    },
+    "plate_area_px": {
+      "description": "Area of plate crop in pixels",
+      "minimum": 0.0,
+      "title": "Plate Area Px",
+      "type": "number"
+    },
+    "chars": {
+      "description": "Sequence of character candidates recognized in this frame",
+      "items": {
+        "$ref": "#/$defs/CharCandidate"
+      },
+      "title": "Chars",
+      "type": "array"
+    }
+  },
+  "required": [
+    "frame_no",
+    "timestamp",
+    "bbox",
+    "plate_crop_path",
+    "sharpness",
+    "plate_area_px"
+  ],
+  "title": "FrameOCRResult",
+  "type": "object"
+}

@@ -1,0 +1,9 @@
+{
+  "hatchback": {"hatchback": 1.0, "sedan": 0.70, "suv": 0.40, "auto-rickshaw": 0.05, "two-wheeler": 0.0, "truck": 0.0, "bus": 0.0},
+  "sedan": {"sedan": 1.0, "hatchback": 0.70, "suv": 0.45, "auto-rickshaw": 0.05, "two-wheeler": 0.0, "truck": 0.0, "bus": 0.0},
+  "suv": {"suv": 1.0, "sedan": 0.45, "hatchback": 0.40, "truck": 0.25, "auto-rickshaw": 0.05, "two-wheeler": 0.0, "bus": 0.10},
+  "two-wheeler": {"two-wheeler": 1.0, "auto-rickshaw": 0.25, "hatchback": 0.0, "sedan": 0.0, "suv": 0.0, "truck": 0.0, "bus": 0.0},
+  "auto-rickshaw": {"auto-rickshaw": 1.0, "two-wheeler": 0.25, "hatchback": 0.10, "sedan": 0.05, "suv": 0.05, "truck": 0.05, "bus": 0.0},
+  "truck": {"truck": 1.0, "bus": 0.45, "suv": 0.25, "auto-rickshaw": 0.05, "hatchback": 0.0, "sedan": 0.0, "two-wheeler": 0.0},
+  "bus": {"bus": 1.0, "truck": 0.45, "suv": 0.15, "auto-rickshaw": 0.0, "hatchback": 0.0, "sedan": 0.0, "two-wheeler": 0.0}
+}

@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>TRACE-X report · {{ result.job_id }}</title>
+<style>
+  :root{
+    --bg:#0b1418; --panel:#101f25; --panel2:#162b33; --ink:#e8f1f2;
+    --muted:#9bb3b9; --line:#27434c; --accent:#37d39b; --warn:#ff9b6a;
+    --blue:#69c7ff; --yellow:#ffd166; --mono:"Consolas","SFMono-Regular",monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+  .wrap{max-width:1180px;margin:0 auto;padding:28px 22px 60px}
+  .top{display:flex;justify-content:space-between;gap:18px;align-items:flex-start;border-bottom:1px solid var(--line);padding-bottom:18px;margin-bottom:18px}
+  .brand{font-size:30px;font-weight:800;letter-spacing:.08em}
+  .brand span{color:var(--accent)}
+  .sub{color:var(--muted);font-size:13px;margin-top:4px}
+  .meta{text-align:right;color:var(--muted);font-size:12px;line-height:1.7}
+  .banner{border:1px solid var(--line);border-left:6px solid var(--accent);background:linear-gradient(90deg,rgba(55,211,155,.13),rgba(55,211,155,.02));padding:16px 18px;border-radius:10px;margin:16px 0}
+  .banner.warn{border-left-color:var(--warn);background:linear-gradient(90deg,rgba(255,155,106,.14),rgba(255,155,106,.02))}
+  .banner h2{margin:0 0 6px;font-size:20px}
+  .banner p{margin:0;color:var(--muted)}
+  .disclaimer{border:1px dashed #3a5a63;color:#cfe0e3;background:#0f1c21;padding:10px 14px;border-radius:8px;font-size:12px;margin:12px 0 18px}
+  .grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:14px 0 22px}
+  .stat{background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:11px 12px}
+  .stat .k{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.06em}
+  .stat .v{font-size:17px;font-weight:700;margin-top:3px}
+  h3{font-size:15px;letter-spacing:.04em;text-transform:uppercase;color:#bfe5ea;margin:26px 0 10px;border-bottom:1px solid var(--line);padding-bottom:7px}
+  .plate{display:flex;gap:6px;flex-wrap:wrap;background:#0c181d;border:1px solid var(--line);padding:14px;border-radius:10px}
+  .pcell{min-width:62px;flex:1;text-align:center;background:#12252c;border:1px solid #2d4b55;border-radius:7px;padding:7px 4px 6px}
+  .pchar{font:700 30px/1.1 var(--mono);letter-spacing:.04em}
+  .pchar.unknown{color:var(--warn)}
+  .pconf{font:11px/1.2 var(--mono);color:var(--accent);margin-top:4px}
+  .pbar{height:4px;background:#1d343c;border-radius:3px;margin-top:5px;overflow:hidden}
+  .pbar > i{display:block;height:100%;background:var(--accent)}
+  .psup{font-size:10px;color:var(--muted);margin-top:4px}
+  .attrs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+  .attr{background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:11px 13px}
+  .attr .k{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.05em}
+  .attr .v{font-size:16px;font-weight:700;margin-top:3px;text-transform:capitalize}
+  .attr .c{font:11px/1.3 var(--mono);color:var(--accent)}
+  table{width:100%;border-collapse:collapse;background:var(--panel);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+  th,td{padding:8px 9px;border-bottom:1px solid var(--line);vertical-align:top;text-align:left;font-size:12px}
+  th{background:#152830;color:#bfe5ea;font-size:11px;text-transform:uppercase;letter-spacing:.05em}
+  tr:last-child td{border-bottom:none}
+  .frameimg{width:230px;max-width:100%;border-radius:6px;border:1px solid #2d4b55}
+  .plateimg{width:190px;max-width:100%;border-radius:4px;border:1px solid #2d4b55;background:#fff}
+  .mono{font-family:var(--mono)}
+  .muted{color:var(--muted)}
+  .chip{display:inline-block;border:1px solid #31525c;background:#102229;border-radius:5px;padding:1px 5px;margin:1px;font:11px/1.5 var(--mono)}
+  .chip b{color:var(--accent)}
+  .chip.unk b{color:var(--warn)}
+  .used{color:var(--accent);font-weight:700}
+  .unused{color:var(--muted)}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:14px 16px;margin:12px 0}
+  .card h4{margin:0 0 5px;font-size:17px}
+  .rank{display:inline-block;min-width:28px;text-align:center;background:#17343c;color:var(--accent);border:1px solid #2c515b;border-radius:6px;padding:2px 7px;margin-right:7px;font:700 13px var(--mono)}
+  .scoreline{color:var(--muted);font-size:12px;margin:4px 0 8px;font-family:var(--mono)}
+  .conf{font:700 22px var(--mono);color:var(--accent)}
+  ul.reasons{margin:6px 0 4px 18px;padding:0}
+  ul.reasons li{margin:3px 0;font-size:12.5px}
+  ul.conflicts{margin:6px 0 4px 18px;padding:0;color:#ffc1a7}
+  ul.conflicts li{margin:3px 0;font-size:12.5px}
+  .tag{display:inline-block;border-radius:5px;padding:2px 6px;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;margin-left:6px}
+  .tag.ok{background:rgba(55,211,155,.15);color:var(--accent);border:1px solid rgba(55,211,155,.35)}
+  .tag.bad{background:rgba(255,155,106,.13);color:var(--warn);border:1px solid rgba(255,155,106,.35)}
+  .small{font-size:11px;color:var(--muted)}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  footer{margin-top:34px;border-top:1px solid var(--line);padding-top:12px;color:var(--muted);font-size:11px;display:flex;justify-content:space-between;gap:14px}
+  @media(max-width:860px){.grid{grid-template-columns:repeat(2,1fr)}.attrs{grid-template-columns:1fr 1fr}.two{grid-template-columns:1fr}}
+  @media print{
+    body{background:#fff;color:#111;font-size:10px}
+    .wrap{max-width:none;padding:0}
+    .top,.banner,.card,.stat,.attr,table{background:#fff;color:#111;border-color:#bbb}
+    .banner{background:#f5f5f5}.disclaimer{background:#fff;color:#333;border-color:#999}
+    .pcell{background:#fafafa;border-color:#bbb}.pchar,.pconf{color:#111}.pbar{background:#ddd}.pbar>i{background:#2a9d75}
+    th{background:#eee;color:#111}.muted,.small,.sub,.meta{color:#555}
+    a{color:#111}
+    .card,.frame-row{break-inside:avoid}
+    h3{color:#111;border-color:#bbb}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div>
+      <div class="brand">TRACE<span>-X</span></div>
+      <div class="sub">Vehicle shortlist from partial number plates · decision support</div>
+    </div>
+    <div class="meta">
+      Case <span class="mono">{{ result.job_id }}</span><br/>
+      Generated {{ generated_at }}<br/>
+      Source: {{ result.source_name }}<br/>
+      Pipeline v{{ result.pipeline_version }}
+    </div>
+  </div>
+
+  <div class="disclaimer">{{ disclaimer }}</div>
+
+  <div class="banner {{ decision_class }}">
+    <h2>{{ decision_title }}</h2>
+    <p>{{ result.decision_reason }}</p>
+  </div>
+
+  <div class="grid">
+    <div class="stat"><div class="k">Frames sampled</div><div class="v">{{ result.n_frames_sampled }}</div></div>
+    <div class="stat"><div class="k">Plate characters known</div><div class="v">{{ result.fused_plate.known_chars }} / {{ result.fused_plate.text|length }}</div></div>
+    <div class="stat"><div class="k">Mean character confidence</div><div class="v">{{ "%.2f"|format(result.fused_plate.mean_confidence) }}</div></div>
+    <div class="stat"><div class="k">Top candidate confidence</div><div class="v">{{ "%.2f"|format(result.top_confidence) }}</div></div>
+    <div class="stat"><div class="k">Colour</div><div class="v" style="text-transform:capitalize">{{ result.attributes.color }}</div></div>
+    <div class="stat"><div class="k">Body type</div><div class="v" style="text-transform:capitalize">{{ result.attributes.body_type }}</div></div>
+    <div class="stat"><div class="k">Plate style</div><div class="v" style="text-transform:capitalize">{{ result.attributes.plate_style }}</div></div>
+    <div class="stat"><div class="k">Source / duration</div><div class="v">{{ result.source_kind }} · {{ "%.1f"|format(result.duration_s) }}s</div></div>
+  </div>
+
+  <h3>Fused plate evidence</h3>
+  {% if result.fused_plate.text %}
+  <div class="plate">
+    {% for c in plate_chars %}
+    <div class="pcell">
+      <div class="pchar {% if c.unknown %}unknown{% endif %}">{{ c.char }}</div>
+      <div class="pconf">{{ "%.2f"|format(c.confidence) }}</div>
+      <div class="pbar"><i style="width: {{ (c.confidence*100)|round(0) }}%"></i></div>
+      <div class="psup">{{ c.support }} frame{% if c.support != 1 %}s{% endif %}</div>
+    </div>
+    {% endfor %}
+  </div>
+  <p class="small">Each cell shows the fused character, calibrated confidence and number of supporting frames. <span class="mono">?</span> means the position could not be read; it is never filled from the registry.</p>
+  {% else %}
+  <p class="muted">No plate characters were recovered.</p>
+  {% endif %}
+
+  {% if result.fused_plate.class_corrections %}
+  <p class="small"><b>Grammar normalisations</b> (observed character reinterpreted, never invented):</p>
+  <ul class="reasons">
+    {% for c in result.fused_plate.class_corrections[:10] %}
+    <li>Position {{ c.position + 1 }}: {{ c.rule }} (confidence {{ "%.2f"|format(c.confidence) }})</li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+
+  <h3>Extracted attributes</h3>
+  <div class="attrs">
+    <div class="attr"><div class="k">Colour</div><div class="v">{{ result.attributes.color }}</div><div class="c">confidence {{ "%.2f"|format(result.attributes.color_confidence) }}</div></div>
+    <div class="attr"><div class="k">Body type</div><div class="v">{{ result.attributes.body_type }}</div><div class="c">confidence {{ "%.2f"|format(result.attributes.body_type_confidence) }}</div></div>
+    <div class="attr"><div class="k">Plate style</div><div class="v">{{ result.attributes.plate_style }}</div><div class="c">confidence {{ "%.2f"|format(result.attributes.plate_style_confidence) }}</div></div>
+    <div class="attr"><div class="k">Make / model</div><div class="v">{{ result.attributes.make }} {{ result.attributes.model }}</div><div class="c">confidence {{ "%.2f"|format(result.attributes.make_model_confidence) }}</div></div>
+    <div class="attr" style="grid-column:span 2"><div class="k">Attribute evidence</div>
+      {% if result.attributes.evidence %}
+      <ul class="reasons">{% for e in result.attributes.evidence %}<li>{{ e }}</li>{% endfor %}</ul>
+      {% else %}<div class="muted">No attribute evidence.</div>{% endif %}
+    </div>
+  </div>
+
+  <h3>Frame evidence</h3>
+  {% if frames %}
+  <table>
+    <thead><tr><th style="width:240px">Frame / plate crop</th><th>OCR reading</th><th>Per-character confidence</th><th>Status</th></tr></thead>
+    <tbody>
+    {% for f in frames %}
+      <tr class="frame-row">
+        <td>
+          {% if f.image_uri %}<img class="frameimg" src="{{ f.image_uri }}" alt="frame {{ f.index }}"/>{% endif %}
+          {% if f.plate_uri %}<div style="margin-top:6px"><img class="plateimg" src="{{ f.plate_uri }}" alt="plate crop"/></div>{% endif %}
+        </td>
+        <td>
+          <div><b>Frame {{ f.index }}</b> · t={{ "%.2f"|format(f.timestamp) }}s · q={{ "%.2f"|format(f.quality) }}</div>
+          <div class="mono" style="font-size:15px;margin:4px 0">{{ f.ocr_text }}</div>
+          <div class="small">mean OCR confidence {{ "%.2f"|format(f.ocr_confidence) }} · detector {{ f.detector_label }}{% if f.track_id is not none %} · track {{ f.track_id }}{% endif %}</div>
+        </td>
+        <td>
+          {% if f.pairs %}
+            {% for p in f.pairs %}
+            <span class="chip {% if p.char == '?' %}unk{% endif %}">{{ p.char }} <b>{{ "%.2f"|format(p.confidence) }}</b></span>
+            {% endfor %}
+          {% else %}<span class="muted">—</span>{% endif %}
+        </td>
+        <td>
+          {% if f.used %}<span class="used">USED</span>{% else %}<span class="unused">not used</span>{% endif %}
+          <div class="small">{{ f.reason }}</div>
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% else %}<p class="muted">No frames available.</p>{% endif %}
+
+  {% if result.decision == "SHORTLIST" and matches %}
+  <h3>Top-5 shortlist <span class="small">(highest-ranked candidates based on the evidence)</span></h3>
+  {% for m in matches %}
+  <div class="card">
+    <h4><span class="rank">#{{ m.rank }}</span><span class="mono">{{ m.plate }}</span> <span class="conf">{{ "%.2f"|format(m.confidence) }}</span>
+      {% if m.exact_plate %}<span class="tag ok">exact plate</span>{% endif %}
+      {% if m.conflicts %}<span class="tag bad">{{ m.conflicts|length }} conflict{% if m.conflicts|length != 1 %}s{% endif %}</span>{% endif %}
+    </h4>
+    <div style="text-transform:capitalize">{{ m.make }} {{ m.model }} · {{ m.color }} · {{ m.body_type }} · {{ m.plate_style }} plate · {{ m.category }}</div>
+    <div class="scoreline">overall {{ "%.2f"|format(m.score) }} · plate {{ "%.2f"|format(m.plate_score) }} · colour {% if m.color_score is not none %}{{ "%.2f"|format(m.color_score) }}{% else %}—{% endif %} · body {% if m.body_score is not none %}{{ "%.2f"|format(m.body_score) }}{% else %}—{% endif %} · style {% if m.plate_style_score is not none %}{{ "%.2f"|format(m.plate_style_score) }}{% else %}—{% endif %} · known {{ m.known_chars }}/{{ m.known_chars + m.unknown_chars }}</div>
+    <ul class="reasons">{% for r in m.reasons %}<li>{{ r }}</li>{% endfor %}</ul>
+    {% if m.conflicts %}<ul class="conflicts">{% for c in m.conflicts %}<li>{{ c }}</li>{% endfor %}</ul>{% endif %}
+  </div>
+  {% endfor %}
+  {% else %}
+  <h3>No confident match</h3>
+  <p>{{ result.decision_reason }}</p>
+  {% if near_misses %}
+  <p class="small">Near misses are shown for transparency only. They are <b>not</b> a confident identification.</p>
+  <table>
+    <thead><tr><th>Rank</th><th>Plate</th><th>Vehicle</th><th>Confidence</th><th>Why it was not shortlisted</th></tr></thead>
+    <tbody>
+    {% for m in near_misses %}
+      <tr>
+        <td>#{{ m.rank }}</td>
+        <td class="mono">{{ m.plate }}</td>
+        <td style="text-transform:capitalize">{{ m.make }} {{ m.model }} · {{ m.color }} · {{ m.body_type }}</td>
+        <td class="mono">{{ "%.2f"|format(m.confidence) }}</td>
+        <td>{{ m.rejection_reason or "Below the confidence / margin threshold." }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+  {% endif %}
+
+  {% if result.tracking %}
+  <h3>Cross-clip association</h3>
+  <div class="card">
+    <h4>{{ result.tracking.decision }} <span class="conf">{{ "%.2f"|format(result.tracking.confidence) }}</span></h4>
+    <p class="small">This is a hypothesis based on plate, colour, body and appearance evidence — not an identity claim.</p>
+    <ul class="reasons">{% for r in result.tracking.reasons %}<li>{{ r }}</li>{% endfor %}</ul>
+    {% if result.tracking.conflicts %}<ul class="conflicts">{% for c in result.tracking.conflicts %}<li>{{ c }}</li>{% endfor %}</ul>{% endif %}
+  </div>
+  {% endif %}
+
+  <h3>Warnings and limitations</h3>
+  <ul class="reasons">
+    {% for w in warnings %}<li>{{ w }}</li>{% endfor %}
+  </ul>
+  <p class="small">
+    <b>Method.</b> Pretrained YOLO vehicle detection (+ ByteTrack when available), plate localisation,
+    PaddleOCR or template OCR, team-authored confidence-weighted multi-frame character fusion, and
+    team-authored partial-plate + attribute ranking. Unknown characters are <span class="mono">?</span>
+    and are never filled from the registry. No super-resolution is used. Evaluation splits are by
+    clip/vehicle, never by frame.
+  </p>
+
+  <footer>
+    <span>TRACE-X · {{ result.job_id }} · decision support, not proof</span>
+    <span>Report generated {{ generated_at }}</span>
+  </footer>
+</div>
+</body>
+</html>

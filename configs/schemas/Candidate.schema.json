@@ -1,0 +1,100 @@
+{
+  "$defs": {
+    "ScoreBreakdown": {
+      "description": "Component-level similarity scores for an evaluated candidate.",
+      "properties": {
+        "plate": {
+          "description": "Positional partial-plate similarity",
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Plate",
+          "type": "number"
+        },
+        "colour": {
+          "description": "Colour compatibility score",
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Colour",
+          "type": "number"
+        },
+        "body": {
+          "description": "Body-type compatibility score",
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Body",
+          "type": "number"
+        },
+        "visual": {
+          "anyOf": [
+            {
+              "maximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Appearance / embedding similarity score",
+          "title": "Visual"
+        }
+      },
+      "required": [
+        "plate",
+        "colour",
+        "body"
+      ],
+      "title": "ScoreBreakdown",
+      "type": "object"
+    }
+  },
+  "description": "A shortlisted candidate vehicle from the registry with ranking rationale.",
+  "properties": {
+    "vehicle_id": {
+      "description": "Registry record identifier",
+      "title": "Vehicle Id",
+      "type": "string"
+    },
+    "registration_number": {
+      "description": "Full registration number",
+      "title": "Registration Number",
+      "type": "string"
+    },
+    "final_score": {
+      "description": "Weighted composite similarity score",
+      "maximum": 1.0,
+      "minimum": 0.0,
+      "title": "Final Score",
+      "type": "number"
+    },
+    "breakdown": {
+      "$ref": "#/$defs/ScoreBreakdown",
+      "description": "Component score breakdown"
+    },
+    "why_match": {
+      "description": "Evidence supporting this candidate match",
+      "items": {
+        "type": "string"
+      },
+      "title": "Why Match",
+      "type": "array"
+    },
+    "why_not": {
+      "description": "Evidence against this candidate or explaining why it is ranked lower",
+      "items": {
+        "type": "string"
+      },
+      "title": "Why Not",
+      "type": "array"
+    }
+  },
+  "required": [
+    "vehicle_id",
+    "registration_number",
+    "final_score",
+    "breakdown"
+  ],
+  "title": "Candidate",
+  "type": "object"
+}
