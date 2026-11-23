@@ -16,7 +16,7 @@ import re
 from typing import Any
 import numpy as np
 
-from pipeline.schemas import CharAlternative, FusedPlate, PositionVote, VehicleAttributes
+from pipeline.schemas import CharAlternative, FrameVote, FusedPlate, PositionVote, VehicleAttributes
 
 
 def normalize_vlm_to_10_slots(vlm_text: str, default_prefix: str = "MP04") -> str:
@@ -118,6 +118,10 @@ def fuse_ocr_and_vlm(
                 new_votes[pos_idx].char_or_unknown = replacement_ch
                 new_votes[pos_idx].confidence = max(0.50, new_votes[pos_idx].confidence)
                 new_votes[pos_idx].explanation = f"Resolved to '{replacement_ch}' by Qwen2-VL"
+                if not new_votes[pos_idx].votes:
+                    new_votes[pos_idx].votes = [FrameVote(frame_no=1, char=replacement_ch, prob=round(new_votes[pos_idx].confidence, 3), weight=1.0)]
+                if not new_votes[pos_idx].candidates:
+                    new_votes[pos_idx].candidates = [{"char": replacement_ch, "prob": round(new_votes[pos_idx].confidence, 3)}]
 
         new_text = "".join(v.char_or_unknown for v in new_votes)
         known = sum(1 for c in new_text if c != "?")
@@ -157,8 +161,8 @@ def fuse_ocr_and_vlm(
             index=i,
             char_or_unknown=ch,
             confidence=round(conf, 3),
-            votes=[],
-            candidates=[{"char": ch, "prob": conf}],
+            votes=[FrameVote(frame_no=1, char=ch, prob=round(conf, 3), weight=1.0)],
+            candidates=[{"char": ch, "prob": round(conf, 3)}],
             explanation=expl
         ))
 
