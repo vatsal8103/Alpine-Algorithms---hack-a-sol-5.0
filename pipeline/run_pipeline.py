@@ -227,7 +227,6 @@ def run_pipeline(
                 f_plate = FusedPlate(text="NOT FOUND", frames_used=f_plate.frames_used, unknown_count=0, mean_confidence=0.0)
             elif "?" in f_plate.text:
                 chars = list(f_plate.text)
-                defaults = "MP04AA1001"
                 for idx, ch in enumerate(chars):
                     if ch == "?":
                         cand_ch = None
@@ -237,11 +236,23 @@ def run_pipeline(
                                 if c.get("char") and c["char"] != "?":
                                     cand_ch = c["char"]
                                     break
-                        chars[idx] = cand_ch or (defaults[idx] if idx < len(defaults) else "0")
-                f_plate.text = "".join(chars)
-                f_plate.unknown_count = 0
+                        if cand_ch:
+                            chars[idx] = cand_ch
+                cand_str = "".join(chars)
+                from fusion.grammar import is_valid_indian_plate
+                if "?" not in cand_str and is_valid_indian_plate(cand_str):
+                    f_plate.text = cand_str
+                    f_plate.unknown_count = 0
+                    f_plate.format_valid = True
+                else:
+                    f_plate = FusedPlate(text="NOT FOUND", frames_used=f_plate.frames_used, unknown_count=0, mean_confidence=0.0)
         else:
             f_plate = FusedPlate(text="NOT FOUND", frames_used=0, unknown_count=0, mean_confidence=0.0)
+
+        # Enforce MoRTH Indian syntax verification on OCR output
+        from fusion.grammar import is_valid_indian_plate
+        if f_plate.text != "NOT FOUND" and not is_valid_indian_plate(f_plate.text):
+            f_plate = FusedPlate(text="NOT FOUND", frames_used=f_plate.frames_used, unknown_count=0, mean_confidence=0.0)
 
         track_classes = [item.get("cls") for item in obs if item.get("cls") is not None]
         dom_cls = max(set(track_classes), key=track_classes.count) if track_classes else None
@@ -595,9 +606,17 @@ def run_pipeline(
                     v_text = vlm.recognize(p_crop_path)
                     vlm.unload_model()
                     if v_text and len(v_text) >= 4:
-                        vlm_reading = v_text
-                        vlm_consulted = True
-                        print(f"[vlm] Target #{target_tid}: Qwen2-VL resolved plate as '{v_text}'")
+                        from fusion.grammar import is_valid_indian_plate
+                        if is_valid_indian_plate(v_text):
+                            from fusion.vlm_fusion import fuse_ocr_and_vlm
+                            fused_plate, _ = fuse_ocr_and_vlm(fused_plate, v_text)
+                            vlm_reading = v_text
+                            vlm_consulted = True
+                            top_5, decision, decision_reason = rank_candidates(
+                                fused_plate, attributes, registry,
+                                no_match_threshold=0.48, margin_threshold=0.06
+                            )
+                            print(f"[vlm] Target #{target_tid}: Qwen2-VL resolved plate as '{v_text}'")
             except Exception as e:
                 print(f"[vlm] Escalation bypassed: {e}")
 

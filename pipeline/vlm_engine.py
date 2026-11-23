@@ -29,19 +29,18 @@ from PIL import Image
 INDIAN_VLM_SYSTEM_PROMPT = (
     "You are an expert Indian forensic Automatic Number Plate Recognition (ANPR) system. "
     "Your objective is to read the exact vehicle registration number from the license plate crop.\n\n"
-    "Indian License Plate Rules:\n"
-    "1. Format is strictly: [State Code: 2 letters][RTO Code: 2 digits][Series: 1-2 letters][Number: 4 digits].\n"
-    "   Examples: DL01AB1234, MH12DE1433, KA03MN4821, CG04TR7788, UP32KL9021, MP04CY2090.\n"
-    "2. CRITICAL FOR TWO-LINE / SQUARE PLATES (Scooters, Motorcycles, Auto-Rickshaws, Trucks):\n"
+    "Indian License Plate Rules (CMVR 1989 / MoRTH):\n"
+    "1. Format is strictly: [State Code: 2 letters][RTO Code: 2 digits][Series: 1-3 letters][Number: 4 digits] "
+    "or Bharat series [2 digits]BH[4 digits][1-2 letters]. Example: DL01AB1234.\n"
+    "2. Valid 2-letter state codes include: MH, DL, KA, MP, CG, GJ, HR, UP, TN, KL, RJ, PB, WB, JH, GA, AP, TS, TG, etc.\n"
+    "3. NEVER invent or hallucinate characters. NEVER read shop signboards, restaurant awnings, advertisements, or English words.\n"
+    "4. CRITICAL SAFE ABSTENTION: If NO vehicle license plate is clearly visible in the image, or if the plate is completely unreadable/missing, "
+    "you MUST output ONLY the word NONE. Never guess or hallucinate when no plate is present.\n"
+    "5. CRITICAL FOR TWO-LINE / SQUARE PLATES (Scooters, Motorcycles, Auto-Rickshaws, Trucks):\n"
     "   - Plates often have TWO stacked lines: Top Line and Bottom Line.\n"
-    "   - Top Line: State Code + RTO Code (e.g. MP 04, DL 01, MH 12)\n"
-    "   - Bottom Line: Series Letters + Number (e.g. CY 2090, AB 1234, 2354)\n"
-    "   - You MUST read BOTH lines and concatenate them in order: Top Line followed by Bottom Line -> MP04CY2090.\n"
-    "   - NEVER output only the bottom line or only the top line. Both lines MUST be included.\n"
-    "3. Ignore High-Security (HSRP) artifacts: ignore the blue 'IND' stamp, chromium hologram sticker, "
-    "   screws/rivets, and Ashok Chakra stamp.\n"
-    "4. NO QUESTION MARKS: You MUST predict every character. Output ONLY the uppercase registration string "
-    "   without punctuation, spaces, question marks, or explanation. If any character is unclear, predict your single best guess."
+    "   - Read BOTH lines and concatenate them in topological order: Top Line followed by Bottom Line.\n"
+    "6. Ignore High-Security (HSRP) artifacts (blue 'IND' stamp, chromium hologram sticker, screws/rivets).\n"
+    "Output ONLY the uppercase registration string or NONE. Do not provide explanations."
 )
 
 
@@ -138,7 +137,8 @@ def recognize_via_lm_studio(
                         "text": (
                             "Read the Indian vehicle license plate in this image. "
                             "If it is a two-line scooter/motorcycle plate, read top line first then bottom line. "
-                            "Output ONLY the uppercase alphanumeric plate number."
+                            "If NO license plate is visible, output NONE. "
+                            "Output ONLY the uppercase alphanumeric plate number or NONE."
                         )
                     },
                     {
@@ -164,6 +164,11 @@ def recognize_via_lm_studio(
 
     cleaned = re.sub(r"[^A-Za-z0-9]", "", raw_text).upper()
     cleaned = re.sub(r"^(IND|INO|IMD|IRD|IHD|1ND)", "", cleaned)
+    if cleaned in {"NONE", "NOPLATE", "NOTFOUND", "UNREADABLE", "THELICENSE", "UNKNOWN"} or len(cleaned) < 7:
+        return ""
+    from fusion.grammar import is_valid_indian_plate
+    if not is_valid_indian_plate(cleaned):
+        return ""
     return cleaned
 
 
@@ -323,10 +328,11 @@ class Qwen2VLLicensePlateRecognizer:
 
         prompt_text = custom_prompt or (
             "Read the Indian vehicle license plate in this image. "
-            "IMPORTANT: If the plate has TWO LINES (stacked top and bottom, common on two-wheelers and scooters), "
-            "you MUST read BOTH lines: the top line (State + RTO code) followed by the bottom line (Series + number). "
-            "Concatenate BOTH lines into one single continuous string without spaces (e.g. MP04CY2090 or MP042354). "
-            "Predict every character. NEVER output '?' or question marks. Output ONLY the uppercase alphanumeric plate number."
+            "If the plate has TWO LINES (stacked top and bottom, common on two-wheelers and scooters), "
+            "read BOTH lines: the top line (State + RTO code) followed by the bottom line (Series + number) "
+            "into one single continuous string without spaces. "
+            "If NO vehicle license plate is clearly visible or readable, output ONLY the word NONE. "
+            "Output ONLY the uppercase alphanumeric plate number or NONE."
         )
 
         messages = [
@@ -366,10 +372,12 @@ class Qwen2VLLicensePlateRecognizer:
             cleaned = re.sub(r"[^A-Za-z0-9]", "", output_text).upper()
             # Strip HSRP prefix if inadvertently captured
             cleaned = re.sub(r"^(IND|INO|IMD|IRD|IHD|1ND)", "", cleaned)
-            if len(cleaned) < 10:
-                defaults = "MP04AA1001"
-                cleaned = (cleaned + defaults[len(cleaned):])[:10]
-            return cleaned[:10]
+            if cleaned in {"NONE", "NOPLATE", "NOTFOUND", "UNREADABLE", "THELICENSE", "UNKNOWN"} or len(cleaned) < 7:
+                return ""
+            from fusion.grammar import is_valid_indian_plate
+            if not is_valid_indian_plate(cleaned):
+                return ""
+            return cleaned[:11]
 
         except Exception as exc:
             print(f"[!] VLM recognition error: {exc}")

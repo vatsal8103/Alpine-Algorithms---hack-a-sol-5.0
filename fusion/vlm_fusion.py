@@ -5,9 +5,10 @@ Solves the core forensic problem:
    the VLM confirms or resolves the question marks to concrete characters ('Z').
 2. When fast OCR and VLM agree on characters (e.g. 'M', 'P', '1', '3', 'U', '2', '0', '5', '8'),
    the evidential confidence is boosted and averaged.
-3. When fast OCR is completely unreadable ('??????????'), VLM populates the full plate
-   with calibrated MoRTH slot tagging.
-4. Recalculates candidate matching scores against the vehicle registry.
+3. When fast OCR is completely unreadable ('??????????' or 'NOT FOUND'), VLM populates
+   the plate ONLY IF it satisfies Indian MoRTH registration grammar.
+4. If VLM reading is invalid (e.g. English words, wrong state code, shop signs) or vehicle has no plate,
+   enforces Forensic Safe Abstention ('NOT FOUND').
 """
 
 from __future__ import annotations
@@ -16,30 +17,21 @@ import re
 from typing import Any
 import numpy as np
 
+from fusion.grammar import is_valid_indian_plate, validate_plate_grammar
 from pipeline.schemas import CharAlternative, FrameVote, FusedPlate, PositionVote, VehicleAttributes
 
 
-def normalize_vlm_to_10_slots(vlm_text: str, default_prefix: str = "MP04") -> str:
-    """Normalize VLM plate reading (including 2-line 8/9 character plates) into a full 10-char string without '?'."""
+def normalize_vlm_to_10_slots(vlm_text: str) -> str:
+    """Normalize VLM plate reading into a clean uppercase string without dummy padding."""
+    if not vlm_text:
+        return ""
     clean = re.sub(r"[^A-Za-z0-9]", "", vlm_text).upper()
     clean = re.sub(r"^(IND|INO|IMD|IRD|IHD|1ND)", "", clean)
-    if len(clean) == 10:
-        return clean
-    # 8-character (e.g. MP042354) -> MP04AA2354
-    m8 = re.match(r"^([A-Z]{2})([0-9]{2})([0-9]{4})$", clean)
-    if m8:
-        return f"{m8.group(1)}{m8.group(2)}AA{m8.group(3)}"
-    # 9-character (e.g. MP04C2090) -> MP04AC2090
-    m9 = re.match(r"^([A-Z]{2})([0-9]{2})([A-Z])([0-9]{4})$", clean)
-    if m9:
-        return f"{m9.group(1)}{m9.group(2)}A{m9.group(3)}{m9.group(4)}"
-    # 4-character number only (e.g. 2354) -> MP04AA2354
-    m4 = re.match(r"^([0-9]{4})$", clean)
-    if m4:
-        return f"{default_prefix}AA{m4.group(1)}"
-    defaults = f"{default_prefix}AA1001"
-    padded = (clean + defaults[len(clean):])[:10]
-    return padded
+    if clean in {"NONE", "UNREADABLE", "NOPLATE", "NOTFOUND", "UNKNOWN", "THELICENSE"}:
+        return ""
+    if len(clean) < 7 or len(clean) > 11:
+        return ""
+    return clean
 
 
 def fuse_ocr_and_vlm(
@@ -47,24 +39,58 @@ def fuse_ocr_and_vlm(
     vlm_text: str,
     vlm_confidence: float = 0.88
 ) -> tuple[FusedPlate, dict[str, Any]]:
-    """Fuse multi-frame OCR FusedPlate with VLM reading, eliminating all '?' with concrete predictions."""
+    """Fuse multi-frame OCR FusedPlate with VLM reading, strictly enforcing MoRTH plate syntax."""
     clean_vlm = normalize_vlm_to_10_slots(vlm_text)
+    vlm_valid = is_valid_indian_plate(clean_vlm) if clean_vlm else False
 
-    if not clean_vlm:
-        clean_vlm = "MP04AA1001"
+    # If VLM provided no valid plate or text failed MoRTH grammar
+    if not clean_vlm or not vlm_valid:
+        # Check if fast OCR had a valid plate
+        if fused_plate and fused_plate.text not in ("NOT FOUND", "??????????") and fused_plate.format_valid:
+            return fused_plate, {
+                "resolved_chars": [],
+                "agreed_chars": [],
+                "corrected_chars": [],
+                "old_text": fused_plate.text,
+                "new_text": fused_plate.text,
+                "old_conf": fused_plate.mean_confidence,
+                "new_conf": fused_plate.mean_confidence,
+                "status": "vlm_rejected_prior_valid_kept"
+            }
+        # Safe abstention: honestly report NOT FOUND
+        abstain_plate = FusedPlate(
+            text="NOT FOUND",
+            per_position=[],
+            format_valid=False,
+            frames_used=fused_plate.frames_used if fused_plate else 0,
+            mean_confidence=0.0,
+            known_count=0,
+            unknown_count=0
+        )
+        return abstain_plate, {
+            "resolved_chars": [],
+            "agreed_chars": [],
+            "corrected_chars": [],
+            "old_text": fused_plate.text if fused_plate else "NOT FOUND",
+            "new_text": "NOT FOUND",
+            "old_conf": fused_plate.mean_confidence if fused_plate else 0.0,
+            "new_conf": 0.0,
+            "status": "abstain_not_found"
+        }
 
     resolved_chars: list[str] = []
     agreed_chars: list[str] = []
     corrected_chars: list[str] = []
 
-    # Case A: Previous fused plate has per-position votes
-    if fused_plate and fused_plate.per_position and len(fused_plate.per_position) == 10:
+    # Case A: Previous fused plate has per-position votes with matching length
+    target_len = len(clean_vlm)
+    if fused_plate and fused_plate.per_position and len(fused_plate.per_position) == target_len:
         new_votes: list[PositionVote] = []
-        for i in range(10):
+        for i in range(target_len):
             old_pv = fused_plate.per_position[i]
             old_ch = old_pv.char_or_unknown
             old_conf = float(old_pv.confidence or 0.0)
-            vlm_ch = clean_vlm[i] if i < len(clean_vlm) else "MP04AA1001"[i]
+            vlm_ch = clean_vlm[i]
 
             if old_ch == "?":
                 # Question mark resolved by VLM!
@@ -76,12 +102,12 @@ def fuse_ocr_and_vlm(
                     index=i,
                     char_or_unknown=new_ch,
                     confidence=round(new_conf, 3),
-                    votes=old_pv.votes,
+                    votes=old_pv.votes or [FrameVote(frame_no=1, char=new_ch, prob=round(new_conf, 3), weight=1.0)],
                     candidates=[{"char": new_ch, "prob": new_conf}],
                     explanation=explanation
                 ))
             elif old_ch == vlm_ch:
-                # Both models agree! Average and boost confidence
+                # Both models agree! Boost confidence
                 new_conf = min(0.99, (old_conf + vlm_confidence) / 2.0 + 0.05)
                 explanation = f"Cross-verified: Fast OCR ({round(old_conf*100)}%) and Qwen2-VL agreement"
                 agreed_chars.append(f"Pos #{i+1}: '{old_ch}' (conf: {round(old_conf*100)}% -> {round(new_conf*100)}%)")
@@ -94,10 +120,10 @@ def fuse_ocr_and_vlm(
                     explanation=explanation
                 ))
             else:
-                # Disagreement: if OCR was weak (<0.58), take VLM
-                if old_conf < 0.58:
+                # Disagreement: take VLM if OCR had low confidence
+                if old_conf < 0.65:
                     new_ch = vlm_ch
-                    new_conf = vlm_confidence * 0.90
+                    new_conf = vlm_confidence * 0.92
                     explanation = f"Corrected to Qwen2-VL '{new_ch}' (Fast OCR had low confidence {round(old_conf*100)}% on '{old_ch}')"
                     corrected_chars.append(f"Pos #{i+1}: '{old_ch}' ({round(old_conf*100)}%) -> '{new_ch}'")
                     new_votes.append(PositionVote(
@@ -111,10 +137,10 @@ def fuse_ocr_and_vlm(
                 else:
                     new_votes.append(old_pv)
 
-        # Guarantee NO question marks remain in new_votes
+        # Eliminate any accidental question marks remaining
         for pos_idx in range(len(new_votes)):
             if new_votes[pos_idx].char_or_unknown == "?":
-                replacement_ch = clean_vlm[pos_idx] if pos_idx < len(clean_vlm) and clean_vlm[pos_idx] != "?" else "MP04AA1001"[pos_idx]
+                replacement_ch = clean_vlm[pos_idx]
                 new_votes[pos_idx].char_or_unknown = replacement_ch
                 new_votes[pos_idx].confidence = max(0.50, new_votes[pos_idx].confidence)
                 new_votes[pos_idx].explanation = f"Resolved to '{replacement_ch}' by Qwen2-VL"
@@ -124,19 +150,17 @@ def fuse_ocr_and_vlm(
                     new_votes[pos_idx].candidates = [{"char": replacement_ch, "prob": round(new_votes[pos_idx].confidence, 3)}]
 
         new_text = "".join(v.char_or_unknown for v in new_votes)
-        known = sum(1 for c in new_text if c != "?")
-        unknown = 10 - known
         mean_c = round(float(np.mean([v.confidence for v in new_votes])), 3)
 
         updated_fused = FusedPlate(
             text=new_text,
             per_position=new_votes,
-            format_valid=(known >= 8),
+            format_valid=is_valid_indian_plate(new_text),
             frames_used=max(1, fused_plate.frames_used),
             mean_confidence=mean_c,
-            known_count=known,
-            unknown_count=unknown,
-            template=fused_plate.template,
+            known_count=len(new_text),
+            unknown_count=0,
+            template=fused_plate.template or "STANDARD",
             corrections=fused_plate.corrections + ([f"VLM resolved {len(resolved_chars)} missing characters"] if resolved_chars else []),
             flags=fused_plate.flags
         )
@@ -150,11 +174,9 @@ def fuse_ocr_and_vlm(
             "new_conf": mean_c
         }
 
-    # Case B: Completely unreadable plate (or no positions)
+    # Case B: Previously unreadable plate, different length, or no prior position votes
     new_votes = []
-    defaults = "MP04AA1001"
-    for i in range(10):
-        ch = clean_vlm[i] if i < len(clean_vlm) and clean_vlm[i] != "?" else defaults[i]
+    for i, ch in enumerate(clean_vlm):
         conf = vlm_confidence
         expl = f"Identified by Qwen2-VL as '{ch}'"
         new_votes.append(PositionVote(
@@ -166,26 +188,24 @@ def fuse_ocr_and_vlm(
             explanation=expl
         ))
 
-    new_text = "".join(v.char_or_unknown for v in new_votes)
-    known = 10
-    unknown = 0
     mean_c = round(float(np.mean([v.confidence for v in new_votes])), 3)
 
     updated_fused = FusedPlate(
-        text=new_text,
+        text=clean_vlm,
         per_position=new_votes,
         format_valid=True,
-        frames_used=1,
+        frames_used=max(1, fused_plate.frames_used if fused_plate else 1),
         mean_confidence=mean_c,
-        known_count=known,
-        unknown_count=unknown
+        known_count=len(clean_vlm),
+        unknown_count=0,
+        template="STANDARD"
     )
     return updated_fused, {
-        "resolved_chars": [f"Directly resolved from unreadable to '{new_text}'"],
+        "resolved_chars": [f"Directly resolved to '{clean_vlm}' via Qwen2-VL"],
         "agreed_chars": [],
         "corrected_chars": [],
-        "old_text": fused_plate.text if fused_plate else "??????????",
-        "new_text": new_text,
+        "old_text": fused_plate.text if fused_plate else "NOT FOUND",
+        "new_text": clean_vlm,
         "old_conf": fused_plate.mean_confidence if fused_plate else 0.0,
         "new_conf": mean_c
     }

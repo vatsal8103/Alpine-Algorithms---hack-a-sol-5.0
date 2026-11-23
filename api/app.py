@@ -581,45 +581,56 @@ def clarify_all_with_vlm(case_id: str) -> dict[str, Any]:
             continue
 
         tid = v.track_id
-        crop = case_dir / f"track_{tid}_plate.jpg"
-        if not crop.exists():
-            cands = list(case_dir.glob(f"crops/track_{tid}_*.png"))
+        crop = None
+        p_cand = case_dir / f"track_{tid}_plate.jpg"
+        if p_cand.exists() and p_cand.stat().st_size > 500:
+            crop = p_cand
+        else:
+            cands = list(case_dir.glob(f"crops/track_{tid}_*plate.png"))
             if cands:
                 crop = cands[0]
-            else:
-                thumb = case_dir / f"track_{tid}_thumb.jpg"
-                if thumb.exists():
-                    crop = thumb
+
+        # If vehicle has no localized license plate crop, enforce forensic safe abstention
         if not crop or not crop.exists():
             continue
 
         try:
             v_text = vlm.recognize(crop)
-            if v_text and len(v_text) >= 4:
+            from fusion.grammar import is_valid_indian_plate
+            if v_text and is_valid_indian_plate(v_text):
                 f_fused, stats = fuse_ocr_and_vlm(v.fused_plate, v_text)
-                v.fused_plate = f_fused
-                v.vlm_reading = v_text
-                cands, dec, dec_reason = rank_candidates(f_fused, v.attributes, registry)
-                v.candidates = cands
-                v.decision = dec
-                v.decision_reason = dec_reason
-                v.top_score = cands[0].final_score if cands else 0.0
-                if case_obj.all_vehicles and v.track_id == case_obj.all_vehicles[0].track_id:
-                    case_obj.fused_plate = f_fused
-                    case_obj.vlm_reading = v_text
-                    case_obj.vlm_consulted = True
-                    case_obj.candidates = cands
-                    case_obj.decision = dec
-                    case_obj.decision_reason = dec_reason
-                clarified_count += 1
-                clarified_items.append({
-                    "track_id": tid,
-                    "old_plate": stats.get("old_text", "??????????"),
-                    "vlm_reading": v_text,
-                    "fused_plate": f_fused.text,
-                    "new_confidence": f_fused.mean_confidence,
-                    "resolved": stats.get("resolved_chars", [])
-                })
+                if f_fused.text != "NOT FOUND" and f_fused.format_valid:
+                    v.fused_plate = f_fused
+                    v.vlm_reading = v_text
+                    cands, dec, dec_reason = rank_candidates(f_fused, v.attributes, registry)
+                    v.candidates = cands
+                    v.decision = dec
+                    v.decision_reason = dec_reason
+                    v.top_score = cands[0].final_score if cands else 0.0
+                    if case_obj.all_vehicles and v.track_id == case_obj.all_vehicles[0].track_id:
+                        case_obj.fused_plate = f_fused
+                        case_obj.vlm_reading = v_text
+                        case_obj.vlm_consulted = True
+                        case_obj.candidates = cands
+                        case_obj.decision = dec
+                        case_obj.decision_reason = dec_reason
+                    clarified_count += 1
+                    clarified_items.append({
+                        "track_id": tid,
+                        "old_plate": stats.get("old_text", "??????????"),
+                        "vlm_reading": v_text,
+                        "fused_plate": f_fused.text,
+                        "new_confidence": f_fused.mean_confidence,
+                        "resolved": stats.get("resolved_chars", [])
+                    })
+            else:
+                # If VLM output is invalid or unreadable, safely abstain
+                if not v.fused_plate or not v.fused_plate.format_valid or not is_valid_indian_plate(v.fused_plate.text):
+                    v.fused_plate = FusedPlate(text="NOT FOUND", per_position=[], format_valid=False, frames_used=v.fused_plate.frames_used if v.fused_plate else 0, mean_confidence=0.0, known_count=0, unknown_count=0)
+                    v.candidates = []
+                    v.decision = "NO_CONFIDENT_MATCH"
+                    v.decision_reason = f"No license plate was found or detected on Vehicle #{tid}."
+                    v.top_score = 0.0
         except Exception as e:
             print(f"[!] Error clarifying track {tid}: {e}")
 

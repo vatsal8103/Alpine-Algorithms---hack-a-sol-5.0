@@ -147,3 +147,28 @@ def test_property_no_unsupported_characters_ever_invented():
         parsed = parse_plate(posteriors)
         for i, ch in enumerate(parsed.text):
             assert ch in allowed_chars_per_pos[i], f"Pos {i}: character '{ch}' was invented without evidence!"
+
+
+@pytest.mark.parametrize("invalid_plate", [
+    "29074W0201",
+    "2500451001",
+    "H47BL41461",
+    "THELICENSE",
+    "VEGRESTAURANTIMITIMUIUNIAV",
+    "MP04235401",
+    "6018AA1001",
+    "6A0BAA2LOW"
+])
+def test_impossible_indian_plate_rejection(invalid_plate: str):
+    """Verify that impossible strings, shop signboards, and illegal formats are strictly rejected."""
+    from fusion.grammar import is_valid_indian_plate, validate_plate_grammar
+    from fusion.vlm_fusion import fuse_ocr_and_vlm
+
+    assert is_valid_indian_plate(invalid_plate) is False
+    assert validate_plate_grammar(invalid_plate) is False
+
+    # Fusion with impossible plates must safely abstain to NOT FOUND
+    fused, stats = fuse_ocr_and_vlm(None, invalid_plate)
+    assert fused.text == "NOT FOUND"
+    assert fused.format_valid is False
+

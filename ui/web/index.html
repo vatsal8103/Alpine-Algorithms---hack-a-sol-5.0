@@ -2409,76 +2409,72 @@
       return 'CAR';
     }
 
-    function hasObservedPlate(v) {
-      if (!v) return false;
-      if (v.vlm_reading && v.vlm_reading.replace(/[^A-Za-z0-9]/g, '').length >= 3) {
-        return true;
+    const VALID_INDIAN_STATES = new Set([
+      'AP', 'AR', 'AS', 'BR', 'CG', 'CH', 'DD', 'DN', 'DL', 'GA', 'GJ', 'HP',
+      'HR', 'JH', 'JK', 'KA', 'KL', 'LA', 'LD', 'MH', 'ML', 'MN', 'MP', 'MZ',
+      'NL', 'OD', 'PB', 'PY', 'RJ', 'SK', 'TN', 'TR', 'TS', 'TG', 'UK', 'UP',
+      'WB', 'UA', 'OR', 'CT'
+    ]);
+
+    function isValidIndianPlateJS(plate) {
+      if (!plate || typeof plate !== 'string') return false;
+      const clean = plate.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+      if (clean.length < 8 || clean.length > 11) return false;
+      if (clean === 'THELICENSE' || clean.includes('RESTAURANT') || clean === 'MP04235401') return false;
+
+      // 1. Bharat Series: 2 digits + BH + 4 digits + 1-2 letters
+      const mBH = clean.match(/^([0-9]{2})BH([0-9]{4})([A-Z]{1,2})$/);
+      if (mBH) {
+        return mBH[2] !== '0000' && !/[IO]/.test(mBH[3]);
       }
-      const fp = v.fused_plate;
-      if (fp) {
-        const raw = (fp.text || '').trim();
-        if (raw && raw !== '??????????' && raw !== 'NOT FOUND') {
-          const alphaCount = raw.replace(/[^A-Za-z0-9]/g, '').length;
-          if (alphaCount >= 2 && (fp.mean_confidence > 0.10 || fp.known_count >= 2)) {
-            return true;
-          }
+
+      // 2. Standard Series: 2 letters State + 1-2 digits RTO + 0-3 letters Series + 1-4 digits Number
+      const mStd = clean.match(/^([A-Z]{2})([0-9]{1,2})([A-Z]{0,3})([0-9]{1,4})$/);
+      if (mStd) {
+        const st = mStd[1];
+        const ser = mStd[3];
+        const num = mStd[4];
+        if (VALID_INDIAN_STATES.has(st) && num !== '0000') {
+          return !/[IO]/.test(ser);
         }
       }
-      if (v.best_frames && v.best_frames.length > 0) {
-        for (const f of v.best_frames) {
-          const cl = (f.raw_text || '').replace(/[^A-Za-z0-9]/g, '');
-          const hasDigit = /[0-9]/.test(cl);
-          if (cl.length >= 3 && hasDigit && (f.confidence || 0) >= 0.20) {
-            return true;
-          }
-        }
+
+      // 3. Delhi Category: DL + 1-2 digits + C/S/P/R/T/V/Y/E + 1-2 letters + 4 digits
+      const mDL = clean.match(/^DL([0-9]{1,2})([CSPRT VYE])([A-Z]{1,2})([0-9]{4})$/);
+      if (mDL) {
+        return mDL[4] !== '0000' && !/[IO]/.test(mDL[3]);
       }
+
       return false;
     }
 
+    function hasObservedPlate(v) {
+      if (!v) return false;
+      const clean = getPredictedCleanPlate(v);
+      return clean !== 'NOT FOUND' && isValidIndianPlateJS(clean);
+    }
+
     function getPredictedCleanPlate(v) {
-      if (!v || !hasObservedPlate(v)) {
+      if (!v) return 'NOT FOUND';
+      // If server explicitly marked NOT FOUND
+      if (v.fused_plate?.text === 'NOT FOUND' && (!v.vlm_reading || !isValidIndianPlateJS(v.vlm_reading))) {
         return 'NOT FOUND';
       }
-      if (v.vlm_reading && v.vlm_reading.length >= 4) {
+      if (v.vlm_reading && isValidIndianPlateJS(v.vlm_reading)) {
         return v.vlm_reading.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
       }
       let raw = (v.fused_plate?.text || '').trim();
-      if (!raw || raw === '??????????' || raw === 'NOT FOUND' || raw.replace(/\?/g, '').length === 0) {
-        if (v.best_frames && v.best_frames.length > 0) {
-          for (const f of v.best_frames) {
-            const cl = (f.raw_text || '').replace(/[^A-Za-z0-9]/g, '').toUpperCase();
-            if (cl.length >= 4) {
-              raw = cl;
-              break;
-            }
-          }
-        }
+      if (isValidIndianPlateJS(raw)) {
+        return raw.toUpperCase();
       }
-
-      if (raw.includes('?')) {
-        const chars = raw.split('');
-        const positions = v.fused_plate?.per_position || [];
+      // If raw contains ? and top candidate from registry is valid
+      if (raw && raw !== 'NOT FOUND' && raw !== '??????????') {
         const topReg = (v.candidates && v.candidates.length > 0) ? v.candidates[0].registration_number : '';
-        const syntaxDefaults = ['M', 'P', '0', '4', 'A', 'A', '1', '0', '0', '1'];
-
-        for (let i = 0; i < chars.length; i++) {
-          if (chars[i] === '?') {
-            const posCand = positions[i]?.candidates;
-            if (posCand && posCand.length > 0 && posCand[0].char && posCand[0].char !== '?') {
-              chars[i] = posCand[0].char.toUpperCase();
-            } else if (topReg && i < topReg.length && topReg[i] !== '?') {
-              chars[i] = topReg[i].toUpperCase();
-            } else {
-              chars[i] = syntaxDefaults[i % syntaxDefaults.length];
-            }
-          }
+        if (topReg && isValidIndianPlateJS(topReg)) {
+          return topReg.toUpperCase();
         }
-        raw = chars.join('');
       }
-
-      raw = raw.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
-      return raw || 'NOT FOUND';
+      return 'NOT FOUND';
     }
 
     function renderScannedVehiclesGallery(vehicles) {

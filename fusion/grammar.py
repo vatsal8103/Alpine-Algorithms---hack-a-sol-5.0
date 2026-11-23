@@ -450,7 +450,10 @@ def parse_plate(
                 if slot_val == "BH":
                     seg_score *= 1.3
                 else:
-                    seg_score *= 0.01
+                    seg_chars[slot_start] = "?"
+                    seg_chars[slot_start + 1] = "?"
+                    seg_flags.append("invalid_bh_tag")
+                    seg_score *= 0.001
 
             elif slot_id == "number":
                 if slot_val.replace("?", "") == "0" * len(slot_val.replace("?", "")):
@@ -520,10 +523,48 @@ def parse_plate_text(plate_text: str, allowed_confusion_twins: bool = True) -> P
     return parse_plate(posteriors)
 
 
+def is_valid_indian_plate(plate_text: str) -> bool:
+    """Strict verification of Indian vehicle registration plate syntax (CMVR 1989 / MoRTH).
+    
+    Returns True only if:
+    1. The string is non-empty and between 8 and 11 alphanumeric characters.
+    2. Does not contain '?' or noise tokens / words.
+    3. Matches Standard, Delhi, or Bharat series templates with recognized state codes.
+    """
+    clean = clean_noise(plate_text)
+    if not clean or len(clean) < 8 or len(clean) > 11 or "?" in clean:
+        return False
+    if not (any(c.isalpha() for c in clean) and any(c.isdigit() for c in clean)):
+        return False
+
+    # Check Bharat (BH) series: [2 digits year]BH[4 digits number][1-2 letters series]
+    m_bh = re.match(r"^([0-9]{2})BH([0-9]{4})([A-Z]{1,2})$", clean)
+    if m_bh:
+        num, ser = m_bh.group(2), m_bh.group(3)
+        return num != "0000" and not ("I" in ser or "O" in ser)
+
+    # Check Standard series: [2 letters State][1-2 digits RTO][0-3 letters Series][1-4 digits Number]
+    m_std = re.match(r"^([A-Z]{2})([0-9]{1,2})([A-Z]{0,3})([0-9]{1,4})$", clean)
+    if m_std:
+        st, rto, ser, num = m_std.groups()
+        if st in ALL_VALID_STATES and num != "0000":
+            return not ("I" in ser or "O" in ser)
+
+    # Check Delhi category series: DL[1-2 digits][C/S/P/R/T/V/Y/E][1-2 letters][4 digits]
+    m_dl = re.match(r"^DL([0-9]{1,2})([CSPRT VYE])([A-Z]{1,2})([0-9]{4})$", clean)
+    if m_dl:
+        num, ser = m_dl.group(4), m_dl.group(3)
+        return num != "0000" and not ("I" in ser or "O" in ser)
+
+    return False
+
+
 def validate_plate_grammar(plate_text: str) -> bool:
     """Validate whether plate text matches Indian legal grammar rules."""
     clean = clean_noise(plate_text)
     if not clean:
+        return False
+    if not is_valid_indian_plate(clean):
         return False
     parsed = parse_plate_text(clean, allowed_confusion_twins=False)
     return parsed.is_valid
