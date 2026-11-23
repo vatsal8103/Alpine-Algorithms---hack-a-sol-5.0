@@ -2400,11 +2400,12 @@
     function formatSimpleBodyType(bType) {
       if (!bType) return 'CAR';
       const b = bType.toLowerCase();
-      if (b.includes('auto') || b.includes('rickshaw')) return 'AUTO';
-      if (b.includes('car') || b.includes('suv') || b.includes('sedan') || b.includes('hatchback')) return 'CAR';
+      if (b.includes('auto') || b.includes('rickshaw') || b.includes('tuk')) return 'AUTO';
       if (b.includes('two') || b.includes('motorcycle') || b.includes('bike') || b.includes('scooter')) return 'TWO-WHEELER';
+      if (b.includes('suv')) return 'SUV';
       if (b.includes('truck') || b.includes('pickup') || b.includes('lorry')) return 'TRUCK';
       if (b.includes('bus')) return 'BUS';
+      if (b.includes('car') || b.includes('sedan') || b.includes('hatchback')) return 'CAR';
       return 'CAR';
     }
 

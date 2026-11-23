@@ -101,3 +101,36 @@ def test_cross_camera_implausible_travel_time():
     assert not match.same_vehicle
     assert not match.travel_time_feasible
     assert "Implausible travel time" in match.explanation
+
+
+def test_indian_body_type_classifier():
+    from scripts.train_bodytype import BodyTypeClassifier
+
+    clf = BodyTypeClassifier()
+
+    # 1. Narrow aspect -> two-wheeler
+    two_wheeler_crop = np.zeros((300, 150, 3), dtype=np.uint8)  # aspect 0.50
+    body, conf, _ = clf.predict(two_wheeler_crop)
+    assert body == "two-wheeler"
+    assert conf >= 0.85
+
+    # 2. Yellow canopy + auto aspect -> auto-rickshaw
+    auto_crop = np.zeros((200, 180, 3), dtype=np.uint8)  # aspect 0.90
+    auto_crop[:60, :] = [0, 215, 255]  # upper yellow canopy
+    body_a, conf_a, _ = clf.predict(auto_crop)
+    assert body_a == "auto-rickshaw"
+    assert conf_a >= 0.85
+
+    # 3. Square plate aspect -> two-wheeler
+    bike_crop = np.zeros((200, 200, 3), dtype=np.uint8)
+    sq_plate = np.zeros((100, 100, 3), dtype=np.uint8)
+    body_b, conf_b, _ = clf.predict(bike_crop, plate_crop=sq_plate)
+    assert body_b == "two-wheeler"
+    assert conf_b >= 0.85
+
+    # 4. Wide vehicle + YOLO truck -> truck
+    truck_crop = np.zeros((200, 300, 3), dtype=np.uint8)  # aspect 1.50
+    body_t, conf_t, _ = clf.predict(truck_crop, yolo_cls=7)
+    assert body_t == "truck"
+    assert conf_t >= 0.85
+

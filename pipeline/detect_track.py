@@ -52,7 +52,7 @@ class VehicleTracker:
                 source=img,
                 persist=True,
                 tracker="bytetrack.yaml",
-                classes=[2, 3, 5, 7],  # COCO car, motorcycle, bus, truck
+                classes=[1, 2, 3, 5, 7],  # COCO bicycle, car, motorcycle, bus, truck
                 imgsz=960 if max(img.shape[:2]) >= 1920 else 640,
                 conf=self.conf,
                 iou=self.iou,

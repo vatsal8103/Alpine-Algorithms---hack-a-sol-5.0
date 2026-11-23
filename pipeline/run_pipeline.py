@@ -251,7 +251,21 @@ def run_pipeline(
                         refined_crops.append(sub)
         crops_for_attr = v_crops
 
-        v_attr = extract_attributes(crops_for_attr, yolo_cls=dom_cls, user_hints=hints if (track_id_target == tid) else None)
+        # Extract best available plate crop for geometry inspection
+        sample_plate_crop = None
+        for vc_item, f_ocr in zip(v_crops, primary_f_ocrs):
+            if f_ocr and f_ocr.bbox and (f_ocr.bbox[2] > f_ocr.bbox[0]) and (f_ocr.bbox[3] > f_ocr.bbox[1]):
+                p_sub = vc_item[max(0, int(f_ocr.bbox[1])):int(f_ocr.bbox[3]), max(0, int(f_ocr.bbox[0])):int(f_ocr.bbox[2])]
+                if p_sub.size > 0:
+                    sample_plate_crop = p_sub
+                    break
+
+        v_attr = extract_attributes(
+            crops_for_attr,
+            yolo_cls=dom_cls,
+            user_hints=hints if (track_id_target == tid) else None,
+            plate_crop=sample_plate_crop
+        )
         cands, dec, dec_reason = rank_candidates(f_plate, v_attr, registry, no_match_threshold=0.48, margin_threshold=0.06)
 
         # Build top 5 TrackFrameEvidence list for investigator inspection

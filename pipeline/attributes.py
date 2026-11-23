@@ -75,39 +75,16 @@ def extract_dominant_colour(vehicle_crops: list[np.ndarray]) -> tuple[str, float
 def extract_attributes(
     vehicle_crops: list[np.ndarray],
     yolo_cls: int | None = None,
-    user_hints: dict[str, str] | None = None
+    user_hints: dict[str, str] | None = None,
+    plate_crop: np.ndarray | None = None
 ) -> VehicleAttributes:
     """Extract aggregated vehicle attributes with soft user-hint integration."""
     top_col, col_conf, col_dist = extract_dominant_colour(vehicle_crops)
 
     body_clf = BodyTypeClassifier()
-    # Predict body type using first available crop
+    # Predict body type using first available crop, plate geometry, and detector cues
     ref_crop = vehicle_crops[0] if vehicle_crops else np.zeros((100, 100, 3), dtype=np.uint8)
-    top_body, body_conf, body_dist = body_clf.predict(ref_crop)
-
-    # Reconcile with YOLO detector class when available
-    if yolo_cls is not None:
-        if yolo_cls == 2:  # Car / SUV / Sedan
-            if top_body not in ("hatchback", "sedan", "suv"):
-                # YOLO detected a car: ensure it is categorized as passenger car, never two-wheeler or auto-rickshaw
-                h, w = ref_crop.shape[:2]
-                aspect = w / float(max(1, h))
-                if aspect >= 1.45:
-                    top_body = "sedan"
-                elif aspect <= 1.20:
-                    top_body = "suv"
-                else:
-                    top_body = "hatchback"
-                body_conf = 0.88
-        elif yolo_cls in (0, 3):  # Rider / Motorcycle / Two-Wheeler
-            top_body = "two-wheeler"
-            body_conf = 0.90
-        elif yolo_cls == 7:  # Truck
-            top_body = "truck"
-            body_conf = 0.90
-        elif yolo_cls == 5:  # Bus
-            top_body = "bus"
-            body_conf = 0.90
+    top_body, body_conf, body_dist = body_clf.predict(ref_crop, plate_crop=plate_crop, yolo_cls=yolo_cls)
 
     # Plausible make/model inference
     make_map = {
