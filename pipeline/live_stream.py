@@ -71,6 +71,7 @@ def run_live_stream(
     )
 
     frame_idx = 0
+    fps_frames = 0
     t_last = time.time()
     fps_display = 0.0
 
@@ -85,10 +86,11 @@ def run_live_stream(
                 break
 
         frame_idx += 1
+        fps_frames += 1
         t_curr = time.time()
         if t_curr - t_last >= 1.0:
-            fps_display = frame_idx / (t_curr - t_last)
-            frame_idx = 0
+            fps_display = fps_frames / (t_curr - t_last)
+            fps_frames = 0
             t_last = t_curr
 
         h, w = frame.shape[:2]
@@ -128,7 +130,7 @@ def run_live_stream(
             track_buffers[tid].append(f_ocr)
 
             # Evidential fusion over rolling buffer
-            fused = fuse_frames(list(track_buffers[tid]), accept_threshold=0.50, margin_threshold=0.12)
+            fused = fuse_frames(list(track_buffers[tid]))
             fused_plate_text = fused.text
 
             # Extract attributes & Rank against registry

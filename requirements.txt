@@ -20,14 +20,10 @@ torch>=2.2
 torchvision>=0.17
 
 # ---- Pretrained OCR (recommended for real CCTV) ----
-# PaddleOCR is the primary OCR backend. Install it separately because the
-# paddlepaddle wheel is platform-specific:
-#   pip install paddlepaddle==2.6.2
-#   pip install "paddleocr>=2.7,<3"
-# If PaddleOCR is unavailable, TRACE-X uses the built-in template OCR
-# backend (works on the synthetic demo, not production footage).
-# paddlepaddle==2.6.2
-# paddleocr>=2.7,<3
+fast-plate-ocr>=1.1.0
+onnxruntime>=1.17
+# PaddleOCR / EasyOCR fallbacks:
+easyocr>=1.7.0
 
 # ---- Dev / evaluation ----
 pytest>=8.0

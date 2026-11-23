@@ -9,9 +9,9 @@ def compute_frame_weights(
     sharpness_scores: list[float],
     plate_areas: list[float],
     mean_confs: list[float],
-    w_sharp: float = 0.35,
-    w_area: float = 0.25,
-    w_conf: float = 0.40
+    w_sharp: float = 0.30,
+    w_area: float = 0.20,
+    w_conf: float = 1.20
 ) -> list[float]:
     """Compute normalized frame weights using power law formula."""
     if not sharpness_scores:

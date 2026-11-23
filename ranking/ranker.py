@@ -30,25 +30,26 @@ def rank_candidates(
     attributes: VehicleAttributes,
     registry: list[RegistryRecord],
     weights: dict[str, float] | None = None,
-    no_match_threshold: float = 0.52,
+    no_match_threshold: float = 0.48,
     margin_threshold: float = 0.06,
     max_uncertainty_threshold: float = 0.40,
-    high_conf_threshold: float = 0.60
+    high_conf_threshold: float = 0.70
 ) -> tuple[list[Candidate], Literal["MATCH_FOUND", "NO_CONFIDENT_MATCH"], str]:
     """Score all registry entries, rank them, and apply forensic abstention rules.
     
     Abstention Conditions (returns NO_CONFIDENT_MATCH):
-    1. Score < no_match_threshold (e.g. 0.52)
+    1. Score < no_match_threshold (e.g. 0.48)
     2. High plate uncertainty (>40% '?') and margin to runner-up < margin_threshold (e.g. 0.06)
     3. Candidate contradicts any high-confidence verified plate character
     """
     if weights is None:
-        weights = {"plate": 0.65, "colour": 0.15, "body": 0.12, "visual": 0.08}
+        weights = {"plate": 0.60, "colour": 0.15, "body": 0.15, "make": 0.10}
 
-    w_plate = weights.get("plate", 0.65)
+    w_plate = weights.get("plate", 0.60)
     w_colour = weights.get("colour", 0.15)
-    w_body = weights.get("body", 0.12)
-    total_w = w_plate + w_colour + w_body
+    w_body = weights.get("body", 0.15)
+    w_make = weights.get("make", 0.10)
+    total_w = w_plate + w_colour + w_body + w_make
 
     plate_confs = [pv.confidence for pv in fused_plate.per_position] if fused_plate.per_position else None
     uncertainty = fused_plate.unknown_count / max(1, len(fused_plate.text))
@@ -65,14 +66,29 @@ def rank_candidates(
         c_score = score_colour(attributes.colour, rec.colour)
         b_score = score_body_type(attributes.body_type, rec.body_type)
 
-        raw_score = (w_plate * p_score + w_colour * c_score + w_body * b_score) / total_w
-        final_conf = calibrate_composite_confidence(raw_score, uncertainty)
+        # Make & model soft scoring
+        if attributes.make and rec.make and attributes.make.lower() == rec.make.lower():
+            m_score = 1.0
+            if attributes.model and rec.model and attributes.model.lower() == rec.model.lower():
+                m_score = 1.0
+        elif attributes.make in (None, "Unknown") or rec.make in (None, "Unknown"):
+            m_score = 0.50
+        else:
+            m_score = 0.20
+
+        raw_score = (w_plate * p_score + w_colour * c_score + w_body * b_score + w_make * m_score) / total_w
+        if high_conf_conflict:
+            # Candidate contradicts high-confidence video evidence
+            raw_score = max(0.0, raw_score - 0.40)
+            p_not.append("Severe penalty: contradicts verified high-confidence plate characters")
 
         why_match = list(p_match[:3])
         if c_score >= 0.70:
             why_match.append(f"Colour compatibility: observed '{attributes.colour}' vs registered '{rec.colour}' ({c_score:.2f})")
         if b_score >= 0.70:
             why_match.append(f"Body type compatibility: observed '{attributes.body_type}' vs registered '{rec.body_type}' ({b_score:.2f})")
+        if m_score >= 0.90:
+            why_match.append(f"Make compatibility: observed '{attributes.make}' vs registered '{rec.make}'")
 
         why_not = list(p_not[:3])
         if c_score < 0.40:
@@ -84,7 +100,7 @@ def rank_candidates(
             plate=p_score,
             colour=c_score,
             body=b_score,
-            visual=None
+            visual=round(m_score, 2)
         )
 
         cand = Candidate(
@@ -97,8 +113,8 @@ def rank_candidates(
         )
         scored_candidates.append((cand, high_conf_conflict))
 
-    # Sort descending by final score
-    scored_candidates.sort(key=lambda item: item[0].final_score, reverse=True)
+    # Sort: non-conflicting candidates prioritized, then descending by final score
+    scored_candidates.sort(key=lambda item: (0 if item[1] else 1, item[0].final_score), reverse=True)
     top_5_items = scored_candidates[:5]
     top_5 = [item[0] for item in top_5_items]
 

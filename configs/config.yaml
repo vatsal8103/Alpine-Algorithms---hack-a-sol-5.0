@@ -44,7 +44,7 @@ detector:
   plate_conf: 0.25                # Minimum confidence for plate detection
   iou_threshold: 0.45             # NMS IoU threshold
   imgsz: 640                      # Inference image size
-  device: "cpu"                   # 'cpu' or 'cuda:0'
+  device: "cuda:0"                # 'cpu' or 'cuda:0' (GPU accelerated)
   target_classes:                 # COCO vehicle classes: car, motorcycle, bus, truck
     - 2  # car
     - 3  # motorcycle
@@ -59,26 +59,31 @@ detector:
 
 # Plate OCR Inference & Calibration
 ocr:
-  backend: "auto"                 # 'paddle' | 'template' | 'auto'
+  backend: "finetuned"            # 'fast_plate_ocr' | 'finetuned' | 'easyocr' | 'paddle' | 'template' | 'auto'
+  use_finetuned: true            # Set true to use fine-tuned CRNN, false to use fast-plate-ocr CCT-XS (79.5% char acc)
+  fast_plate_model: "cct-xs-v2-global-model" # High-accuracy Conv-Transformer ONNX model
+  model_path: "models/ocr_candidate.pth" # Fine-tuned PyTorch CRNN weights (used in benchmark & offline mode)
+  calibration_path: "configs/ocr_calibration.json" # Calibrated temperature scaling parameter (T=0.5)
+  fallback_backend: "easyocr"     # Fallback engine if primary model missing
   lang: "en"
   char_whitelist: "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
   min_char_conf: 0.28             # Individual character acceptance threshold
   min_line_conf: 0.20             # Minimum average line confidence
-  temperature: 1.0                # Calibrated temperature scaling parameter
+  temperature: 0.5                # Optimal calibrated temperature
   upscale_factor: 3.0             # Bilinear/Lanczos upscale factor for small plates
   top_k_alternatives: 3           # Top alternative characters to retain from CTC head
 
 # Multi-Frame Fusion (Original Algorithm)
 fusion:
-  fusion_accept_threshold: 0.50   # Minimum posterior probability to accept a character
-  margin_threshold: 0.12          # Min margin (top_prob - runner_up_prob) to avoid '?'
+  fusion_accept_threshold: 0.70   # Minimum posterior probability to accept a character
+  margin_threshold: 0.15          # Min margin (top_prob - runner_up_prob) to avoid '?'
   weights:
     sharpness: 0.35               # Weight exponent for frame sharpness
     plate_area: 0.25              # Weight exponent for plate bounding box area
     ocr_confidence: 0.40          # Weight exponent for frame mean OCR confidence
   alternative_char_weight: 0.30   # Weight discount for CTC runner-up alternatives
   apply_grammar_prior: true       # Enforce Indian vehicle registration syntax
-  min_frames_for_fusion: 1        # Minimum frames required to run fusion
+  min_frames_for_fusion: 2        # Minimum frames required to run fusion
   max_plate_length: 10            # Standard length (e.g. JH05AB6799)
   min_plate_length: 8             # Vintage / short series length
 

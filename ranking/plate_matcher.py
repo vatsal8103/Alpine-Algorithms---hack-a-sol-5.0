@@ -1,6 +1,8 @@
-"""Positional plate scoring with confusable pair penalty reduction and match map generation."""
+"""Positional plate scoring with Needleman-Wunsch alignment, confusable pair penalty reduction and match map generation."""
 
 from __future__ import annotations
+
+from fusion.align import align_sequences
 
 CONFUSION_PAIRS = {
     ("O", "0"), ("0", "O"),
@@ -13,6 +15,22 @@ CONFUSION_PAIRS = {
     ("T", "7"), ("7", "T"),
     ("V", "U"), ("U", "V"),
     ("Q", "0"), ("0", "Q"),
+    ("P", "D"), ("D", "P"),
+    ("E", "C"), ("C", "E"),
+    ("F", "C"), ("C", "F"),
+    ("G", "C"), ("C", "G"),
+    ("I", "J"), ("J", "I"),
+    ("J", "U"), ("U", "J"),
+    ("W", "U"), ("U", "W"),
+    ("A", "K"), ("K", "A"),
+    ("B", "0"), ("0", "B"),
+    ("8", "3"), ("3", "8"),
+    ("4", "A"), ("A", "4"),
+    ("1", "L"), ("L", "1"),
+    ("L", "4"), ("4", "L"),
+    ("H", "J"), ("J", "H"),
+    ("D", "O"), ("O", "D"),
+    ("C", "O"), ("O", "C"),
 }
 
 
@@ -20,12 +38,12 @@ def score_plate(
     fused_text: str,
     registry_plate: str,
     position_confidences: list[float] | None = None,
-    confusable_penalty: float = 0.35,
-    mismatch_penalty: float = 1.00,
-    gap_penalty: float = 0.40,
-    high_conf_threshold: float = 0.60
+    confusable_penalty: float = 0.25,
+    mismatch_penalty: float = 0.90,
+    gap_penalty: float = 0.25,
+    high_conf_threshold: float = 0.70
 ) -> tuple[float, list[dict[str, str]], list[str], list[str], bool]:
-    """Positional comparison between fused plate (with '?') and candidate plate.
+    """Positional comparison between fused plate (with '?') and candidate plate using alignment.
     
     Returns:
         (plate_score, match_map, why_match, why_not, has_high_conf_conflict)
@@ -37,49 +55,53 @@ def score_plate(
     if max_len == 0:
         return 0.0, [], [], ["Empty plate strings"], False
 
-    confs = position_confidences or [0.85] * len(fused_clean)
+    confs = position_confidences or [1.0] * len(fused_clean)
     while len(confs) < len(fused_clean):
-        confs.append(0.85)
+        confs.append(1.0)
+
+    # Use Needleman-Wunsch sequence alignment to handle single-digit RTOs, insertions, or occlusions
+    a1, a2 = align_sequences(fused_clean, reg_clean)
 
     earned_points = 0.0
-    max_possible = float(max_len)
     match_map: list[dict[str, str]] = []
     why_match: list[str] = []
     why_not: list[str] = []
     has_high_conf_conflict = False
 
-    comp_len = min(len(fused_clean), len(reg_clean))
+    fused_idx = 0
+    for idx, (c1, c2) in enumerate(zip(a1, a2)):
+        c_conf = confs[fused_idx] if (c1 != "-" and fused_idx < len(confs)) else 0.80
 
-    for idx in range(comp_len):
-        f_char = fused_clean[idx]
-        r_char = reg_clean[idx]
-        c_conf = confs[idx] if idx < len(confs) else 0.80
-
-        if f_char == "?":
+        if c1 == "?" or c2 == "?":
             # Wildcard / neutral: missing evidence does NOT earn positive match credit
-            # Neither rewards nor penalizes candidate
-            match_map.append({"pos": str(idx), "fused": "?", "cand": r_char, "status": "wildcard"})
-        elif f_char == r_char:
+            match_map.append({"pos": str(idx), "fused": "?", "cand": c2, "status": "wildcard"})
+            if c1 != "-":
+                fused_idx += 1
+        elif c1 == "-" or c2 == "-":
+            # Gap penalty for inserted/deleted characters
+            earned_points -= gap_penalty
+            match_map.append({"pos": str(idx), "fused": c1, "cand": c2, "status": "gap"})
+            why_not.append(f"Position {idx}: alignment gap '{c1}' vs '{c2}'")
+            if c1 != "-":
+                fused_idx += 1
+        elif c1 == c2:
             earned_points += (1.0 * c_conf)
-            match_map.append({"pos": str(idx), "fused": f_char, "cand": r_char, "status": "match"})
-            why_match.append(f"Position {idx}: verified match '{f_char}' (conf: {c_conf:.2f})")
-        elif (f_char, r_char) in CONFUSION_PAIRS:
+            match_map.append({"pos": str(idx), "fused": c1, "cand": c2, "status": "match"})
+            why_match.append(f"Position {idx}: verified match '{c1}' (conf: {c_conf:.2f})")
+            fused_idx += 1
+        elif (c1, c2) in CONFUSION_PAIRS:
             earned_points += max(0.0, (1.0 - confusable_penalty) * c_conf)
-            match_map.append({"pos": str(idx), "fused": f_char, "cand": r_char, "status": "confusable"})
-            why_not.append(f"Position {idx}: confusable pair '{f_char}' vs '{r_char}'")
+            match_map.append({"pos": str(idx), "fused": c1, "cand": c2, "status": "confusable"})
+            why_match.append(f"Position {idx}: confusable pair '{c1}' vs '{c2}'")
+            fused_idx += 1
         else:
             penalty = mismatch_penalty * c_conf
             earned_points -= penalty
-            match_map.append({"pos": str(idx), "fused": f_char, "cand": r_char, "status": "mismatch"})
-            why_not.append(f"Position {idx}: mismatch '{f_char}' vs '{r_char}' (penalty: -{penalty:.2f})")
+            match_map.append({"pos": str(idx), "fused": c1, "cand": c2, "status": "mismatch"})
+            why_not.append(f"Position {idx}: mismatch '{c1}' vs '{c2}' (penalty: -{penalty:.2f})")
             if c_conf >= high_conf_threshold:
                 has_high_conf_conflict = True
-
-    # Length mismatch gap penalty
-    len_delta = abs(len(fused_clean) - len(reg_clean))
-    if len_delta > 0:
-        earned_points -= (len_delta * gap_penalty)
-        why_not.append(f"Plate length mismatch ({len(fused_clean)} chars observed vs {len(reg_clean)} in registry)")
+            fused_idx += 1
 
     unknown_count = sum(1 for c in fused_clean if c == "?")
     if unknown_count > 0:
@@ -88,5 +110,5 @@ def score_plate(
         else:
             why_not.append(f"{unknown_count} plate character slot(s) unreadable in CCTV footage ('?')")
 
-    normalized_score = max(0.0, min(1.0, earned_points / max_possible))
+    normalized_score = max(0.0, min(1.0, earned_points / float(max_len)))
     return round(normalized_score, 3), match_map, why_match, why_not, has_high_conf_conflict

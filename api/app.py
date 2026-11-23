@@ -23,7 +23,7 @@ import uuid
 from pathlib import Path
 from typing import Any
 
-from fastapi import BackgroundTasks, FastAPI, File, Form, HTTPException, UploadFile
+from fastapi import BackgroundTasks, FastAPI, File, Form, HTTPException, Response, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
@@ -225,6 +225,17 @@ def get_case_status(case_id: str) -> dict[str, Any]:
     conn.close()
 
     if not row:
+        disk_result = Path("runs/cases") / case_id / "result.json"
+        if disk_result.exists():
+            return {
+                "case_id": case_id,
+                "status": "completed",
+                "stage": "completed",
+                "progress": 100.0,
+                "error": None,
+                "clip_name": "video",
+                "created_at": disk_result.stat().st_ctime
+            }
         raise HTTPException(status_code=404, detail="Case ID not found")
 
     return {
@@ -240,13 +251,81 @@ def get_case_status(case_id: str) -> dict[str, Any]:
 
 @app.get("/cases/{case_id}/tracks")
 def get_case_tracks(case_id: str) -> dict[str, Any]:
+    """Return all real scanned vehicles and tracks identified in video."""
+    try:
+        res = get_case_result(case_id)
+        tracks_data = []
+        for v in res.all_vehicles:
+            tracks_data.append({
+                "track_id": v.track_id,
+                "label": f"Vehicle #{v.track_id} ({v.attributes.colour.upper()} {v.attributes.body_type.upper()})",
+                "plate": v.fused_plate.text,
+                "conf": round(v.top_score, 3),
+                "decision": v.decision,
+                "frames": v.frame_count,
+                "thumb": v.thumbnail_url
+            })
+        return {"case_id": case_id, "tracks": tracks_data}
+    except Exception:
+        return {"case_id": case_id, "tracks": []}
+
+
+@app.get("/cases/{case_id}/frames")
+def get_case_frames(case_id: str) -> dict[str, Any]:
+    """Return real evidence crops, frame numbers, and character votes."""
+    crops_dir = Path("runs/cases") / case_id / "crops"
+    crops_list = []
+    if crops_dir.exists():
+        for p in sorted(crops_dir.glob("*.png")):
+            crops_list.append({
+                "filename": p.name,
+                "url": f"/runs/cases/{case_id}/crops/{p.name}"
+            })
+    try:
+        res = get_case_result(case_id)
+        positions = [p.model_dump(by_alias=True) for p in res.fused_plate.per_position]
+    except Exception:
+        positions = []
     return {
         "case_id": case_id,
-        "tracks": [
-            {"track_id": 1, "label": "Vehicle 1", "conf": 0.88, "frames": 12},
-            {"track_id": 2, "label": "Vehicle 2", "conf": 0.72, "frames": 8}
-        ]
+        "crops": crops_list,
+        "positions": positions
     }
+
+
+@app.get("/cases/{case_id}/tracks/{track_id}/frames")
+def get_track_frames(case_id: str, track_id: int) -> dict[str, Any]:
+    """Return top ranked evidence frames for a specific vehicle track."""
+    try:
+        res = get_case_result(case_id)
+        target_v = next((v for v in res.all_vehicles if v.track_id == track_id), None)
+        if target_v is not None and target_v.best_frames:
+            frames = [f.model_dump() for f in target_v.best_frames]
+            return {"case_id": case_id, "track_id": track_id, "frames": frames}
+
+        # Fallback to inspecting crops on disk for this track
+        crops_dir = Path("runs/cases") / case_id / "crops"
+        frames = []
+        if crops_dir.exists():
+            import re
+            for p in sorted(crops_dir.glob(f"track_{track_id}_*.png")):
+                m = re.search(r"f(\d+)_plate", p.name)
+                fno = int(m.group(1)) if m else 0
+                frames.append({
+                    "frame_no": fno,
+                    "timestamp": round(fno / 60.0, 2),
+                    "bbox": [0, 0, 100, 100],
+                    "plate_bbox": None,
+                    "sharpness": 100.0,
+                    "plate_area": 2500.0,
+                    "plate_crop_url": f"/runs/cases/{case_id}/crops/{p.name}",
+                    "raw_text": "",
+                    "confidence": 0.5,
+                    "chars": []
+                })
+        return {"case_id": case_id, "track_id": track_id, "frames": frames}
+    except Exception as e:
+        return {"case_id": case_id, "track_id": track_id, "frames": [], "error": str(e)}
 
 
 @app.post("/cases/{case_id}/select_track")
@@ -275,19 +354,48 @@ def get_case_result(case_id: str) -> CaseResult:
     cur = conn.cursor()
     cur.execute("SELECT result_json, status, error FROM cases WHERE case_id = ?", (case_id,))
     row = cur.fetchone()
-    conn.close()
 
     if not row:
+        disk_result = Path("runs/cases") / case_id / "result.json"
+        if disk_result.exists():
+            with open(disk_result, "r", encoding="utf-8") as f:
+                result_json = f.read()
+            try:
+                cur.execute("""
+                    INSERT OR REPLACE INTO cases (case_id, clip_name, clip_path, status, stage, progress, result_json, hints_json, created_at, updated_at)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """, (case_id, "video.mp4", str(disk_result), "completed", "completed", 100.0, result_json, "{}", disk_result.stat().st_ctime, time.time()))
+                conn.commit()
+            except Exception:
+                pass
+            conn.close()
+            return CaseResult.model_validate_json(result_json)
+        conn.close()
         raise HTTPException(status_code=404, detail="Case ID not found")
 
     result_json, status, error = row
     if status == "running" or status == "queued":
+        conn.close()
         raise HTTPException(status_code=202, detail="Analysis still in progress")
     if status == "failed":
+        conn.close()
         raise HTTPException(status_code=500, detail=f"Analysis failed: {error}")
     if not result_json:
+        disk_result = Path("runs/cases") / case_id / "result.json"
+        if disk_result.exists():
+            with open(disk_result, "r", encoding="utf-8") as f:
+                result_json = f.read()
+            try:
+                cur.execute("UPDATE cases SET result_json = ?, status = 'completed', stage = 'completed', progress = 100.0 WHERE case_id = ?", (result_json, case_id))
+                conn.commit()
+            except Exception:
+                pass
+            conn.close()
+            return CaseResult.model_validate_json(result_json)
+        conn.close()
         raise HTTPException(status_code=404, detail="No result found for case")
 
+    conn.close()
     return CaseResult.model_validate_json(result_json)
 
 
@@ -347,13 +455,25 @@ def compare_cases(req: CompareRequest) -> dict[str, Any]:
     }
 
 
+@app.get("/favicon.ico", include_in_schema=False)
+def favicon():
+    return Response(status_code=204)
+
+
 @app.get("/", response_class=HTMLResponse)
 def serve_dashboard() -> HTMLResponse:
     """Serve the lightweight, modern TRACE-X web interface."""
     index_file = Path("ui/web/index.html")
     if index_file.exists():
         with open(index_file, "r", encoding="utf-8") as f:
-            return HTMLResponse(content=f.read())
+            return HTMLResponse(
+                content=f.read(),
+                headers={
+                    "Cache-Control": "no-cache, no-store, must-revalidate",
+                    "Pragma": "no-cache",
+                    "Expires": "0"
+                }
+            )
     return HTMLResponse(content="<h1>TRACE-X Web Dashboard</h1><p>ui/web/index.html not found</p>")
 
 

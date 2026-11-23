@@ -62,3 +62,42 @@ def align_sequences(seq1: str, seq2: str, gap_penalty: float = 0.8) -> tuple[str
             j -= 1
 
     return "".join(reversed(al1)), "".join(reversed(al2))
+
+
+def align_chars_to_reference(
+    reference_seq: str,
+    char_candidates: list[Any]
+) -> list[Any | None]:
+    """Align a list of character candidates to a reference string using Needleman-Wunsch.
+    
+    Returns a list of length len(reference_seq) where each slot is either the corresponding
+    candidate from char_candidates, or None if that position was gapped.
+    """
+    if not char_candidates:
+        return [None] * len(reference_seq)
+    
+    cand_seq = "".join(getattr(c, "char", str(c)) for c in char_candidates)
+    if cand_seq == reference_seq:
+        return list(char_candidates)
+    
+    al_ref, al_cand = align_sequences(reference_seq, cand_seq)
+    
+    result: list[Any | None] = []
+    cand_idx = 0
+    ref_idx = 0
+    
+    for r_char, c_char in zip(al_ref, al_cand):
+        if r_char != "-":
+            if c_char != "-" and cand_idx < len(char_candidates):
+                result.append(char_candidates[cand_idx])
+            else:
+                result.append(None)
+        
+        if c_char != "-":
+            cand_idx += 1
+        if r_char != "-":
+            ref_idx += 1
+            
+    if len(result) < len(reference_seq):
+        result.extend([None] * (len(reference_seq) - len(result)))
+    return result[:len(reference_seq)]

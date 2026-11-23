@@ -106,6 +106,27 @@ class PositionVote(BaseModel):
         default=None,
         description="Human-readable reason if marked '?' (e.g. margin < threshold)"
     )
+    candidates: list[dict[str, Any]] = Field(
+        default_factory=list,
+        description="Top candidate characters and posterior probabilities for UI inspection/tooltips"
+    )
+
+
+class TrackFrameEvidence(BaseModel):
+    """Forensic evidence for a single video frame of a vehicle track."""
+    model_config = ConfigDict(extra="ignore")
+
+    frame_no: int = Field(..., ge=0, description="Video frame sequence number")
+    annotated_timestamp: float | None = Field(default=None, ge=0.0)
+    timestamp: float = Field(..., ge=0.0, description="Timestamp in seconds")
+    bbox: list[float] = Field(..., description="Vehicle bounding box [x1, y1, x2, y2]")
+    plate_bbox: list[float] | None = Field(default=None, description="Plate bounding box [px1, py1, px2, py2] in frame coordinates")
+    sharpness: float = Field(default=0.0, description="Variance of Laplacian sharpness score")
+    plate_area: float = Field(default=0.0, description="Plate crop area in pixels")
+    plate_crop_url: str = Field(default="", description="Web URL or path to plate crop image")
+    raw_text: str = Field(default="", description="Raw OCR prediction text")
+    confidence: float = Field(default=0.0, description="Overall OCR confidence for this frame")
+    chars: list[CharCandidate] = Field(default_factory=list, description="Per-character candidates and alternatives")
 
 
 class FusedPlate(BaseModel):
@@ -235,12 +256,17 @@ class VehicleScanItem(BaseModel):
     track_id: int = Field(..., description="Unique tracker ID for this vehicle")
     frame_count: int = Field(..., description="Number of observed video frames")
     thumbnail_url: str = Field(default="", description="Path to cropped vehicle thumbnail")
+    plate_crop_url: str = Field(default="", description="Path to cropped plate thumbnail")
     fused_plate: FusedPlate = Field(..., description="Consensus plate for this vehicle")
     attributes: VehicleAttributes = Field(..., description="Colour, body type, make/model")
     candidates: list[Candidate] = Field(default_factory=list, description="Top-5 shortlist")
     decision: Literal["MATCH_FOUND", "NO_CONFIDENT_MATCH"] = Field(..., description="Decision")
     decision_reason: str = Field(..., description="Plain-English explanation")
     top_score: float = Field(default=0.0, description="Highest candidate score")
+    best_frames: list[TrackFrameEvidence] = Field(
+        default_factory=list,
+        description="Top 5 forensic frames ranked by plate sharpness, area, and OCR confidence"
+    )
 
 
 class CaseResult(BaseModel):
@@ -271,6 +297,10 @@ class CaseResult(BaseModel):
     annotated_video_path: str | None = Field(
         default=None,
         description="Relative path to rendered video with bounding boxes and plate overlays"
+    )
+    original_video_url: str | None = Field(
+        default=None,
+        description="Relative path or URL to original CCTV video file"
     )
     thresholds_used: dict[str, float] = Field(
         default_factory=dict,

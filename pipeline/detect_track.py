@@ -6,31 +6,33 @@ import time
 from typing import Any
 import cv2
 import numpy as np
+import torch
 
 
 class VehicleTracker:
-    """Tracks vehicles across video frames using YOLOv8 and ByteTrack."""
+    """Tracks vehicles across video frames using YOLOv8 and ByteTrack (GPU Accelerated)."""
 
     def __init__(
         self,
         model_name: str = "yolov8s.pt",
-        conf: float = 0.25,
+        conf: float = 0.10,
         iou: float = 0.45,
-        device: str = "cpu"
+        device: str | None = None
     ) -> None:
         self.model_name = model_name
         self.conf = conf
         self.iou = iou
-        self.device = device
-        self._model: Any = None
-        self._init_yolo()
-
-    def _init_yolo(self) -> None:
+        self.device = device or ("cuda:0" if torch.cuda.is_available() else "cpu")
+        if torch.cuda.is_available() and str(self.device).startswith("cuda"):
+            try:
+                torch.backends.cudnn.benchmark = True
+            except Exception:
+                pass
         try:
             from ultralytics import YOLO
             self._model = YOLO(self.model_name)
-        except Exception as e:
-            self._model = None
+        except Exception as exc:
+            raise RuntimeError(f"Could not load vehicle detector {self.model_name}: {exc}") from exc
 
     def track(
         self,
@@ -45,48 +47,36 @@ class VehicleTracker:
         t0 = time.time()
         tracks: dict[int, list[dict[str, Any]]] = {}
 
-        if self._model is not None:
-            try:
-                for fno, ts, img, sharp in frames:
-                    results = self._model.track(
-                        source=img,
-                        persist=True,
-                        tracker="bytetrack.yaml",
-                        classes=[2, 3, 5, 7], # car, motorcycle, bus, truck
-                        conf=self.conf,
-                        iou=self.iou,
-                        device=self.device,
-                        verbose=False
-                    )
-                    if results and len(results[0].boxes) > 0:
-                        boxes = results[0].boxes
-                        for box in boxes:
-                            tid = int(box.id[0]) if box.id is not None else 1
-                            xyxy = box.xyxy[0].cpu().numpy().tolist()
-                            conf = float(box.conf[0])
-                            tracks.setdefault(tid, []).append({
-                                "frame_no": fno,
-                                "timestamp": ts,
-                                "bbox": [round(c, 1) for c in xyxy],
-                                "conf": round(conf, 3),
-                                "sharpness": sharp,
-                                "frame_image": img
-                            })
-            except Exception:
-                pass
-
-        # Fallback tracking if YOLO tracking yielded no tracks (or model missing)
-        if not tracks:
-            for fno, ts, img, sharp in frames:
-                h, w = img.shape[:2]
-                tracks.setdefault(1, []).append({
-                    "frame_no": fno,
-                    "timestamp": ts,
-                    "bbox": [float(w * 0.15), float(h * 0.20), float(w * 0.85), float(h * 0.85)],
-                    "conf": 0.90,
-                    "sharpness": sharp,
-                    "frame_image": img
-                })
+        for fno, ts, img, sharp in frames:
+            results = self._model.track(
+                source=img,
+                persist=True,
+                tracker="bytetrack.yaml",
+                classes=[2, 3, 5, 7],  # COCO car, motorcycle, bus, truck
+                imgsz=960 if max(img.shape[:2]) >= 1920 else 640,
+                conf=self.conf,
+                iou=self.iou,
+                device=self.device,
+                verbose=False
+            )
+            if results and len(results[0].boxes) > 0:
+                boxes = results[0].boxes
+                for box in boxes:
+                    if box.id is None:
+                        continue
+                    tid = int(box.id[0])
+                    xyxy = box.xyxy[0].cpu().numpy().tolist()
+                    conf = float(box.conf[0])
+                    cls_id = int(box.cls[0]) if box.cls is not None else 2
+                    tracks.setdefault(tid, []).append({
+                        "frame_no": fno,
+                        "timestamp": ts,
+                        "bbox": [round(c, 1) for c in xyxy],
+                        "conf": round(conf, 3),
+                        "cls": cls_id,
+                        "sharpness": sharp,
+                        "frame_image": img
+                    })
 
         elapsed_ms = (time.time() - t0) * 1000.0
         print(f"[detect_track] Tracked {len(tracks)} vehicle track(s) across {len(frames)} frames in {elapsed_ms:.1f}ms")
