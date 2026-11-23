@@ -141,15 +141,28 @@ def run_pipeline(
             pct = 25.0 + 50.0 * (idx_t / max(1, len(sorted_track_ids)))
             progress_cb("plate_and_ocr", round(pct, 1))
 
-        # Target track gets up to 15 frames, prominent tracks get up to 10, incidental tracks get 3
+        # Target track gets up to 15 frames, prominent tracks get up to 12, incidental tracks get 6
         if track_id_target == tid:
             track_best_n = 15
         elif len(obs) >= 6:
-            track_best_n = 10
+            track_best_n = 12
         else:
-            track_best_n = 3
+            track_best_n = min(6, len(obs))
 
         best_f = select_best_frames(obs, best_n=track_best_n)
+
+        # Prioritize candidate frames by quality descending (sharpness & vehicle area)
+        # This guarantees that mid/end frames where the vehicle is close & plate is sharp are evaluated first,
+        # preventing vehicles whose plates only appear later from being prematurely aborted.
+        eval_frames = sorted(
+            best_f,
+            key=lambda x: (
+                float(x.get("plate_sharpness", x.get("sharpness", 0.0))) *
+                max(1.0, (x["bbox"][2] - x["bbox"][0]) * (x["bbox"][3] - x["bbox"][1]))
+            ),
+            reverse=True
+        )
+
         v_crops = []
         all_f_ocrs = []
         primary_f_ocrs = []
@@ -157,7 +170,7 @@ def run_pipeline(
         unreadable = []
         consecutive_no_plate = 0
 
-        for idx, item in enumerate(best_f):
+        for idx, item in enumerate(eval_frames):
             f_img = item["frame_image"]
             bx = item["bbox"]
             vh, vw = f_img.shape[:2]
@@ -198,8 +211,8 @@ def run_pipeline(
                 consecutive_no_plate += 1
                 if len(unreadable) < 3:
                     unreadable.append((item, primary, vc))
-                # Early stop on non-plate objects (pedestrians, side-profile frames) after 4 fruitless attempts
-                if consecutive_no_plate >= 4 and len(tested_frames) == 0:
+                # Do not abort prematurely on initial blurry/angled entry frames; allow scanning across trajectory
+                if consecutive_no_plate >= 10 and len(tested_frames) == 0:
                     break
 
         if not tested_frames:
