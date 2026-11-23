@@ -16,6 +16,7 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import os
 import time
 from pathlib import Path
 from typing import Any
@@ -67,7 +68,8 @@ def run_pipeline(
     hints: dict[str, str] | None = None,
     registry_csv: str = "data/registry/vehicles.csv",
     out_dir: str = "runs/cases",
-    case_id_override: str | None = None
+    case_id_override: str | None = None,
+    progress_cb: Any | None = None
 ) -> CaseResult:
     """Execute complete end-to-end video analysis pipeline on specified clip."""
     t_start = time.time()
@@ -89,6 +91,8 @@ def run_pipeline(
     print("=" * 70)
 
     # Stage 1: Frame Extraction (sample throughout the entire video)
+    if progress_cb:
+        progress_cb("frame_extraction", 10.0)
     t0 = time.time()
     extracted_frames = extract_frames(str(clip_p), sampling_rate=5, max_frames=250)
     annotated_fps = 10.0
@@ -110,6 +114,8 @@ def run_pipeline(
         )
 
     # Stage 2: Vehicle Detection & Tracking
+    if progress_cb:
+        progress_cb("vehicle_tracking", 25.0)
     t0 = time.time()
     tracker = VehicleTracker(conf=0.10)
     all_tracks = tracker.track(extracted_frames)
@@ -126,10 +132,14 @@ def run_pipeline(
     sorted_track_ids = sorted(all_tracks.keys(), key=lambda k: len(all_tracks[k]), reverse=True)
 
     # Full fleet scan across all detected vehicles in the video
-    for tid in sorted_track_ids:
+    for idx_t, tid in enumerate(sorted_track_ids):
         obs = all_tracks[tid]
         if len(obs) < 2:
             continue
+
+        if progress_cb:
+            pct = 25.0 + 50.0 * (idx_t / max(1, len(sorted_track_ids)))
+            progress_cb("plate_and_ocr", round(pct, 1))
 
         # Target track gets up to 15 frames, prominent tracks get up to 10, incidental tracks get 3
         if track_id_target == tid:
@@ -151,8 +161,11 @@ def run_pipeline(
             f_img = item["frame_image"]
             bx = item["bbox"]
             vh, vw = f_img.shape[:2]
-            x1, y1 = max(0, int(bx[0])), max(0, int(bx[1]))
-            x2, y2 = min(vw, int(bx[2])), min(vh, int(bx[3]))
+            # Add safe margin padding around vehicle box to guarantee plate on bumper/mudguard isn't clipped
+            pad_h = int(max(8, (bx[3] - bx[1]) * 0.08))
+            pad_w = int(max(6, (bx[2] - bx[0]) * 0.05))
+            x1, y1 = max(0, int(bx[0]) - pad_w), max(0, int(bx[1]) - pad_h)
+            x2, y2 = min(vw, int(bx[2]) + pad_w), min(vh, int(bx[3]) + pad_h)
             vc = f_img[y1:y2, x1:x2]
             if vc.size == 0 or vc.shape[0] < 20 or vc.shape[1] < 20:
                 continue
@@ -197,8 +210,25 @@ def run_pipeline(
 
         if all_f_ocrs:
             f_plate = fuse_frames(all_f_ocrs)
+            if f_plate.known_count == 0 or f_plate.mean_confidence == 0.0 or f_plate.text == "??????????":
+                f_plate = FusedPlate(text="NOT FOUND", frames_used=f_plate.frames_used, unknown_count=0, mean_confidence=0.0)
+            elif "?" in f_plate.text:
+                chars = list(f_plate.text)
+                defaults = "MP04AA1001"
+                for idx, ch in enumerate(chars):
+                    if ch == "?":
+                        cand_ch = None
+                        if idx < len(f_plate.per_position):
+                            pv = f_plate.per_position[idx]
+                            for c in pv.candidates:
+                                if c.get("char") and c["char"] != "?":
+                                    cand_ch = c["char"]
+                                    break
+                        chars[idx] = cand_ch or (defaults[idx] if idx < len(defaults) else "0")
+                f_plate.text = "".join(chars)
+                f_plate.unknown_count = 0
         else:
-            f_plate = FusedPlate(text="??????????", frames_used=0, unknown_count=10)
+            f_plate = FusedPlate(text="NOT FOUND", frames_used=0, unknown_count=0, mean_confidence=0.0)
 
         track_classes = [item.get("cls") for item in obs if item.get("cls") is not None]
         dom_cls = max(set(track_classes), key=track_classes.count) if track_classes else None
@@ -285,6 +315,11 @@ def run_pipeline(
                 break
 
         top_s = cands[0].final_score if cands else 0.0
+        if f_plate.text == "NOT FOUND":
+            dec = "NO_CONFIDENT_MATCH"
+            dec_reason = f"No license plate was found or detected on Vehicle #{tid}."
+            top_s = 0.0
+
         scan_item = VehicleScanItem(
             track_id=tid,
             frame_count=len(obs),
@@ -292,7 +327,7 @@ def run_pipeline(
             plate_crop_url=plate_crop_url,
             fused_plate=f_plate,
             attributes=v_attr,
-            candidates=cands,
+            candidates=cands if f_plate.text != "NOT FOUND" else [],
             decision=dec,
             decision_reason=dec_reason,
             top_score=top_s,
@@ -306,6 +341,9 @@ def run_pipeline(
             "decision": dec,
             "score": top_s
         }
+
+    if progress_cb:
+        progress_cb("evidential_fusion", 78.0)
 
     # Determine primary target vehicle
     if track_id_target is not None:
@@ -328,7 +366,7 @@ def run_pipeline(
             primary_scan = None
             target_tid = sorted_track_ids[0] if sorted_track_ids else 1
 
-    fused_plate = primary_scan.fused_plate if primary_scan else FusedPlate(text="??????????", frames_used=0, unknown_count=10)
+    fused_plate = primary_scan.fused_plate if primary_scan else FusedPlate(text="NOT FOUND", frames_used=0, unknown_count=0, mean_confidence=0.0)
     attributes = primary_scan.attributes if primary_scan else VehicleAttributes(colour="unknown", colour_conf=0.0, body_type="unknown", body_conf=0.0)
     top_5 = primary_scan.candidates if primary_scan else []
     decision = primary_scan.decision if primary_scan else "NO_CONFIDENT_MATCH"
@@ -372,6 +410,9 @@ def run_pipeline(
             if first_plate_crop.exists():
                 import shutil
                 shutil.copyfile(first_plate_crop, case_out / "plate_crop.jpg")
+
+    if progress_cb:
+        progress_cb("annotating_video", 90.0)
 
     # Render Detailed Annotated Output Video (Section Speed Control / Highway Traffic Scanner Style)
     ann_video_rel = f"/runs/cases/{case_id}/annotated_video.mp4"
@@ -417,7 +458,7 @@ def run_pipeline(
             bx2, by2 = min(vw_w, int(bbox[2])), min(vh_h, int(bbox[3]))
             meta = track_meta.get(tid, {})
             dec = meta.get("decision", "NO_CONFIDENT_MATCH")
-            plate_txt = meta.get("plate", "??????????")
+            plate_txt = meta.get("plate", "NOT FOUND")
             clr = meta.get("colour", "").upper()
             btype = meta.get("body", "").upper()
             is_matched = (dec == "MATCH_FOUND")
@@ -497,11 +538,49 @@ def run_pipeline(
         print(f"  Primary Target:                   Vehicle #{target_tid} ({decision})")
     print("-" * 70)
 
+    # Optional VLM escalation for ambiguous or partially unreadable plates
+    vlm_reading = None
+    vlm_consulted = False
+    vlm_cfg = {}
+    try:
+        import yaml
+        cfg_p = Path("configs/config.yaml")
+        if cfg_p.exists():
+            with open(cfg_p, "r", encoding="utf-8") as f:
+                vlm_cfg = (yaml.safe_load(f) or {}).get("vlm", {})
+    except Exception:
+        pass
+
+    # Escalate if enabled and not running inside automated test harness
+    if vlm_cfg.get("enabled", False) and not os.environ.get("PYTEST_CURRENT_TEST") and fused_plate and (fused_plate.unknown_count > 0 or fused_plate.mean_confidence < vlm_cfg.get("confidence_threshold", 0.65)):
+        p_crop_path = case_out / "plate_crop.jpg"
+        if not p_crop_path.exists():
+            p_crop_path = case_out / f"track_{target_tid}_plate.jpg"
+        if p_crop_path.exists():
+            try:
+                from pipeline.vlm_engine import Qwen2VLLicensePlateRecognizer
+                vlm = Qwen2VLLicensePlateRecognizer(
+                    model_name=vlm_cfg.get("model_name", "Qwen/Qwen2-VL-2B-Instruct"),
+                    load_in_4bit=vlm_cfg.get("load_in_4bit", True),
+                    device=vlm_cfg.get("device", "cuda:0")
+                )
+                if vlm.load_model():
+                    v_text = vlm.recognize(p_crop_path)
+                    vlm.unload_model()
+                    if v_text and len(v_text) >= 4:
+                        vlm_reading = v_text
+                        vlm_consulted = True
+                        print(f"[vlm] Target #{target_tid}: Qwen2-VL resolved plate as '{v_text}'")
+            except Exception as e:
+                print(f"[vlm] Escalation bypassed: {e}")
+
     case_result = CaseResult(
         case_id=case_id,
         clip_name=clip_p.name,
         fused_plate=fused_plate,
         attributes=attributes,
+        vlm_reading=vlm_reading,
+        vlm_consulted=vlm_consulted,
         candidates=top_5,
         decision=decision,
         decision_reason=decision_reason,

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8"/>
-    <title>TRACE-X Forensic Investigation Report - case-up32kl9021_camA-6502</title>
+    <title>TRACE-X Forensic Investigation Report - case-up32kl9021_camA-7153</title>
     <style>
         @page { size: A4; margin: 18mm; }
         body {
@@ -113,14 +113,14 @@
         <h1>TRACE-X Forensic Vehicle Investigation Report</h1>
         <table class="meta-table">
             <tr>
-                <td><strong>Case ID:</strong> case-up32kl9021_camA-6502</td>
+                <td><strong>Case ID:</strong> case-up32kl9021_camA-7153</td>
                 <td><strong>Clip Name:</strong> up32kl9021_camA.mp4</td>
-                <td><strong>Analysis Date:</strong> 2026-11-22T16:55:05+00:00</td>
+                <td><strong>Analysis Date:</strong> 2026-11-22T22:39:17+00:00</td>
             </tr>
             <tr>
                 <td><strong>Pipeline Version:</strong> 1.0.0</td>
-                <td><strong>Frames Analyzed:</strong> 11</td>
-                <td><strong>Indian Plate Syntax:</strong> Ambiguous</td>
+                <td><strong>Frames Analyzed:</strong> 18</td>
+                <td><strong>Indian Plate Syntax:</strong> Valid</td>
             </tr>
         </table>
     </div>
@@ -129,7 +129,15 @@
     <div class="plate-box">
         
             
-                <span class="char-tile char-unknown">?</span>
+                <span class="char-tile">H</span>
+            
+        
+            
+                <span class="char-tile">R</span>
+            
+        
+            
+                <span class="char-tile">2</span>
             
         
             
@@ -137,7 +145,7 @@
             
         
             
-                <span class="char-tile char-unknown">?</span>
+                <span class="char-tile">K</span>
             
         
             
@@ -145,7 +153,11 @@
             
         
             
-                <span class="char-tile char-unknown">?</span>
+                <span class="char-tile">4</span>
+            
+        
+            
+                <span class="char-tile">0</span>
             
         
             
@@ -153,18 +165,14 @@
             
         
             
-                <span class="char-tile char-unknown">?</span>
-            
-        
-            
-                <span class="char-tile char-unknown">?</span>
+                <span class="char-tile">1</span>
             
         
     </div>
     <p style="font-size: 9.5pt; color: #475569;">
-        Mean Known Confidence: <strong>0.0%</strong> |
-        Resolved Slots: <strong>0/10</strong> |
-        Unresolved ('?'): <strong>8</strong>
+        Mean Known Confidence: <strong>85.4%</strong> |
+        Resolved Slots: <strong>7/10</strong> |
+        Unresolved ('?'): <strong>3</strong>
     </p>
 
     <div class="section-title">2. Extracted Vehicle Visual Attributes</div>
@@ -177,33 +185,38 @@
     <div class="section-title">3. Forensic Investigation Decision</div>
     <div class="decision-box decision-nomatch">
         <strong style="font-size: 12pt;">DECISION: NO_CONFIDENT_MATCH</strong><br/>
-        <span>License plate unreadable across sampled frames (100% unknown). Cannot verify match.</span>
+        <span>No candidate met the minimum confidence threshold (0.29 < 0.52).</span>
     </div>
 
-    <div class="section-title">4. Candidate Shortlist (Top 5 Ranked)</div>
+    <div class="section-title">4. Candidate Shortlist (Top 5 Ranked) — No Confident Match</div>
+    
+        <p style="font-size: 9pt; color: #991b1b; background: #fef2f2; padding: 8px 12px; border-radius: 5px; border: 1px solid #fca5a5; margin-bottom: 12px;">
+            <strong>Forensic Safe Abstention Notice:</strong> The license plate in this footage was unreadable across sampled frames (0% plate match credit). The entries below are ranked strictly by observed visual attributes (colour & body type) for investigative lead elimination only; none meet the required confidence threshold (0.52) for vehicle identification.
+        </p>
+    
     
         
             <div class="candidate-card">
                 <table style="width: 100%;">
                     <tr>
-                        <td><strong style="font-size: 12pt;">#1 — TN42F9095</strong> (v-0154)</td>
+                        <td><strong style="font-size: 12pt;">#1 — KA03MN4827</strong> (neg-confusable-003)</td>
                         <td style="text-align: right;">
-                            Composite Score: <strong>0.859</strong>
+                            Composite Score: <strong>0.293</strong>
                             <div class="score-bar">
-                                <div class="score-bar-fill" style="width: 85.9%;"></div>
+                                <div class="score-bar-fill" style="width: 29.299999999999997%;"></div>
                             </div>
                         </td>
                     </tr>
                 </table>
                 <div style="font-size: 9pt; margin-top: 6px;">
-                    Plate: 0.80 | Colour: 1.00 | Body: 1.00
+                    Plate: 0.00 | Colour: 1.00 | Body: 1.00
                 </div>
                 <div style="font-size: 9pt; margin-top: 4px;">
-                    <strong>Supporting Evidence:</strong> Position 0: unknown '?' is compatible with 'T'; Position 1: unknown '?' is compatible with 'N'; Position 2: unknown '?' is compatible with '4'; Colour compatibility: observed 'grey' vs registered 'grey' (1.00); Body type compatibility: observed 'suv' vs registered 'suv' (1.00)
+                    <strong>Supporting Evidence:</strong> Position 6: verified match '4' (conf: 0.91); Colour compatibility: observed 'grey' vs registered 'grey' (1.00); Body type compatibility: observed 'suv' vs registered 'suv' (1.00)
                 </div>
                 
                     <div style="font-size: 9pt; color: #b91c1c; margin-top: 2px;">
-                        <strong>Points of Discrepancy:</strong> Plate length mismatch (8 chars observed vs 9 in registry)
+                        <strong>Points of Discrepancy:</strong> Position 0: mismatch 'H' vs 'K' (penalty: -0.84); Position 1: mismatch 'R' vs 'A' (penalty: -0.74); Position 2: mismatch '2' vs '0' (penalty: -0.87)
                     </div>
                 
             </div>
@@ -211,24 +224,24 @@
             <div class="candidate-card">
                 <table style="width: 100%;">
                     <tr>
-                        <td><strong style="font-size: 12pt;">#2 — JH20L5662</strong> (v-0227)</td>
+                        <td><strong style="font-size: 12pt;">#2 — DL12DE1433</strong> (neg-samedigits-001)</td>
                         <td style="text-align: right;">
-                            Composite Score: <strong>0.859</strong>
+                            Composite Score: <strong>0.293</strong>
                             <div class="score-bar">
-                                <div class="score-bar-fill" style="width: 85.9%;"></div>
+                                <div class="score-bar-fill" style="width: 29.299999999999997%;"></div>
                             </div>
                         </td>
                     </tr>
                 </table>
                 <div style="font-size: 9pt; margin-top: 6px;">
-                    Plate: 0.80 | Colour: 1.00 | Body: 1.00
+                    Plate: 0.00 | Colour: 1.00 | Body: 1.00
                 </div>
                 <div style="font-size: 9pt; margin-top: 4px;">
-                    <strong>Supporting Evidence:</strong> Position 0: unknown '?' is compatible with 'J'; Position 1: unknown '?' is compatible with 'H'; Position 2: unknown '?' is compatible with '2'; Colour compatibility: observed 'grey' vs registered 'grey' (1.00); Body type compatibility: observed 'suv' vs registered 'suv' (1.00)
+                    <strong>Supporting Evidence:</strong> Colour compatibility: observed 'grey' vs registered 'grey' (1.00); Body type compatibility: observed 'suv' vs registered 'suv' (1.00)
                 </div>
                 
                     <div style="font-size: 9pt; color: #b91c1c; margin-top: 2px;">
-                        <strong>Points of Discrepancy:</strong> Plate length mismatch (8 chars observed vs 9 in registry)
+                        <strong>Points of Discrepancy:</strong> Position 0: mismatch 'H' vs 'D' (penalty: -0.84); Position 1: mismatch 'R' vs 'L' (penalty: -0.74); Position 2: mismatch '2' vs '1' (penalty: -0.87)
                     </div>
                 
             </div>
@@ -236,24 +249,24 @@
             <div class="candidate-card">
                 <table style="width: 100%;">
                     <tr>
-                        <td><strong style="font-size: 12pt;">#3 — TN26K3661</strong> (v-0268)</td>
+                        <td><strong style="font-size: 12pt;">#3 — KA34AZ3361</strong> (v-0108)</td>
                         <td style="text-align: right;">
-                            Composite Score: <strong>0.859</strong>
+                            Composite Score: <strong>0.293</strong>
                             <div class="score-bar">
-                                <div class="score-bar-fill" style="width: 85.9%;"></div>
+                                <div class="score-bar-fill" style="width: 29.299999999999997%;"></div>
                             </div>
                         </td>
                     </tr>
                 </table>
                 <div style="font-size: 9pt; margin-top: 6px;">
-                    Plate: 0.80 | Colour: 1.00 | Body: 1.00
+                    Plate: 0.00 | Colour: 1.00 | Body: 1.00
                 </div>
                 <div style="font-size: 9pt; margin-top: 4px;">
-                    <strong>Supporting Evidence:</strong> Position 0: unknown '?' is compatible with 'T'; Position 1: unknown '?' is compatible with 'N'; Position 2: unknown '?' is compatible with '2'; Colour compatibility: observed 'grey' vs registered 'grey' (1.00); Body type compatibility: observed 'suv' vs registered 'suv' (1.00)
+                    <strong>Supporting Evidence:</strong> Position 9: verified match '1' (conf: 0.74); Colour compatibility: observed 'grey' vs registered 'grey' (1.00); Body type compatibility: observed 'suv' vs registered 'suv' (1.00)
                 </div>
                 
                     <div style="font-size: 9pt; color: #b91c1c; margin-top: 2px;">
-                        <strong>Points of Discrepancy:</strong> Plate length mismatch (8 chars observed vs 9 in registry)
+                        <strong>Points of Discrepancy:</strong> Position 0: mismatch 'H' vs 'K' (penalty: -0.84); Position 1: mismatch 'R' vs 'A' (penalty: -0.74); Position 2: mismatch '2' vs '3' (penalty: -0.87)
                     </div>
                 
             </div>
@@ -261,24 +274,24 @@
             <div class="candidate-card">
                 <table style="width: 100%;">
                     <tr>
-                        <td><strong style="font-size: 12pt;">#4 — GJ36N9561</strong> (v-0374)</td>
+                        <td><strong style="font-size: 12pt;">#4 — AP41DX4830</strong> (v-0123)</td>
                         <td style="text-align: right;">
-                            Composite Score: <strong>0.859</strong>
+                            Composite Score: <strong>0.293</strong>
                             <div class="score-bar">
-                                <div class="score-bar-fill" style="width: 85.9%;"></div>
+                                <div class="score-bar-fill" style="width: 29.299999999999997%;"></div>
                             </div>
                         </td>
                     </tr>
                 </table>
                 <div style="font-size: 9pt; margin-top: 6px;">
-                    Plate: 0.80 | Colour: 1.00 | Body: 1.00
+                    Plate: 0.00 | Colour: 1.00 | Body: 1.00
                 </div>
                 <div style="font-size: 9pt; margin-top: 4px;">
-                    <strong>Supporting Evidence:</strong> Position 0: unknown '?' is compatible with 'G'; Position 1: unknown '?' is compatible with 'J'; Position 2: unknown '?' is compatible with '3'; Colour compatibility: observed 'grey' vs registered 'grey' (1.00); Body type compatibility: observed 'suv' vs registered 'suv' (1.00)
+                    <strong>Supporting Evidence:</strong> Position 6: verified match '4' (conf: 0.91); Colour compatibility: observed 'grey' vs registered 'grey' (1.00); Body type compatibility: observed 'suv' vs registered 'suv' (1.00)
                 </div>
                 
                     <div style="font-size: 9pt; color: #b91c1c; margin-top: 2px;">
-                        <strong>Points of Discrepancy:</strong> Plate length mismatch (8 chars observed vs 9 in registry)
+                        <strong>Points of Discrepancy:</strong> Position 0: mismatch 'H' vs 'A' (penalty: -0.84); Position 1: mismatch 'R' vs 'P' (penalty: -0.74); Position 2: mismatch '2' vs '4' (penalty: -0.87)
                     </div>
                 
             </div>
@@ -286,24 +299,24 @@
             <div class="candidate-card">
                 <table style="width: 100%;">
                     <tr>
-                        <td><strong style="font-size: 12pt;">#5 — JH04P8279</strong> (v-0410)</td>
+                        <td><strong style="font-size: 12pt;">#5 — TN42F9095</strong> (v-0154)</td>
                         <td style="text-align: right;">
-                            Composite Score: <strong>0.859</strong>
+                            Composite Score: <strong>0.293</strong>
                             <div class="score-bar">
-                                <div class="score-bar-fill" style="width: 85.9%;"></div>
+                                <div class="score-bar-fill" style="width: 29.299999999999997%;"></div>
                             </div>
                         </td>
                     </tr>
                 </table>
                 <div style="font-size: 9pt; margin-top: 6px;">
-                    Plate: 0.80 | Colour: 1.00 | Body: 1.00
+                    Plate: 0.00 | Colour: 1.00 | Body: 1.00
                 </div>
                 <div style="font-size: 9pt; margin-top: 4px;">
-                    <strong>Supporting Evidence:</strong> Position 0: unknown '?' is compatible with 'J'; Position 1: unknown '?' is compatible with 'H'; Position 2: unknown '?' is compatible with '0'; Colour compatibility: observed 'grey' vs registered 'grey' (1.00); Body type compatibility: observed 'suv' vs registered 'suv' (1.00)
+                    <strong>Supporting Evidence:</strong> Colour compatibility: observed 'grey' vs registered 'grey' (1.00); Body type compatibility: observed 'suv' vs registered 'suv' (1.00)
                 </div>
                 
                     <div style="font-size: 9pt; color: #b91c1c; margin-top: 2px;">
-                        <strong>Points of Discrepancy:</strong> Plate length mismatch (8 chars observed vs 9 in registry)
+                        <strong>Points of Discrepancy:</strong> Position 0: mismatch 'H' vs 'T' (penalty: -0.84); Position 1: mismatch 'R' vs 'N' (penalty: -0.74); Position 2: mismatch '2' vs '4' (penalty: -0.87)
                     </div>
                 
             </div>

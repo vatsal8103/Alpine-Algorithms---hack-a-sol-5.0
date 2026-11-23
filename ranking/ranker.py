@@ -61,6 +61,7 @@ def rank_candidates(
             fused_plate.text,
             rec.registration_number,
             position_confidences=plate_confs,
+            slot_map=fused_plate.slot_map,
             high_conf_threshold=high_conf_threshold
         )
         c_score = score_colour(attributes.colour, rec.colour)

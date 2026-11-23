@@ -33,22 +33,31 @@ class BodyTypeClassifier:
         aspect = w / float(max(1, h))
 
         probs = np.zeros(len(CLASSES), dtype=np.float32)
-        if aspect < 0.8:
+        if aspect < 0.85:
             # Tall/narrow: two-wheeler or auto-rickshaw
-            probs[3] = 0.65  # two-wheeler
-            probs[4] = 0.25  # auto-rickshaw
+            probs[3] = 0.70  # two-wheeler
+            probs[4] = 0.20  # auto-rickshaw
             probs[2] = 0.10  # suv
-        elif aspect > 2.0:
-            # Long/wide: truck or bus
-            probs[5] = 0.55  # truck
-            probs[6] = 0.35  # bus
-            probs[1] = 0.10  # sedan
+        elif aspect < 1.25:
+            # Boxy/three-wheeler: auto-rickshaw
+            probs[4] = 0.75  # auto-rickshaw
+            probs[0] = 0.15  # hatchback
+            probs[2] = 0.10  # suv
+        elif aspect < 1.55:
+            # Compact passenger: hatchback
+            probs[0] = 0.60  # hatchback
+            probs[2] = 0.25  # suv
+            probs[1] = 0.15  # sedan
+        elif aspect < 1.85:
+            # Elongated passenger: sedan / suv
+            probs[1] = 0.55  # sedan
+            probs[2] = 0.30  # suv
+            probs[0] = 0.15  # hatchback
         else:
-            # Standard ratio: car / suv
-            probs[2] = 0.45  # suv
-            probs[0] = 0.30  # hatchback
-            probs[1] = 0.20  # sedan
-            probs[4] = 0.05  # auto-rickshaw
+            # Long/wide: truck or bus
+            probs[5] = 0.60  # truck
+            probs[6] = 0.35  # bus
+            probs[1] = 0.05  # sedan
 
         top_idx = int(np.argmax(probs))
         dist = {cls_name: round(float(probs[i]), 3) for i, cls_name in enumerate(CLASSES)}

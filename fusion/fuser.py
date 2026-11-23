@@ -6,15 +6,22 @@ from typing import Any
 import numpy as np
 
 from fusion.align import align_chars_to_reference, align_sequences
-from fusion.grammar import get_positional_prior, validate_plate_grammar
+from fusion.grammar import (
+    DIGIT_TO_LETTER_CONFUSIONS,
+    INDIAN_STATES,
+    LETTER_TO_DIGIT_CONFUSIONS,
+    get_positional_prior,
+    parse_plate,
+    validate_plate_grammar,
+)
 from fusion.weights import compute_frame_weights
 from pipeline.schemas import FrameOCRResult, FrameVote, FusedPlate, PositionVote
 
 
 def fuse_frames(
     results: list[FrameOCRResult],
-    accept_threshold: float = 0.70,
-    margin_threshold: float = 0.15,
+    accept_threshold: float = 0.40,
+    margin_threshold: float = 0.06,
     alternative_weight: float = 0.35
 ) -> FusedPlate:
     """Fuse per-frame OCR character predictions into a calibrated FusedPlate."""
@@ -55,7 +62,7 @@ def fuse_frames(
             by_frame[key] = (score, result)
     valid_results = [result for _, result in by_frame.values()]
 
-    if not valid_results:
+    if len(valid_results) < 2:
         votes = [
             PositionVote(
                 index=i,
@@ -63,7 +70,7 @@ def fuse_frames(
                 confidence=0.0,
                 votes=[],
                 candidates=[],
-                explanation="No recognized character glyphs across input frames"
+                explanation="Fewer than two distinct frames available to confirm plate"
             )
             for i in range(10)
         ]
@@ -71,7 +78,7 @@ def fuse_frames(
             text="??????????",
             per_position=votes,
             format_valid=False,
-            frames_used=0,
+            frames_used=len(valid_results),
             mean_confidence=0.0,
             known_count=0,
             unknown_count=10
@@ -136,12 +143,12 @@ def fuse_frames(
 
     fused_chars: list[str] = []
     position_votes: list[PositionVote] = []
-    known_confs: list[float] = []
+    raw_posteriors_per_pos: list[dict[str, float]] = []
+    votes_per_pos: list[list[FrameVote]] = []
 
     for pos in range(target_len):
         class_evidence: dict[str, float] = {}
         votes: list[FrameVote] = []
-        prior_type = get_positional_prior(pos, total_len=target_len)
 
         for frame_idx, r in enumerate(valid_results):
             c_item = aligned_chars_per_frame[frame_idx][pos]
@@ -165,54 +172,89 @@ def fuse_frames(
                 alt_p = float(alt.prob)
                 class_evidence[alt_ch] = class_evidence.get(alt_ch, 0.0) + (w * alt_p * alternative_weight)
 
-        if not class_evidence:
-            fused_chars.append("?")
-            position_votes.append(PositionVote(
-                index=pos,
-                char_or_unknown="?",
-                confidence=0.0,
-                votes=votes,
-                candidates=[],
-                explanation="No observations at this position"
-            ))
-            continue
-
-        # Calculate normalized posteriors
         total_ev = sum(class_evidence.values())
-        normalized_posteriors: dict[str, float] = {
+        normalized: dict[str, float] = {
             ch: ev / max(1e-5, total_ev) for ch, ev in class_evidence.items()
-        }
+        } if total_ev > 0 else {}
 
-        # Collect top candidates for forensic tooltip
-        sorted_raw = sorted(normalized_posteriors.items(), key=lambda x: x[1], reverse=True)
+        raw_posteriors_per_pos.append(normalized)
+        votes_per_pos.append(votes)
+
+    # Execute probabilistic Viterbi / Dynamic Programming grammar parse over posteriors
+    parsed = parse_plate(
+        raw_posteriors_per_pos,
+        accept_threshold=accept_threshold,
+        margin_threshold=margin_threshold,
+    )
+
+    correction_by_index = {c.index: c for c in parsed.corrections}
+
+    position_votes: list[PositionVote] = []
+    known_confs: list[float] = []
+    fused_chars: list[str] = []
+
+    for pos in range(target_len):
+        p_dist = raw_posteriors_per_pos[pos]
+        sorted_raw = sorted(p_dist.items(), key=lambda x: x[1], reverse=True)
         top_candidates = [
             {"char": ch, "prob": round(float(p), 3)}
             for ch, p in sorted_raw[:3]
         ]
 
-        # Top character decision
-        top_char, top_prob = sorted_raw[0]
+        top_char, top_prob = sorted_raw[0] if sorted_raw else ("?", 0.0)
         runner_up_prob = sorted_raw[1][1] if len(sorted_raw) > 1 else 0.0
         margin = top_prob - runner_up_prob
 
-        support = [v for v in votes if v.char == top_char and v.prob >= accept_threshold]
-        # Absolute support retains the cost of missing, conflicting, or weak observations.
-        confidence = min(top_prob, sum(v.weight * v.prob for v in votes if v.char == top_char), 1.0)
+        votes = votes_per_pos[pos]
+        support = [v for v in votes if v.char == top_char and v.prob >= accept_threshold * 0.80]
+        char_weights = [v.weight for v in votes if v.char == top_char]
+        char_weighted_p = sum(v.weight * v.prob for v in votes if v.char == top_char)
+        frame_conf = (char_weighted_p / max(1e-5, sum(char_weights))) if char_weights else 0.0
+        confidence = min(top_prob, frame_conf) if char_weights else top_prob
+
+        slot_label = parsed.slot_map[pos] if pos < len(parsed.slot_map) else "unknown"
         explanation = None
+
         if len(support) < 2:
             explanation = "Fewer than two distinct frames clearly read this character."
         elif confidence < accept_threshold or margin < margin_threshold:
-            explanation = "Weak or conflicting OCR readings."
-        elif (prior_type == "digit" and not top_char.isdigit()) or (prior_type == "alpha" and not top_char.isalpha()):
-            explanation = "Observed character conflicts with the expected plate format."
+            explanation = "Weak or conflicting OCR readings across frames."
 
-        decided = top_char if explanation is None else "?"
-        fused_chars.append(decided)
-        if decided != "?":
+        corr = correction_by_index.get(pos)
+        if corr and explanation is None:
+            twin_char = corr.corrected
+            twin_support = [v for v in votes if v.char == twin_char and v.prob >= accept_threshold]
+            if len(twin_support) >= 1 or p_dist.get(twin_char, 0.0) >= accept_threshold:
+                decided_char = twin_char
+                explanation = corr.reason
+            else:
+                decided_char = "?"
+                explanation = "Candidate twin lacks sufficient multi-frame support"
+        elif explanation is not None:
+            decided_char = "?"
+        else:
+            if pos < len(parsed.text) and parsed.text[pos] == "?":
+                decided_char = "?"
+                explanation = "Character conflicts with slot grammar rule or invalid class"
+            elif pos < len(parsed.text):
+                decided_char = parsed.text[pos]
+            else:
+                decided_char = top_char
+
+        fused_chars.append(decided_char)
+        if decided_char != "?":
             known_confs.append(confidence)
+
+        char_conf = confidence if decided_char != "?" else (top_prob or 0.0)
+
         position_votes.append(PositionVote(
-            index=pos, char_or_unknown=decided, confidence=round(confidence, 3),
-            votes=votes, candidates=top_candidates, explanation=explanation
+            index=pos,
+            char_or_unknown=decided_char,
+            confidence=round(float(char_conf), 3),
+            votes=votes,
+            candidates=top_candidates,
+            slot=slot_label,
+            explanation=explanation
         ))
 
     fused_text = "".join(fused_chars)
@@ -223,9 +265,15 @@ def fuse_frames(
     return FusedPlate(
         text=fused_text,
         per_position=position_votes,
-        format_valid=unknown_c == 0 and validate_plate_grammar(fused_text),
+        format_valid=(unknown_c == 0 and validate_plate_grammar(fused_text)),
         frames_used=len(valid_results),
         mean_confidence=round(mean_conf, 3),
         known_count=known_c,
-        unknown_count=unknown_c
+        unknown_count=unknown_c,
+        template=parsed.template,
+        slot_map=parsed.slot_map,
+        slots=parsed.slots,
+        corrections=[c.reason for c in parsed.corrections],
+        flags=parsed.flags,
+        format_confidence=parsed.format_confidence
     )

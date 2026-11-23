@@ -22,15 +22,38 @@ import csv
 import random
 import re
 import sqlite3
+import sys
 from pathlib import Path
 from typing import Any
 
-STATE_CODES = [
-    ("JH", "Ranchi"), ("MH", "Pune"), ("DL", "Delhi"), ("KA", "Bengaluru"),
-    ("TN", "Chennai"), ("UP", "Lucknow"), ("WB", "Kolkata"), ("GJ", "Ahmedabad"),
-    ("CG", "Raipur"), ("MP", "Indore"), ("RJ", "Jaipur"), ("TS", "Hyderabad"),
-    ("AP", "Visakhapatnam"), ("KL", "Kochi"), ("HR", "Gurugram"), ("PB", "Ludhiana")
-]
+import yaml
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from fusion.grammar import validate_plate_grammar, parse_plate_text
+
+CONFIG_PATH = Path(__file__).resolve().parent.parent / "configs" / "plate_grammar.yaml"
+
+def _load_grammar_states() -> list[tuple[str, str]]:
+    try:
+        if CONFIG_PATH.is_file():
+            with open(CONFIG_PATH, "r", encoding="utf-8") as f:
+                cfg = yaml.safe_load(f) or {}
+                states = cfg.get("state_codes", {})
+                res = []
+                for k, v in states.items():
+                    res.append((k, v.get("name", k)))
+                if res:
+                    return res
+    except Exception:
+        pass
+    return [
+        ("JH", "Ranchi"), ("MH", "Pune"), ("DL", "Delhi"), ("KA", "Bengaluru"),
+        ("TN", "Chennai"), ("UP", "Lucknow"), ("WB", "Kolkata"), ("GJ", "Ahmedabad"),
+        ("CG", "Raipur"), ("MP", "Indore"), ("RJ", "Jaipur"), ("TG", "Hyderabad"),
+        ("AP", "Visakhapatnam"), ("KL", "Kochi"), ("HR", "Gurugram"), ("PB", "Ludhiana")
+    ]
+
+STATE_CODES = _load_grammar_states()
 
 BODY_TYPE_MODELS = {
     "hatchback": [
@@ -119,8 +142,8 @@ def format_plate(state: str, district: int, series: str, digits: int) -> str:
 
 
 def is_valid_plate(plate: str) -> bool:
-    """Check if string strictly matches standard Indian registration format."""
-    return bool(INDIAN_PLATE_REGEX.match(plate))
+    """Check if string strictly matches verified Indian registration grammar."""
+    return validate_plate_grammar(plate)
 
 
 def sample_body_type(rng: random.Random) -> str:
@@ -142,16 +165,38 @@ def generate_single_record(
     fixed_colour: str | None = None,
     fixed_body: str | None = None
 ) -> dict[str, Any]:
-    state, city = rng.choice(STATE_CODES)
-    district = rng.randint(1, 45)
-    series_len = rng.choice([1, 2, 2, 2])
-    letters = "ABCDEFGHJKLMNPQRSTUVWXYZ"
-    series = "".join(rng.choice(letters) for _ in range(series_len))
-    digits = rng.randint(1000, 9999)
-
-    plate = fixed_plate or format_plate(state, district, series, digits)
     body_type = fixed_body or sample_body_type(rng)
     colour = fixed_colour or sample_colour(rng)
+
+    letters = "ABCDEFGHJKLMNPQRSTUVWXYZ"  # Strictly omit I and O (CMVR Rule 51(8))
+
+    if fixed_plate:
+        plate = fixed_plate
+        state, city = rng.choice(STATE_CODES)
+    else:
+        roll = rng.random()
+        if roll < 0.10:
+            # Delhi-style: DL + 1-2 digit + category letter + 1-2 series + 4 digits
+            cat = "C" if body_type in ("sedan", "hatchback", "suv") else ("S" if body_type == "two-wheeler" else "C")
+            rto = rng.randint(1, 14)
+            series = "".join(rng.choice(letters) for _ in range(rng.choice([1, 2])))
+            digits = rng.randint(1001, 9999)
+            plate = f"DL{rto}{cat}{series}{digits:04d}"
+            state, city = ("DL", "Delhi")
+        elif roll < 0.15:
+            # Bharat BH series: YY BH #### AA
+            year_suffix = rng.randint(21, 24)
+            bh_digits = rng.randint(1001, 9999)
+            bh_series = "".join(rng.choice(letters) for _ in range(2))
+            plate = f"{year_suffix}BH{bh_digits:04d}{bh_series}"
+            state, city = rng.choice(STATE_CODES)
+        else:
+            state, city = rng.choice(STATE_CODES)
+            district = rng.randint(1, 45)
+            series_len = rng.choice([1, 2, 2, 2])
+            series = "".join(rng.choice(letters) for _ in range(series_len))
+            digits = rng.randint(1001, 9999)
+            plate = format_plate(state, district, series, digits)
 
     make, model, fuel = rng.choice(BODY_TYPE_MODELS[body_type])
     year = rng.randint(2014, 2024)
@@ -194,6 +239,8 @@ def generate_registry(
         ("demo-cg04-auto", "CG04TR7788", "yellow", "auto-rickshaw", "Bajaj", "RE Compact", "cng", 2018, "Raipur"),
         ("demo-up32-truck", "UP32KL9021", "blue", "truck", "Tata", "407", "diesel", 2017, "Lucknow"),
         ("demo-dl8c-sedan", "DL08CA1234", "white", "sedan", "Honda", "City", "petrol", 2022, "Delhi"),
+        ("demo-dl8caf-sedan", "DL8CAF1234", "white", "sedan", "Honda", "City", "petrol", 2022, "Delhi"),
+        ("demo-22bh-suv", "22BH1234AA", "black", "suv", "Tata", "Nexon", "diesel", 2022, "Delhi"),
     ]
     for vid, plt, col, bdy, mk, mdl, fl, yr, cty in anchors:
         add_record({
@@ -207,9 +254,12 @@ def generate_registry(
     for i in range(15):
         base = registry[i]
         b_plt = base["registration_number"]
-        # Modify last digit
-        last_digit = int(b_plt[-1])
-        new_last = str((last_digit + 1) % 10)
+        # Modify last character
+        if b_plt[-1].isdigit():
+            last_digit = int(b_plt[-1])
+            new_last = str((last_digit + 1) % 10)
+        else:
+            new_last = "B" if b_plt[-1] == "A" else "A"
         neg_plate = b_plt[:-1] + new_last
         if is_valid_plate(neg_plate):
             add_record(generate_single_record(rng, f"neg-1char-{i:03d}", fixed_plate=neg_plate))

@@ -5,497 +5,497 @@ demo-ka03-bike,KA03MN4821,black,two-wheeler,Royal Enfield,Classic 350,petrol,202
 demo-cg04-auto,CG04TR7788,yellow,auto-rickshaw,Bajaj,RE Compact,cng,2018,Raipur
 demo-up32-truck,UP32KL9021,blue,truck,Tata,407,diesel,2017,Lucknow
 demo-dl8c-sedan,DL08CA1234,white,sedan,Honda,City,petrol,2022,Delhi
-neg-1char-000,JH05AB6790,grey,two-wheeler,Royal Enfield,Classic 350,petrol,2015,Bengaluru
-neg-1char-001,MH12DE1434,grey,hatchback,Renault,Kwid,petrol,2017,Kochi
-neg-1char-002,KA03MN4822,white,two-wheeler,TVS,Apache,petrol,2019,Kochi
-neg-1char-003,CG04TR7789,silver,sedan,Maruti Suzuki,Ciaz,petrol,2023,Raipur
-neg-1char-004,UP32KL9022,white,hatchback,Renault,Kwid,petrol,2019,Raipur
-neg-1char-005,DL08CA1235,green,two-wheeler,Bajaj,Pulsar,petrol,2015,Kolkata
-neg-1char-006,JH05AB6791,white,sedan,Maruti Suzuki,Ciaz,petrol,2024,Visakhapatnam
-neg-1char-007,MH12DE1435,silver,hatchback,Renault,Kwid,petrol,2017,Delhi
-neg-1char-008,KA03MN4823,white,sedan,Volkswagen,Virtus,petrol,2019,Jaipur
-neg-1char-009,CG04TR7780,white,hatchback,Renault,Kwid,petrol,2022,Kolkata
-neg-1char-010,UP32KL9023,brown,hatchback,Renault,Kwid,petrol,2021,Raipur
-neg-1char-011,DL08CA1236,silver,two-wheeler,Hero,Splendor,petrol,2020,Delhi
-neg-1char-012,JH05AB6792,white,two-wheeler,Royal Enfield,Classic 350,petrol,2018,Visakhapatnam
-neg-1char-013,MH12DE1436,black,hatchback,Hyundai,i20,petrol,2022,Jaipur
-neg-1char-014,KA03MN4824,silver,auto-rickshaw,Bajaj,RE Compact,cng,2016,Lucknow
-neg-sameattr-000,TS11V6310,white,suv,Kia,Seltos,diesel,2014,Hyderabad
-neg-sameattr-001,KA24HB4946,silver,hatchback,Renault,Kwid,petrol,2015,Bengaluru
-neg-sameattr-002,DL32T3060,black,two-wheeler,Bajaj,Pulsar,petrol,2024,Delhi
-neg-sameattr-003,PB36JS7932,yellow,auto-rickshaw,Bajaj,RE Compact,cng,2022,Ludhiana
-neg-sameattr-004,WB20XW7118,blue,truck,Tata,Signa,diesel,2022,Kolkata
-neg-sameattr-005,HR08HC6539,white,sedan,Honda,City,petrol,2023,Gurugram
-neg-sameattr-006,GJ38AC1964,grey,two-wheeler,Bajaj,Pulsar,petrol,2015,Ahmedabad
-neg-sameattr-007,MH22S4899,grey,hatchback,Hyundai,i20,petrol,2024,Pune
-neg-sameattr-008,PB14ZU8744,white,two-wheeler,Bajaj,Pulsar,petrol,2021,Ludhiana
-neg-sameattr-009,KL13D8062,silver,sedan,Maruti Suzuki,Ciaz,petrol,2020,Kochi
-neg-sameattr-010,KL30X2612,white,hatchback,Maruti Suzuki,Swift,petrol,2020,Kochi
-neg-sameattr-011,RJ07GG9786,green,two-wheeler,TVS,Apache,petrol,2016,Jaipur
-neg-sameattr-012,KL12QH2235,white,sedan,Skoda,Slavia,petrol,2022,Kochi
-neg-sameattr-013,KA04C4872,silver,hatchback,Maruti Suzuki,Baleno,petrol,2020,Bengaluru
-neg-sameattr-014,PB31NB3697,white,sedan,Skoda,Slavia,petrol,2014,Ludhiana
-neg-confusable-000,JH05AB8799,white,hatchback,Maruti Suzuki,Swift,petrol,2023,Visakhapatnam
-neg-confusable-002,MH12DE1438,white,two-wheeler,Hero,Splendor,petrol,2023,Delhi
-neg-confusable-003,KA03MN4827,grey,suv,Toyota,Fortuner,diesel,2019,Ahmedabad
-neg-samedigits-000,DL05AB6799,white,hatchback,Hyundai,i20,petrol,2016,Delhi
-neg-samedigits-001,DL12DE1433,grey,suv,Hyundai,Creta,petrol,2023,Hyderabad
-neg-samedigits-002,DL03MN4821,blue,sedan,Volkswagen,Virtus,petrol,2016,Ranchi
-neg-samedigits-003,DL04TR7788,red,two-wheeler,Royal Enfield,Classic 350,petrol,2021,Raipur
-neg-samedigits-004,DL32KL9021,white,auto-rickshaw,Piaggio,Ape City,cng,2016,Raipur
-neg-samedigits-005,MH08CA1234,white,suv,Maruti Suzuki,Brezza,petrol,2016,Raipur
-neg-samedigits-006,DL05AB6790,blue,sedan,Honda,City,petrol,2019,Pune
-neg-samedigits-007,DL12DE1434,blue,two-wheeler,TVS,Apache,petrol,2023,Kolkata
-neg-samedigits-008,DL03MN4822,blue,hatchback,Tata,Altroz,diesel,2024,Chennai
-neg-samedigits-009,DL04TR7789,red,auto-rickshaw,Bajaj,RE Compact,cng,2017,Ahmedabad
-neg-samedigits-010,DL32KL9022,silver,two-wheeler,Honda,Activa,petrol,2015,Gurugram
-neg-samedigits-011,MH08CA1235,white,truck,Eicher,Pro 2049,diesel,2016,Raipur
-neg-samedigits-012,DL05AB6791,black,sedan,Skoda,Slavia,petrol,2023,Raipur
-neg-samedigits-013,DL12DE1435,blue,hatchback,Renault,Kwid,petrol,2024,Bengaluru
-neg-samedigits-014,DL03MN4823,grey,two-wheeler,Hero,Splendor,petrol,2018,Kolkata
-v-0054,MP43LN5844,white,suv,Maruti Suzuki,Brezza,petrol,2020,Indore
-v-0055,UP40NT1006,white,sedan,Volkswagen,Virtus,petrol,2023,Lucknow
-v-0056,RJ30QX4501,black,suv,Maruti Suzuki,Brezza,petrol,2016,Jaipur
-v-0057,DL19CH6085,white,hatchback,Maruti Suzuki,Swift,petrol,2014,Delhi
-v-0058,GJ31Q7790,grey,auto-rickshaw,Mahindra,Alfa,diesel,2020,Ahmedabad
-v-0059,PB26EW1090,red,auto-rickshaw,Bajaj,RE Compact,cng,2020,Ludhiana
-v-0060,GJ12BT5082,white,truck,Ashok Leyland,Dost,diesel,2021,Ahmedabad
-v-0061,RJ29TQ3607,silver,two-wheeler,Honda,Activa,petrol,2017,Jaipur
-v-0062,CG34WH5499,black,suv,Tata,Nexon,diesel,2018,Raipur
-v-0063,RJ21E3471,black,hatchback,Maruti Suzuki,Baleno,petrol,2015,Jaipur
-v-0064,KL27TQ7812,red,hatchback,Tata,Altroz,diesel,2023,Kochi
-v-0065,JH37RA6763,silver,sedan,Skoda,Slavia,petrol,2022,Ranchi
-v-0066,GJ32JP8956,silver,hatchback,Tata,Altroz,diesel,2016,Ahmedabad
-v-0067,HR09N1444,silver,hatchback,Tata,Altroz,diesel,2016,Gurugram
-v-0068,MH17LG8449,black,sedan,Skoda,Slavia,petrol,2018,Pune
-v-0069,KL17R1317,white,two-wheeler,Honda,Activa,petrol,2017,Kochi
-v-0070,DL42A5051,white,hatchback,Maruti Suzuki,Baleno,petrol,2017,Delhi
-v-0071,TN31U4571,white,suv,Hyundai,Creta,petrol,2016,Chennai
-v-0072,KA11DU1420,grey,truck,Tata,Signa,diesel,2020,Bengaluru
-v-0073,WB05DY5941,grey,auto-rickshaw,Bajaj,RE Compact,cng,2023,Kolkata
-v-0074,MH23XM2129,silver,suv,Kia,Seltos,diesel,2021,Pune
-v-0075,KA28WQ3506,black,suv,Maruti Suzuki,Brezza,petrol,2018,Bengaluru
-v-0076,PB30ZU5397,white,sedan,Honda,City,petrol,2018,Ludhiana
-v-0077,HR16UV7209,silver,sedan,Maruti Suzuki,Ciaz,petrol,2016,Gurugram
-v-0078,PB14JL5581,black,auto-rickshaw,Piaggio,Ape City,cng,2022,Ludhiana
-v-0079,JH34CH7658,black,suv,Maruti Suzuki,Brezza,petrol,2021,Ranchi
-v-0080,PB29C5820,black,hatchback,Hyundai,i20,petrol,2024,Ludhiana
-v-0081,TS31PZ6419,silver,sedan,Maruti Suzuki,Ciaz,petrol,2018,Hyderabad
-v-0082,GJ08LD9779,black,truck,Ashok Leyland,Dost,diesel,2017,Ahmedabad
-v-0083,PB18DG5853,white,hatchback,Maruti Suzuki,Swift,petrol,2022,Ludhiana
-v-0084,TN18B5786,white,two-wheeler,TVS,Apache,petrol,2015,Chennai
-v-0085,JH37RR8216,yellow,sedan,Maruti Suzuki,Ciaz,petrol,2021,Ranchi
-v-0086,KA05RC1878,red,hatchback,Hyundai,i20,petrol,2015,Bengaluru
-v-0087,GJ08VV4697,silver,two-wheeler,TVS,Apache,petrol,2018,Ahmedabad
-v-0088,KL20V2625,white,truck,Ashok Leyland,Dost,diesel,2018,Kochi
-v-0089,DL11FT2229,silver,hatchback,Renault,Kwid,petrol,2021,Delhi
-v-0090,MP03KY5632,silver,two-wheeler,Bajaj,Pulsar,petrol,2018,Indore
-v-0091,WB28T4683,blue,two-wheeler,Bajaj,Pulsar,petrol,2015,Kolkata
-v-0092,MH11VZ5728,silver,suv,Hyundai,Creta,petrol,2020,Pune
-v-0093,CG33QC1653,black,auto-rickshaw,Mahindra,Alfa,diesel,2018,Raipur
-v-0094,JH06XU1339,grey,bus,Ashok Leyland,Viking,diesel,2023,Ranchi
-v-0095,MH12SW8245,white,truck,Tata,Signa,diesel,2024,Pune
-v-0096,PB06MP6460,white,sedan,Hyundai,Verna,petrol,2019,Ludhiana
-v-0097,KL45KX7561,grey,two-wheeler,TVS,Apache,petrol,2015,Kochi
-v-0098,RJ17DN9431,white,auto-rickshaw,Mahindra,Alfa,diesel,2021,Jaipur
-v-0099,KL04SM9167,black,two-wheeler,Bajaj,Pulsar,petrol,2018,Kochi
-v-0100,TN19YR2989,grey,hatchback,Maruti Suzuki,Baleno,petrol,2016,Chennai
-v-0101,MP36T7684,brown,hatchback,Maruti Suzuki,Swift,petrol,2021,Indore
-v-0102,KA42RY5781,white,suv,Kia,Seltos,diesel,2021,Bengaluru
-v-0103,GJ30NG9327,white,two-wheeler,Hero,Splendor,petrol,2018,Ahmedabad
-v-0104,KL22AK5891,grey,auto-rickshaw,Mahindra,Alfa,diesel,2021,Kochi
-v-0105,TN29ML9903,blue,sedan,Hyundai,Verna,petrol,2017,Chennai
-v-0106,AP15BL8749,red,two-wheeler,TVS,Apache,petrol,2024,Visakhapatnam
-v-0107,TN32E9229,silver,bus,Tata,Starbus,diesel,2021,Chennai
-v-0108,KA34AZ3361,grey,suv,Tata,Nexon,diesel,2015,Bengaluru
-v-0109,PB17VY7512,red,two-wheeler,Royal Enfield,Classic 350,petrol,2020,Ludhiana
-v-0110,RJ41TB2121,black,hatchback,Hyundai,i20,petrol,2017,Jaipur
-v-0111,DL28W2646,black,suv,Mahindra,Scorpio,diesel,2014,Delhi
-v-0112,RJ04MM8056,grey,hatchback,Renault,Kwid,petrol,2024,Jaipur
-v-0113,UP11CV7267,white,suv,Toyota,Fortuner,diesel,2016,Lucknow
-v-0114,GJ30QJ1153,silver,auto-rickshaw,Piaggio,Ape City,cng,2024,Ahmedabad
-v-0115,UP05MU5901,silver,two-wheeler,Honda,Activa,petrol,2021,Lucknow
-v-0116,MP13RD4886,silver,suv,Hyundai,Creta,petrol,2018,Indore
-v-0117,JH43JA1803,black,truck,Eicher,Pro 2049,diesel,2017,Ranchi
-v-0118,TS15VJ3240,blue,two-wheeler,Hero,Splendor,petrol,2018,Hyderabad
-v-0119,HR03ZE2476,silver,truck,Tata,Signa,diesel,2016,Gurugram
-v-0120,WB09SS5465,white,auto-rickshaw,Piaggio,Ape City,cng,2018,Kolkata
-v-0121,RJ08CE4696,black,auto-rickshaw,Piaggio,Ape City,cng,2022,Jaipur
-v-0122,TS06AJ9791,silver,hatchback,Hyundai,i20,petrol,2023,Hyderabad
-v-0123,AP41DX4830,grey,suv,Toyota,Fortuner,diesel,2019,Visakhapatnam
-v-0124,GJ42W8606,white,truck,Tata,Signa,diesel,2015,Ahmedabad
-v-0125,TN03K9071,white,hatchback,Renault,Kwid,petrol,2016,Chennai
-v-0126,AP30XZ9850,black,suv,Tata,Nexon,diesel,2020,Visakhapatnam
-v-0127,KA32JB7070,silver,hatchback,Maruti Suzuki,Baleno,petrol,2019,Bengaluru
-v-0128,KA44TW6876,white,hatchback,Maruti Suzuki,Swift,petrol,2021,Bengaluru
-v-0129,DL43WW1349,silver,hatchback,Maruti Suzuki,Baleno,petrol,2023,Delhi
-v-0130,WB05UG4817,white,sedan,Volkswagen,Virtus,petrol,2014,Kolkata
-v-0131,CG10TJ3858,red,hatchback,Maruti Suzuki,Baleno,petrol,2014,Raipur
-v-0132,TS16AF5347,black,hatchback,Renault,Kwid,petrol,2015,Hyderabad
-v-0133,DL31MS2786,white,suv,Toyota,Fortuner,diesel,2014,Delhi
-v-0134,MP30B8847,silver,auto-rickshaw,Bajaj,RE Compact,cng,2021,Indore
-v-0135,HR05L3430,white,hatchback,Renault,Kwid,petrol,2022,Gurugram
-v-0136,RJ25QS8048,black,hatchback,Renault,Kwid,petrol,2017,Jaipur
-v-0137,KL29PL8430,black,suv,Hyundai,Creta,petrol,2020,Kochi
-v-0138,RJ43ME8770,red,hatchback,Maruti Suzuki,Swift,petrol,2020,Jaipur
-v-0139,KA24TB6400,silver,two-wheeler,TVS,Apache,petrol,2014,Bengaluru
-v-0140,MP39MD9313,grey,hatchback,Maruti Suzuki,Baleno,petrol,2015,Indore
-v-0141,TS36DJ4705,red,two-wheeler,Royal Enfield,Classic 350,petrol,2023,Hyderabad
-v-0142,JH39AF5477,white,two-wheeler,Honda,Activa,petrol,2019,Ranchi
-v-0143,JH12UX7566,black,hatchback,Maruti Suzuki,Swift,petrol,2015,Ranchi
-v-0144,WB25QL3578,black,sedan,Volkswagen,Virtus,petrol,2023,Kolkata
-v-0145,DL04FV1815,white,two-wheeler,TVS,Apache,petrol,2021,Delhi
-v-0146,HR27GS2864,white,sedan,Volkswagen,Virtus,petrol,2021,Gurugram
-v-0147,MP03NV1897,white,hatchback,Maruti Suzuki,Baleno,petrol,2016,Indore
-v-0148,CG19DA9149,white,two-wheeler,TVS,Apache,petrol,2022,Raipur
-v-0149,GJ33CN1693,silver,suv,Mahindra,Scorpio,diesel,2019,Ahmedabad
-v-0150,KL37YW7843,silver,sedan,Maruti Suzuki,Ciaz,petrol,2016,Kochi
-v-0151,HR45CP2734,grey,sedan,Volkswagen,Virtus,petrol,2015,Gurugram
-v-0152,AP20HL3754,grey,hatchback,Renault,Kwid,petrol,2022,Visakhapatnam
-v-0153,WB23ZW3419,white,hatchback,Maruti Suzuki,Baleno,petrol,2016,Kolkata
-v-0154,TN42F9095,grey,suv,Toyota,Fortuner,diesel,2021,Chennai
-v-0155,RJ41EQ2118,grey,suv,Hyundai,Creta,petrol,2023,Jaipur
-v-0156,MH23K8565,white,suv,Hyundai,Creta,petrol,2015,Pune
-v-0157,DL40QU1672,red,suv,Maruti Suzuki,Brezza,petrol,2017,Delhi
-v-0158,RJ39SE2013,red,suv,Hyundai,Creta,petrol,2015,Jaipur
-v-0159,UP03YQ8199,grey,suv,Hyundai,Creta,petrol,2019,Lucknow
-v-0160,MP25LX1857,grey,two-wheeler,Hero,Splendor,petrol,2019,Indore
-v-0161,KA36KJ3463,grey,sedan,Hyundai,Verna,petrol,2019,Bengaluru
-v-0162,MP42EV2388,silver,sedan,Maruti Suzuki,Ciaz,petrol,2016,Indore
-v-0163,DL42SM1298,white,sedan,Hyundai,Verna,petrol,2019,Delhi
-v-0164,PB13EE2264,black,sedan,Volkswagen,Virtus,petrol,2022,Ludhiana
-v-0165,MH43VE7172,white,hatchback,Renault,Kwid,petrol,2016,Pune
-v-0166,HR03MX4891,grey,bus,Eicher,Skyline Pro,diesel,2021,Gurugram
-v-0167,GJ35KR4178,yellow,sedan,Skoda,Slavia,petrol,2021,Ahmedabad
-v-0168,MP25FG3267,white,auto-rickshaw,Piaggio,Ape City,cng,2019,Indore
-v-0169,KA34K2374,white,two-wheeler,Royal Enfield,Classic 350,petrol,2016,Bengaluru
-v-0170,KL06QM1436,silver,suv,Hyundai,Creta,petrol,2017,Kochi
-v-0171,AP06HA6221,red,truck,Eicher,Pro 2049,diesel,2016,Visakhapatnam
-v-0172,TN03RY3273,silver,two-wheeler,Royal Enfield,Classic 350,petrol,2014,Chennai
-v-0173,DL02GE9991,grey,truck,Tata,Signa,diesel,2015,Delhi
-v-0174,MP16DB4906,black,suv,Kia,Seltos,diesel,2015,Indore
-v-0175,KA32W9443,black,suv,Hyundai,Creta,petrol,2020,Bengaluru
-v-0176,JH40HU7825,grey,hatchback,Renault,Kwid,petrol,2019,Ranchi
-v-0177,DL34N8702,silver,hatchback,Hyundai,i20,petrol,2018,Delhi
-v-0178,JH23M4950,grey,two-wheeler,Royal Enfield,Classic 350,petrol,2019,Ranchi
-v-0179,TN03TL3868,black,auto-rickshaw,Mahindra,Alfa,diesel,2021,Chennai
-v-0180,UP09Y8498,white,hatchback,Maruti Suzuki,Baleno,petrol,2014,Lucknow
-v-0181,RJ20TR5150,grey,hatchback,Hyundai,i20,petrol,2019,Jaipur
-v-0182,MH42JD7029,silver,suv,Kia,Seltos,diesel,2020,Pune
-v-0183,RJ12YR7018,silver,truck,Tata,407,diesel,2020,Jaipur
-v-0184,DL28TK6262,silver,hatchback,Hyundai,i20,petrol,2018,Delhi
-v-0185,HR39FY8272,white,sedan,Maruti Suzuki,Ciaz,petrol,2023,Gurugram
-v-0186,KL18C7655,red,sedan,Hyundai,Verna,petrol,2014,Kochi
-v-0187,TN39BE2101,grey,hatchback,Hyundai,i20,petrol,2020,Chennai
-v-0188,MH39XQ7077,black,sedan,Volkswagen,Virtus,petrol,2016,Pune
-v-0189,TS26WJ5089,white,bus,Tata,Starbus,diesel,2021,Hyderabad
-v-0190,AP36J5264,white,two-wheeler,Royal Enfield,Classic 350,petrol,2018,Visakhapatnam
-v-0191,PB13E2213,blue,suv,Kia,Seltos,diesel,2015,Ludhiana
-v-0192,RJ43YC9882,white,sedan,Hyundai,Verna,petrol,2024,Jaipur
-v-0193,UP24DG3275,silver,hatchback,Hyundai,i20,petrol,2022,Lucknow
-v-0194,TS30VC2077,brown,sedan,Skoda,Slavia,petrol,2022,Hyderabad
-v-0195,KL27E6194,silver,two-wheeler,Royal Enfield,Classic 350,petrol,2019,Kochi
-v-0196,TN36EP9238,white,truck,Tata,407,diesel,2022,Chennai
-v-0197,TN20FL4694,yellow,sedan,Maruti Suzuki,Ciaz,petrol,2015,Chennai
-v-0198,CG13EW5961,white,suv,Maruti Suzuki,Brezza,petrol,2016,Raipur
-v-0199,TN11UB1464,yellow,hatchback,Renault,Kwid,petrol,2018,Chennai
-v-0200,WB37VW1496,grey,suv,Hyundai,Creta,petrol,2024,Kolkata
-v-0201,MP31XN5873,black,suv,Tata,Nexon,diesel,2021,Indore
-v-0202,KL31GL3353,black,sedan,Maruti Suzuki,Ciaz,petrol,2020,Kochi
-v-0203,TN24L4960,white,suv,Tata,Nexon,diesel,2016,Chennai
-v-0204,KA04NV7850,red,sedan,Hyundai,Verna,petrol,2019,Bengaluru
-v-0205,RJ13RS8648,white,suv,Mahindra,Scorpio,diesel,2015,Jaipur
-v-0206,AP33HG6781,white,hatchback,Renault,Kwid,petrol,2024,Visakhapatnam
-v-0207,PB19D8060,white,hatchback,Hyundai,i20,petrol,2020,Ludhiana
-v-0208,TS03BU4189,white,sedan,Skoda,Slavia,petrol,2022,Hyderabad
-v-0209,HR36VX2946,white,hatchback,Hyundai,i20,petrol,2019,Gurugram
-v-0210,TS10VS7576,white,suv,Tata,Nexon,diesel,2019,Hyderabad
-v-0211,PB34EV9446,blue,hatchback,Hyundai,i20,petrol,2016,Ludhiana
-v-0212,AP40UL9311,grey,auto-rickshaw,Mahindra,Alfa,diesel,2023,Visakhapatnam
-v-0213,MP31M6427,green,two-wheeler,Royal Enfield,Classic 350,petrol,2018,Indore
-v-0214,JH39JW4728,grey,two-wheeler,Bajaj,Pulsar,petrol,2022,Ranchi
-v-0215,AP10BU2800,silver,hatchback,Tata,Altroz,diesel,2016,Visakhapatnam
-v-0216,KL45PS8726,black,auto-rickshaw,Bajaj,RE Compact,cng,2016,Kochi
-v-0217,WB36XR9609,yellow,sedan,Skoda,Slavia,petrol,2022,Kolkata
-v-0218,RJ35XZ5331,white,suv,Tata,Nexon,diesel,2018,Jaipur
-v-0219,MP15KY4396,silver,two-wheeler,TVS,Apache,petrol,2019,Indore
-v-0220,CG19U9899,green,sedan,Maruti Suzuki,Ciaz,petrol,2016,Raipur
-v-0221,MP03YC6674,grey,truck,Tata,Signa,diesel,2017,Indore
-v-0222,WB35TY5450,grey,hatchback,Renault,Kwid,petrol,2017,Kolkata
-v-0223,GJ04WH1860,silver,hatchback,Tata,Altroz,diesel,2015,Ahmedabad
-v-0224,TN01PW8793,white,suv,Hyundai,Creta,petrol,2019,Chennai
-v-0225,MP42C4804,black,suv,Mahindra,Scorpio,diesel,2016,Indore
-v-0226,KL12N9116,black,hatchback,Hyundai,i20,petrol,2014,Kochi
-v-0227,JH20L5662,grey,suv,Toyota,Fortuner,diesel,2021,Ranchi
-v-0228,TN33JG2845,black,sedan,Maruti Suzuki,Ciaz,petrol,2016,Chennai
-v-0229,JH22UX4164,red,hatchback,Tata,Altroz,diesel,2020,Ranchi
-v-0230,RJ06XD4027,silver,bus,Tata,Starbus,diesel,2014,Jaipur
-v-0231,CG25QJ6400,black,sedan,Honda,City,petrol,2018,Raipur
-v-0232,TS45BX2936,white,suv,Maruti Suzuki,Brezza,petrol,2022,Hyderabad
-v-0233,MP45W5833,white,sedan,Hyundai,Verna,petrol,2021,Indore
-v-0234,TN30PY9998,black,truck,Ashok Leyland,Dost,diesel,2017,Chennai
-v-0235,DL34SY6927,grey,hatchback,Maruti Suzuki,Swift,petrol,2022,Delhi
-v-0236,WB37FL9525,black,suv,Maruti Suzuki,Brezza,petrol,2023,Kolkata
-v-0237,PB06BQ3161,silver,suv,Mahindra,Scorpio,diesel,2022,Ludhiana
-v-0238,HR44ZA7487,white,sedan,Hyundai,Verna,petrol,2023,Gurugram
-v-0239,DL03MY2044,white,suv,Mahindra,Scorpio,diesel,2021,Delhi
-v-0240,MH19FE7887,blue,sedan,Skoda,Slavia,petrol,2020,Pune
-v-0241,AP06WM2943,grey,hatchback,Renault,Kwid,petrol,2016,Visakhapatnam
-v-0242,GJ01K8585,grey,two-wheeler,Royal Enfield,Classic 350,petrol,2020,Ahmedabad
-v-0243,GJ16ME5516,red,hatchback,Maruti Suzuki,Swift,petrol,2014,Ahmedabad
-v-0244,KL40H4376,grey,hatchback,Tata,Altroz,diesel,2023,Kochi
-v-0245,MH16N8191,white,hatchback,Maruti Suzuki,Swift,petrol,2016,Pune
-v-0246,MP15UV6253,red,hatchback,Renault,Kwid,petrol,2017,Indore
-v-0247,KL20BT3869,silver,two-wheeler,TVS,Apache,petrol,2014,Kochi
-v-0248,TS42SL7821,white,suv,Tata,Nexon,diesel,2022,Hyderabad
-v-0249,PB16KY3365,blue,two-wheeler,Royal Enfield,Classic 350,petrol,2020,Ludhiana
-v-0250,KL36NH5177,grey,hatchback,Tata,Altroz,diesel,2019,Kochi
-v-0251,DL35BJ7179,grey,two-wheeler,Hero,Splendor,petrol,2017,Delhi
-v-0252,WB31LK1251,white,hatchback,Maruti Suzuki,Swift,petrol,2021,Kolkata
-v-0253,GJ45NH6269,silver,two-wheeler,Royal Enfield,Classic 350,petrol,2024,Ahmedabad
-v-0254,TS20MS9147,red,suv,Maruti Suzuki,Brezza,petrol,2021,Hyderabad
-v-0255,RJ14LP1749,white,suv,Tata,Nexon,diesel,2014,Jaipur
-v-0256,CG36KE4214,silver,sedan,Hyundai,Verna,petrol,2021,Raipur
-v-0257,RJ17ZW9037,black,suv,Hyundai,Creta,petrol,2016,Jaipur
-v-0258,TN35FT1962,red,suv,Mahindra,Scorpio,diesel,2024,Chennai
-v-0259,MH01EW4791,white,hatchback,Maruti Suzuki,Baleno,petrol,2022,Pune
-v-0260,HR24V8916,white,two-wheeler,Royal Enfield,Classic 350,petrol,2022,Gurugram
-v-0261,KL01S5501,white,suv,Toyota,Fortuner,diesel,2024,Kochi
-v-0262,KL12D9591,white,hatchback,Renault,Kwid,petrol,2018,Kochi
-v-0263,TS18CM7652,white,suv,Maruti Suzuki,Brezza,petrol,2017,Hyderabad
-v-0264,MP44W1519,silver,hatchback,Renault,Kwid,petrol,2021,Indore
-v-0265,MH41Y3807,red,hatchback,Hyundai,i20,petrol,2023,Pune
-v-0266,KA34H4463,black,truck,Tata,Signa,diesel,2018,Bengaluru
-v-0267,MH05TU1539,red,hatchback,Maruti Suzuki,Swift,petrol,2017,Pune
-v-0268,TN26K3661,grey,suv,Kia,Seltos,diesel,2024,Chennai
-v-0269,RJ25YZ2284,green,suv,Mahindra,Scorpio,diesel,2015,Jaipur
-v-0270,KL15L7499,silver,bus,Eicher,Skyline Pro,diesel,2018,Kochi
-v-0271,HR32MT7150,grey,suv,Maruti Suzuki,Brezza,petrol,2020,Gurugram
-v-0272,DL40HY2204,white,hatchback,Maruti Suzuki,Baleno,petrol,2020,Delhi
-v-0273,RJ24C1085,silver,truck,Eicher,Pro 2049,diesel,2015,Jaipur
-v-0274,TN06PQ9395,white,suv,Hyundai,Creta,petrol,2022,Chennai
-v-0275,DL39NA5781,black,suv,Maruti Suzuki,Brezza,petrol,2022,Delhi
-v-0276,GJ37XN3777,white,hatchback,Tata,Altroz,diesel,2016,Ahmedabad
-v-0277,DL11JP5911,white,suv,Hyundai,Creta,petrol,2017,Delhi
-v-0278,PB39QD3219,yellow,sedan,Maruti Suzuki,Ciaz,petrol,2023,Ludhiana
-v-0279,AP22LP3230,grey,sedan,Hyundai,Verna,petrol,2021,Visakhapatnam
-v-0280,RJ12LK9044,black,bus,Ashok Leyland,Viking,diesel,2020,Jaipur
-v-0281,CG26DU4273,grey,suv,Maruti Suzuki,Brezza,petrol,2022,Raipur
-v-0282,JH30QK2133,black,two-wheeler,TVS,Apache,petrol,2024,Ranchi
-v-0283,PB09HJ3525,black,two-wheeler,Hero,Splendor,petrol,2021,Ludhiana
-v-0284,PB38TS7853,black,suv,Hyundai,Creta,petrol,2022,Ludhiana
-v-0285,DL07XX6816,grey,hatchback,Renault,Kwid,petrol,2024,Delhi
-v-0286,AP22DA2615,silver,sedan,Volkswagen,Virtus,petrol,2022,Visakhapatnam
-v-0287,GJ29NQ9199,brown,hatchback,Tata,Altroz,diesel,2015,Ahmedabad
-v-0288,MP27D3321,silver,sedan,Hyundai,Verna,petrol,2022,Indore
-v-0289,PB23DQ8412,white,sedan,Honda,City,petrol,2014,Ludhiana
-v-0290,RJ42X3692,black,truck,Ashok Leyland,Dost,diesel,2022,Jaipur
-v-0291,UP22QH7636,white,two-wheeler,TVS,Apache,petrol,2020,Lucknow
-v-0292,JH40QU8037,black,suv,Tata,Nexon,diesel,2018,Ranchi
-v-0293,DL37T4063,white,sedan,Honda,City,petrol,2018,Delhi
-v-0294,PB34VN7431,silver,suv,Kia,Seltos,diesel,2023,Ludhiana
-v-0295,UP44VU2388,white,two-wheeler,Bajaj,Pulsar,petrol,2018,Lucknow
-v-0296,KA12YE9369,grey,suv,Toyota,Fortuner,diesel,2020,Bengaluru
-v-0297,KL12WT3838,silver,suv,Tata,Nexon,diesel,2016,Kochi
-v-0298,RJ29M1157,white,suv,Kia,Seltos,diesel,2022,Jaipur
-v-0299,PB27PY8272,white,suv,Mahindra,Scorpio,diesel,2017,Ludhiana
-v-0300,MP03HT5729,silver,hatchback,Tata,Altroz,diesel,2022,Indore
-v-0301,KA37J9898,silver,auto-rickshaw,Bajaj,RE Compact,cng,2021,Bengaluru
-v-0302,WB28Z5055,brown,sedan,Skoda,Slavia,petrol,2018,Kolkata
-v-0303,TS06DH4438,grey,two-wheeler,Honda,Activa,petrol,2023,Hyderabad
-v-0304,KL11GG1972,grey,suv,Toyota,Fortuner,diesel,2022,Kochi
-v-0305,UP21KU5380,silver,truck,Tata,407,diesel,2016,Lucknow
-v-0306,KL04WE3174,black,sedan,Hyundai,Verna,petrol,2024,Kochi
-v-0307,AP32UW5402,silver,two-wheeler,Hero,Splendor,petrol,2024,Visakhapatnam
-v-0308,DL26YM8449,silver,truck,Tata,407,diesel,2015,Delhi
-v-0309,HR41CT7516,silver,hatchback,Maruti Suzuki,Baleno,petrol,2021,Gurugram
-v-0310,CG21LT3139,silver,suv,Hyundai,Creta,petrol,2024,Raipur
-v-0311,MH03W8529,blue,hatchback,Maruti Suzuki,Baleno,petrol,2021,Pune
-v-0312,HR01GY3161,white,auto-rickshaw,Piaggio,Ape City,cng,2015,Gurugram
-v-0313,TS17M3711,grey,hatchback,Maruti Suzuki,Baleno,petrol,2020,Hyderabad
-v-0314,DL07G8812,grey,hatchback,Renault,Kwid,petrol,2024,Delhi
-v-0315,HR01Y6629,green,two-wheeler,TVS,Apache,petrol,2016,Gurugram
-v-0316,PB05NC2678,silver,hatchback,Hyundai,i20,petrol,2016,Ludhiana
-v-0317,AP09CS1138,white,suv,Hyundai,Creta,petrol,2017,Visakhapatnam
-v-0318,TN27GC2646,white,hatchback,Tata,Altroz,diesel,2019,Chennai
-v-0319,KL21HJ2380,grey,sedan,Volkswagen,Virtus,petrol,2018,Kochi
-v-0320,JH43GS9348,silver,hatchback,Maruti Suzuki,Swift,petrol,2017,Ranchi
-v-0321,PB25H9185,white,two-wheeler,Hero,Splendor,petrol,2019,Ludhiana
-v-0322,RJ09UP6986,white,suv,Kia,Seltos,diesel,2015,Jaipur
-v-0323,JH38A5295,blue,hatchback,Tata,Altroz,diesel,2022,Ranchi
-v-0324,MP41PY7590,grey,hatchback,Renault,Kwid,petrol,2016,Indore
-v-0325,CG06CS4329,white,bus,Ashok Leyland,Viking,diesel,2020,Raipur
-v-0326,DL20ZH1948,blue,sedan,Honda,City,petrol,2021,Delhi
-v-0327,MH20DA3248,white,two-wheeler,Honda,Activa,petrol,2022,Pune
-v-0328,CG11EZ5403,white,two-wheeler,Hero,Splendor,petrol,2019,Raipur
-v-0329,KL18J2262,silver,suv,Mahindra,Scorpio,diesel,2021,Kochi
-v-0330,UP24JD2889,silver,hatchback,Maruti Suzuki,Swift,petrol,2014,Lucknow
-v-0331,GJ03MN3458,yellow,hatchback,Maruti Suzuki,Swift,petrol,2022,Ahmedabad
-v-0332,KL15HP6241,white,sedan,Maruti Suzuki,Ciaz,petrol,2015,Kochi
-v-0333,MH12SB7568,silver,hatchback,Hyundai,i20,petrol,2018,Pune
-v-0334,RJ06AM4287,black,sedan,Volkswagen,Virtus,petrol,2017,Jaipur
-v-0335,HR24GZ9954,white,two-wheeler,Hero,Splendor,petrol,2020,Gurugram
-v-0336,JH15WY1157,white,truck,Tata,Signa,diesel,2018,Ranchi
-v-0337,KA14PR1981,white,bus,Ashok Leyland,Viking,diesel,2015,Bengaluru
-v-0338,MH15YM8511,white,bus,Tata,Starbus,diesel,2022,Pune
-v-0339,TN41CU2020,yellow,suv,Tata,Nexon,diesel,2018,Chennai
-v-0340,CG21YZ6345,white,sedan,Honda,City,petrol,2017,Raipur
-v-0341,TN38E2731,silver,hatchback,Tata,Altroz,diesel,2015,Chennai
-v-0342,TS14KQ5341,white,auto-rickshaw,Mahindra,Alfa,diesel,2018,Hyderabad
-v-0343,MH14EC5066,silver,bus,Tata,Starbus,diesel,2024,Pune
-v-0344,MP17AN8408,grey,suv,Mahindra,Scorpio,diesel,2021,Indore
-v-0345,KA09A2010,green,auto-rickshaw,Bajaj,RE Compact,cng,2017,Bengaluru
-v-0346,AP24U5240,white,truck,Tata,407,diesel,2017,Visakhapatnam
-v-0347,HR09L3007,silver,hatchback,Maruti Suzuki,Baleno,petrol,2023,Gurugram
-v-0348,KL26AN7990,white,hatchback,Maruti Suzuki,Baleno,petrol,2018,Kochi
-v-0349,CG29BV5026,silver,two-wheeler,Royal Enfield,Classic 350,petrol,2021,Raipur
-v-0350,MH06NE7868,blue,hatchback,Renault,Kwid,petrol,2017,Pune
-v-0351,JH25RT8940,grey,sedan,Maruti Suzuki,Ciaz,petrol,2020,Ranchi
-v-0352,CG12L4588,red,hatchback,Hyundai,i20,petrol,2014,Raipur
-v-0353,PB34UH3615,grey,hatchback,Hyundai,i20,petrol,2022,Ludhiana
-v-0354,MH15MF3885,white,hatchback,Hyundai,i20,petrol,2023,Pune
-v-0355,JH45UU3328,white,suv,Kia,Seltos,diesel,2022,Ranchi
-v-0356,MP12BC1920,white,hatchback,Renault,Kwid,petrol,2021,Indore
-v-0357,JH22EL3907,red,truck,Eicher,Pro 2049,diesel,2014,Ranchi
-v-0358,JH10DS6978,silver,bus,Eicher,Skyline Pro,diesel,2020,Ranchi
-v-0359,KA22LE3580,silver,two-wheeler,TVS,Apache,petrol,2024,Bengaluru
-v-0360,RJ12HX3872,black,sedan,Maruti Suzuki,Ciaz,petrol,2016,Jaipur
-v-0361,UP01UB3983,blue,suv,Toyota,Fortuner,diesel,2017,Lucknow
-v-0362,KA32LZ2274,green,hatchback,Maruti Suzuki,Baleno,petrol,2024,Bengaluru
-v-0363,DL43QA5345,black,hatchback,Hyundai,i20,petrol,2018,Delhi
-v-0364,KA01N8179,yellow,two-wheeler,TVS,Apache,petrol,2021,Bengaluru
-v-0365,AP23DR4695,white,hatchback,Maruti Suzuki,Swift,petrol,2018,Visakhapatnam
-v-0366,JH21DC6600,silver,hatchback,Maruti Suzuki,Swift,petrol,2022,Ranchi
-v-0367,DL22YA8066,white,truck,Tata,Signa,diesel,2016,Delhi
-v-0368,MH07GG7705,black,two-wheeler,Royal Enfield,Classic 350,petrol,2018,Pune
-v-0369,MP20DB7437,red,suv,Tata,Nexon,diesel,2014,Indore
-v-0370,TS01CK8869,white,hatchback,Maruti Suzuki,Baleno,petrol,2024,Hyderabad
-v-0371,MP06DK7512,blue,suv,Hyundai,Creta,petrol,2015,Indore
-v-0372,AP12NM4056,white,suv,Kia,Seltos,diesel,2018,Visakhapatnam
-v-0373,GJ18E2584,silver,hatchback,Renault,Kwid,petrol,2020,Ahmedabad
-v-0374,GJ36N9561,grey,suv,Kia,Seltos,diesel,2023,Ahmedabad
-v-0375,GJ31CN1568,blue,suv,Toyota,Fortuner,diesel,2024,Ahmedabad
-v-0376,TN08FF4471,white,two-wheeler,TVS,Apache,petrol,2015,Chennai
-v-0377,KL13VJ6238,blue,truck,Tata,407,diesel,2015,Kochi
-v-0378,AP36TL5525,blue,suv,Mahindra,Scorpio,diesel,2023,Visakhapatnam
-v-0379,KL08EE2641,grey,truck,Tata,407,diesel,2018,Kochi
-v-0380,TS27NW8955,silver,suv,Tata,Nexon,diesel,2018,Hyderabad
-v-0381,AP10BN6431,white,two-wheeler,TVS,Apache,petrol,2018,Visakhapatnam
-v-0382,TS02KK5593,red,auto-rickshaw,Mahindra,Alfa,diesel,2015,Hyderabad
-v-0383,GJ09ZQ6257,silver,sedan,Honda,City,petrol,2017,Ahmedabad
-v-0384,HR14ZR9462,red,auto-rickshaw,Mahindra,Alfa,diesel,2016,Gurugram
-v-0385,DL20ES1474,red,hatchback,Maruti Suzuki,Baleno,petrol,2014,Delhi
-v-0386,GJ03BM4262,red,sedan,Volkswagen,Virtus,petrol,2020,Ahmedabad
-v-0387,KA44H7102,silver,suv,Kia,Seltos,diesel,2023,Bengaluru
-v-0388,TS23JZ2480,silver,sedan,Hyundai,Verna,petrol,2023,Hyderabad
-v-0389,WB15XG5408,silver,two-wheeler,Hero,Splendor,petrol,2021,Kolkata
-v-0390,TN42VA4666,red,sedan,Maruti Suzuki,Ciaz,petrol,2024,Chennai
-v-0391,CG28MQ5128,white,hatchback,Renault,Kwid,petrol,2023,Raipur
-v-0392,AP38A9380,yellow,bus,Ashok Leyland,Viking,diesel,2022,Visakhapatnam
-v-0393,MP20R2045,white,sedan,Maruti Suzuki,Ciaz,petrol,2018,Indore
-v-0394,CG42GE9475,blue,two-wheeler,Royal Enfield,Classic 350,petrol,2020,Raipur
-v-0395,RJ44ZA9148,white,bus,Ashok Leyland,Viking,diesel,2020,Jaipur
-v-0396,AP03LZ4643,grey,two-wheeler,TVS,Apache,petrol,2024,Visakhapatnam
-v-0397,TS33FX3967,silver,sedan,Maruti Suzuki,Ciaz,petrol,2022,Hyderabad
-v-0398,UP44WC4641,black,sedan,Maruti Suzuki,Ciaz,petrol,2020,Lucknow
-v-0399,RJ24UK8598,silver,auto-rickshaw,Mahindra,Alfa,diesel,2023,Jaipur
-v-0400,DL31SD7253,silver,suv,Tata,Nexon,diesel,2016,Delhi
-v-0401,WB22UQ3346,black,sedan,Honda,City,petrol,2021,Kolkata
-v-0402,RJ41LW1950,white,hatchback,Maruti Suzuki,Baleno,petrol,2023,Jaipur
-v-0403,UP32E8105,silver,two-wheeler,TVS,Apache,petrol,2020,Lucknow
-v-0404,JH03ZM1230,black,auto-rickshaw,Mahindra,Alfa,diesel,2017,Ranchi
-v-0405,JH44W5076,red,hatchback,Hyundai,i20,petrol,2016,Ranchi
-v-0406,KA25FC1749,white,sedan,Volkswagen,Virtus,petrol,2023,Bengaluru
-v-0407,RJ28LR6885,white,two-wheeler,TVS,Apache,petrol,2014,Jaipur
-v-0408,GJ15GZ1359,white,suv,Hyundai,Creta,petrol,2024,Ahmedabad
-v-0409,MH25TV1796,white,suv,Mahindra,Scorpio,diesel,2024,Pune
-v-0410,JH04P8279,grey,suv,Kia,Seltos,diesel,2016,Ranchi
-v-0411,WB45K7895,grey,two-wheeler,Honda,Activa,petrol,2023,Kolkata
-v-0412,TN27S2928,black,sedan,Skoda,Slavia,petrol,2017,Chennai
-v-0413,WB17MY7713,white,sedan,Skoda,Slavia,petrol,2017,Kolkata
-v-0414,PB22AA2458,red,truck,Tata,Signa,diesel,2016,Ludhiana
-v-0415,DL33Z2659,grey,truck,Tata,Signa,diesel,2018,Delhi
-v-0416,CG30D3862,red,auto-rickshaw,Piaggio,Ape City,cng,2024,Raipur
-v-0417,RJ28D1751,white,hatchback,Maruti Suzuki,Baleno,petrol,2019,Jaipur
-v-0418,TS29ZC7105,white,two-wheeler,TVS,Apache,petrol,2020,Hyderabad
-v-0419,HR18YR7909,black,two-wheeler,Hero,Splendor,petrol,2016,Gurugram
-v-0420,MH11P8908,grey,two-wheeler,Bajaj,Pulsar,petrol,2023,Pune
-v-0421,AP23X3140,silver,suv,Kia,Seltos,diesel,2021,Visakhapatnam
-v-0422,MH05WL1202,grey,two-wheeler,Royal Enfield,Classic 350,petrol,2023,Pune
-v-0423,GJ43SS2560,black,suv,Kia,Seltos,diesel,2019,Ahmedabad
-v-0424,AP10A3571,silver,suv,Kia,Seltos,diesel,2016,Visakhapatnam
-v-0425,DL32HL5557,white,hatchback,Tata,Altroz,diesel,2020,Delhi
-v-0426,GJ06QU8341,silver,hatchback,Hyundai,i20,petrol,2015,Ahmedabad
-v-0427,PB42D7609,grey,suv,Mahindra,Scorpio,diesel,2015,Ludhiana
-v-0428,MP33WX8474,silver,truck,Tata,407,diesel,2017,Indore
-v-0429,HR22YX6952,white,two-wheeler,Bajaj,Pulsar,petrol,2014,Gurugram
-v-0430,RJ23TS7125,white,two-wheeler,Bajaj,Pulsar,petrol,2021,Jaipur
-v-0431,TN27J4209,blue,hatchback,Tata,Altroz,diesel,2017,Chennai
-v-0432,HR13DP1761,red,truck,Tata,407,diesel,2021,Gurugram
-v-0433,HR43RA9689,grey,two-wheeler,TVS,Apache,petrol,2023,Gurugram
-v-0434,PB33YU3845,white,two-wheeler,TVS,Apache,petrol,2024,Ludhiana
-v-0435,RJ33PV5067,yellow,sedan,Maruti Suzuki,Ciaz,petrol,2021,Jaipur
-v-0436,TN09VY9393,black,sedan,Maruti Suzuki,Ciaz,petrol,2022,Chennai
-v-0437,WB13VY5760,blue,two-wheeler,Bajaj,Pulsar,petrol,2024,Kolkata
-v-0438,UP33YD6771,grey,suv,Maruti Suzuki,Brezza,petrol,2020,Lucknow
-v-0439,MP28S2744,white,hatchback,Maruti Suzuki,Swift,petrol,2017,Indore
-v-0440,CG11XJ3399,black,auto-rickshaw,Piaggio,Ape City,cng,2017,Raipur
-v-0441,MH23DV4675,grey,two-wheeler,Bajaj,Pulsar,petrol,2022,Pune
-v-0442,MP45N7349,black,suv,Maruti Suzuki,Brezza,petrol,2019,Indore
-v-0443,MH01GV8259,blue,auto-rickshaw,Mahindra,Alfa,diesel,2024,Pune
-v-0444,TS38ZG5819,green,suv,Mahindra,Scorpio,diesel,2016,Hyderabad
-v-0445,UP33N1665,grey,suv,Tata,Nexon,diesel,2016,Lucknow
-v-0446,CG01QY3536,blue,hatchback,Renault,Kwid,petrol,2014,Raipur
-v-0447,MP32CY6207,yellow,suv,Toyota,Fortuner,diesel,2015,Indore
-v-0448,UP27CM4624,grey,auto-rickshaw,Piaggio,Ape City,cng,2019,Lucknow
-v-0449,MP14TW1144,silver,hatchback,Maruti Suzuki,Baleno,petrol,2024,Indore
-v-0450,GJ03ND7322,black,sedan,Honda,City,petrol,2022,Ahmedabad
-v-0451,TS33RB5856,white,auto-rickshaw,Mahindra,Alfa,diesel,2015,Hyderabad
-v-0452,KA11W2072,grey,hatchback,Maruti Suzuki,Baleno,petrol,2024,Bengaluru
-v-0453,KL07TY8130,blue,two-wheeler,Bajaj,Pulsar,petrol,2014,Kochi
-v-0454,HR22C2200,black,hatchback,Renault,Kwid,petrol,2015,Gurugram
-v-0455,GJ17NQ7626,white,suv,Maruti Suzuki,Brezza,petrol,2015,Ahmedabad
-v-0456,JH42Z1745,white,two-wheeler,Royal Enfield,Classic 350,petrol,2015,Ranchi
-v-0457,MP44VC5612,silver,two-wheeler,TVS,Apache,petrol,2024,Indore
-v-0458,JH31TH3234,black,two-wheeler,Royal Enfield,Classic 350,petrol,2018,Ranchi
-v-0459,TN20AT3316,white,hatchback,Renault,Kwid,petrol,2020,Chennai
-v-0460,DL20ZZ6633,blue,hatchback,Renault,Kwid,petrol,2016,Delhi
-v-0461,UP12VJ4183,grey,hatchback,Renault,Kwid,petrol,2014,Lucknow
-v-0462,HR42K2103,white,sedan,Volkswagen,Virtus,petrol,2021,Gurugram
-v-0463,RJ23XW4842,grey,hatchback,Maruti Suzuki,Baleno,petrol,2019,Jaipur
-v-0464,PB29VX6008,white,two-wheeler,Royal Enfield,Classic 350,petrol,2019,Ludhiana
-v-0465,RJ28AL5033,black,two-wheeler,TVS,Apache,petrol,2018,Jaipur
-v-0466,TS09RQ8296,white,sedan,Volkswagen,Virtus,petrol,2015,Hyderabad
-v-0467,UP42J3293,white,auto-rickshaw,Mahindra,Alfa,diesel,2024,Lucknow
-v-0468,DL05S1511,grey,two-wheeler,Royal Enfield,Classic 350,petrol,2017,Delhi
-v-0469,MH36TT8734,white,two-wheeler,TVS,Apache,petrol,2017,Pune
-v-0470,MP09SS2483,silver,suv,Maruti Suzuki,Brezza,petrol,2017,Indore
-v-0471,UP33QF3935,grey,suv,Tata,Nexon,diesel,2021,Lucknow
-v-0472,TS03RH2029,white,sedan,Hyundai,Verna,petrol,2022,Hyderabad
-v-0473,TS25QB1653,silver,bus,Eicher,Skyline Pro,diesel,2022,Hyderabad
-v-0474,CG17NW7201,grey,sedan,Honda,City,petrol,2022,Raipur
-v-0475,CG25SN6781,silver,two-wheeler,TVS,Apache,petrol,2023,Raipur
-v-0476,JH33QF4768,grey,hatchback,Maruti Suzuki,Baleno,petrol,2016,Ranchi
-v-0477,UP11VY2938,silver,two-wheeler,Honda,Activa,petrol,2015,Lucknow
-v-0478,PB44RG3641,silver,two-wheeler,Bajaj,Pulsar,petrol,2014,Ludhiana
-v-0479,TN37EW9399,grey,hatchback,Maruti Suzuki,Swift,petrol,2016,Chennai
-v-0480,CG12VU1305,black,auto-rickshaw,Piaggio,Ape City,cng,2015,Raipur
-v-0481,WB29RF4594,grey,auto-rickshaw,Mahindra,Alfa,diesel,2016,Kolkata
-v-0482,CG11QV2127,silver,hatchback,Maruti Suzuki,Swift,petrol,2014,Raipur
-v-0483,WB34EV2577,blue,hatchback,Renault,Kwid,petrol,2014,Kolkata
-v-0484,KA06XE9835,blue,auto-rickshaw,Mahindra,Alfa,diesel,2024,Bengaluru
-v-0485,KL34MB9680,blue,suv,Kia,Seltos,diesel,2020,Kochi
-v-0486,TS38P3193,black,sedan,Honda,City,petrol,2018,Hyderabad
-v-0487,KL17AY1116,white,suv,Mahindra,Scorpio,diesel,2020,Kochi
-v-0488,WB45PM2746,grey,hatchback,Hyundai,i20,petrol,2018,Kolkata
-v-0489,KL37VJ7511,silver,two-wheeler,Royal Enfield,Classic 350,petrol,2021,Kochi
-v-0490,UP24JK6641,silver,two-wheeler,Bajaj,Pulsar,petrol,2024,Lucknow
-v-0491,KA15YF2642,silver,hatchback,Hyundai,i20,petrol,2022,Bengaluru
-v-0492,MH11WA2492,silver,auto-rickshaw,Mahindra,Alfa,diesel,2020,Pune
-v-0493,DL05HM2311,black,suv,Kia,Seltos,diesel,2023,Delhi
-v-0494,MP39F9099,white,suv,Maruti Suzuki,Brezza,petrol,2022,Indore
-v-0495,MP13V9364,white,suv,Tata,Nexon,diesel,2024,Indore
-v-0496,MH24WA3579,white,hatchback,Tata,Altroz,diesel,2019,Pune
-v-0497,AP26SA2124,grey,truck,Eicher,Pro 2049,diesel,2019,Visakhapatnam
-v-0498,CG15QN1076,silver,sedan,Honda,City,petrol,2022,Raipur
-v-0499,DL33LD9409,red,truck,Eicher,Pro 2049,diesel,2021,Delhi
+demo-dl8caf-sedan,DL8CAF1234,white,sedan,Honda,City,petrol,2022,Delhi
+demo-22bh-suv,22BH1234AA,black,suv,Tata,Nexon,diesel,2022,Delhi
+neg-1char-000,JH05AB6790,white,two-wheeler,Bajaj,Pulsar,petrol,2017,Ladakh
+neg-1char-001,MH12DE1434,white,hatchback,Maruti Suzuki,Swift,petrol,2023,Uttar Pradesh
+neg-1char-002,KA03MN4822,white,suv,Tata,Nexon,diesel,2022,Jharkhand
+neg-1char-003,CG04TR7789,grey,suv,Kia,Seltos,diesel,2017,Uttar Pradesh
+neg-1char-004,UP32KL9022,white,suv,Tata,Nexon,diesel,2020,Andaman and Nicobar Islands
+neg-1char-005,DL08CA1235,white,sedan,Honda,City,petrol,2015,Manipur
+neg-1char-006,DL8CAF1235,silver,sedan,Volkswagen,Virtus,petrol,2018,Madhya Pradesh
+neg-1char-007,22BH1234AB,black,two-wheeler,Hero,Splendor,petrol,2020,Uttar Pradesh
+neg-1char-008,JH05AB6791,white,hatchback,Renault,Kwid,petrol,2019,Dadra and Nagar Haveli (Legacy)
+neg-1char-009,MH12DE1435,black,suv,Maruti Suzuki,Brezza,petrol,2017,Arunachal Pradesh
+neg-1char-010,KA03MN4823,green,two-wheeler,Hero,Splendor,petrol,2020,Jammu and Kashmir
+neg-1char-011,CG04TR7780,grey,sedan,Hyundai,Verna,petrol,2019,Mizoram
+neg-1char-012,UP32KL9023,grey,sedan,Volkswagen,Virtus,petrol,2024,Bihar
+neg-1char-013,DL08CA1236,black,hatchback,Tata,Altroz,diesel,2020,Gujarat
+neg-1char-014,DL8CAF1236,blue,sedan,Hyundai,Verna,petrol,2024,West Bengal
+neg-sameattr-000,AS15L7573,white,suv,Hyundai,Creta,petrol,2015,Assam
+neg-sameattr-001,TS21WR7483,silver,hatchback,Tata,Altroz,diesel,2016,Telangana (Legacy)
+neg-sameattr-002,KA36ZU8020,black,two-wheeler,Royal Enfield,Classic 350,petrol,2020,Karnataka
+neg-sameattr-003,DL33CB2797,yellow,auto-rickshaw,Bajaj,RE Compact,cng,2024,Delhi
+neg-sameattr-004,PY39N7253,blue,truck,Tata,Signa,diesel,2022,Puducherry
+neg-sameattr-005,WB01X9798,white,sedan,Maruti Suzuki,Ciaz,petrol,2024,West Bengal
+neg-sameattr-006,LD28QA5316,white,sedan,Volkswagen,Virtus,petrol,2016,Lakshadweep
+neg-sameattr-007,CH41WS4259,black,suv,Tata,Nexon,diesel,2019,Chandigarh
+neg-sameattr-008,UP34V6311,white,two-wheeler,TVS,Apache,petrol,2014,Uttar Pradesh
+neg-sameattr-009,23BH6039HB,white,hatchback,Renault,Kwid,petrol,2015,Karnataka
+neg-sameattr-010,DL8CT3061,white,suv,Tata,Nexon,diesel,2024,Delhi
+neg-sameattr-011,WB11SV7933,grey,suv,Tata,Nexon,diesel,2022,West Bengal
+neg-sameattr-012,HR20XW7119,white,suv,Kia,Seltos,diesel,2022,Haryana
+neg-sameattr-013,KA15L1345,white,sedan,Volkswagen,Virtus,petrol,2022,Karnataka
+neg-sameattr-014,JK01Y1965,silver,sedan,Hyundai,Verna,petrol,2015,Jammu and Kashmir
+neg-confusable-000,JH05AB8799,red,truck,Ashok Leyland,Dost,diesel,2018,Bihar
+neg-confusable-002,MH12DE1438,black,suv,Tata,Nexon,diesel,2015,Punjab
+neg-confusable-003,KA03MN4827,silver,hatchback,Tata,Altroz,diesel,2021,Puducherry
+neg-samedigits-000,DL05AB6799,red,two-wheeler,Bajaj,Pulsar,petrol,2017,Chandigarh
+neg-samedigits-001,DL12DE1433,silver,hatchback,Maruti Suzuki,Baleno,petrol,2018,Puducherry
+neg-samedigits-002,DL03MN4821,red,suv,Kia,Seltos,diesel,2022,Bihar
+neg-samedigits-003,DL04TR7788,grey,hatchback,Maruti Suzuki,Swift,petrol,2015,Uttar Pradesh
+neg-samedigits-004,DL32KL9021,red,truck,Tata,Signa,diesel,2021,Gujarat
+neg-samedigits-005,MH08CA1234,red,suv,Tata,Nexon,diesel,2020,Assam
+neg-samedigits-008,DL05AB6790,silver,hatchback,Hyundai,i20,petrol,2020,Sikkim
+neg-samedigits-009,DL12DE1434,black,two-wheeler,TVS,Apache,petrol,2016,West Bengal
+neg-samedigits-010,DL03MN4822,white,hatchback,Renault,Kwid,petrol,2022,Assam
+neg-samedigits-011,DL04TR7789,white,hatchback,Renault,Kwid,petrol,2021,Assam
+neg-samedigits-012,DL32KL9022,red,suv,Mahindra,Scorpio,diesel,2022,Gujarat
+neg-samedigits-013,MH08CA1235,white,hatchback,Maruti Suzuki,Swift,petrol,2024,Odisha (Legacy)
+v-0053,TS16V2344,silver,auto-rickshaw,Piaggio,Ape City,cng,2024,Telangana (Legacy)
+v-0054,JH43HJ7485,grey,suv,Tata,Nexon,diesel,2024,Jharkhand
+v-0055,BR01VU2639,silver,two-wheeler,Hero,Splendor,petrol,2022,Bihar
+v-0056,BR16KF8180,white,hatchback,Renault,Kwid,petrol,2018,Bihar
+v-0057,AN43XD3201,green,suv,Hyundai,Creta,petrol,2015,Andaman and Nicobar Islands
+v-0058,LD39YL4336,black,auto-rickshaw,Mahindra,Alfa,diesel,2024,Lakshadweep
+v-0059,AS06JB1059,silver,auto-rickshaw,Piaggio,Ape City,cng,2016,Assam
+v-0060,WB28D2233,white,two-wheeler,Bajaj,Pulsar,petrol,2022,West Bengal
+v-0061,PY09K6975,silver,hatchback,Maruti Suzuki,Swift,petrol,2019,Puducherry
+v-0062,24BH3533HF,white,hatchback,Tata,Altroz,diesel,2014,Himachal Pradesh
+v-0063,PB43JF2772,blue,hatchback,Tata,Altroz,diesel,2014,Punjab
+v-0064,SK23HH1388,white,auto-rickshaw,Mahindra,Alfa,diesel,2017,Sikkim
+v-0065,DL13CMW9347,white,suv,Kia,Seltos,diesel,2024,Delhi
+v-0066,DD17UJ1627,grey,bus,Tata,Starbus,diesel,2023,Dadra and Nagar Haveli and Daman and Diu
+v-0067,OR33N4115,black,suv,Hyundai,Creta,petrol,2014,Odisha (Legacy)
+v-0068,UP44MP2147,white,two-wheeler,Honda,Activa,petrol,2023,Uttar Pradesh
+v-0069,MH33XP6345,red,sedan,Skoda,Slavia,petrol,2018,Maharashtra
+v-0070,NL44VU5931,white,suv,Kia,Seltos,diesel,2022,Nagaland
+v-0071,UA39QQ8245,white,auto-rickshaw,Mahindra,Alfa,diesel,2017,Uttarakhand (Legacy)
+v-0072,GJ43K9446,black,suv,Maruti Suzuki,Brezza,petrol,2024,Gujarat
+v-0073,KA44HG3415,white,suv,Mahindra,Scorpio,diesel,2014,Karnataka
+v-0074,BR30WU4186,silver,sedan,Skoda,Slavia,petrol,2021,Bihar
+v-0075,CH28FY9487,white,suv,Kia,Seltos,diesel,2014,Chandigarh
+v-0076,22BH8613XS,blue,suv,Toyota,Fortuner,diesel,2019,West Bengal
+v-0077,TR28FZ8778,blue,truck,Tata,Signa,diesel,2018,Tripura
+v-0078,UK32JQ2270,red,two-wheeler,Honda,Activa,petrol,2017,Uttarakhand
+v-0079,DL10NY3504,white,sedan,Hyundai,Verna,petrol,2015,Delhi
+v-0080,AS14NU1321,silver,suv,Toyota,Fortuner,diesel,2020,Assam
+v-0081,NL27RH5472,yellow,suv,Kia,Seltos,diesel,2021,Nagaland
+v-0082,OD11EV9752,silver,hatchback,Maruti Suzuki,Swift,petrol,2020,Odisha
+v-0083,DL7CQ3978,grey,suv,Mahindra,Scorpio,diesel,2018,Delhi
+v-0084,NL18JC8706,white,sedan,Honda,City,petrol,2022,Nagaland
+v-0085,BR42A5052,yellow,hatchback,Maruti Suzuki,Baleno,petrol,2014,Bihar
+v-0086,DD37QY5199,white,two-wheeler,Honda,Activa,petrol,2016,Dadra and Nagar Haveli and Daman and Diu
+v-0087,GJ20U1421,yellow,suv,Hyundai,Creta,petrol,2023,Gujarat
+v-0088,HR05DY5942,yellow,two-wheeler,Royal Enfield,Classic 350,petrol,2015,Haryana
+v-0089,DL9SXM2130,grey,two-wheeler,Royal Enfield,Classic 350,petrol,2024,Delhi
+v-0090,CH28WQ3507,red,sedan,Skoda,Slavia,petrol,2016,Chandigarh
+v-0091,UP31PZ5398,yellow,two-wheeler,Honda,Activa,petrol,2017,Uttar Pradesh
+v-0092,KA30LA9099,white,auto-rickshaw,Piaggio,Ape City,cng,2016,Karnataka
+v-0093,LA39TA9465,silver,suv,Tata,Nexon,diesel,2015,Ladakh
+v-0094,KA45WY9042,silver,sedan,Skoda,Slavia,petrol,2014,Karnataka
+v-0095,MH43RT9699,white,hatchback,Hyundai,i20,petrol,2020,Maharashtra
+v-0096,SK18JH2977,grey,bus,Eicher,Skyline Pro,diesel,2017,Sikkim
+v-0097,HP13ZR5531,black,sedan,Volkswagen,Virtus,petrol,2022,Himachal Pradesh
+v-0098,LD15FK1232,green,suv,Maruti Suzuki,Brezza,petrol,2022,Lakshadweep
+v-0099,DL5CW9043,white,hatchback,Maruti Suzuki,Swift,petrol,2014,Delhi
+v-0100,HP04RD2071,silver,suv,Kia,Seltos,diesel,2021,Himachal Pradesh
+v-0101,DL3CCH2941,grey,hatchback,Renault,Kwid,petrol,2020,Delhi
+v-0102,UK25QK8026,black,suv,Hyundai,Creta,petrol,2023,Uttarakhand
+v-0103,JH41JX2331,grey,two-wheeler,Bajaj,Pulsar,petrol,2017,Jharkhand
+v-0104,DL8CKB4793,white,hatchback,Hyundai,i20,petrol,2018,Delhi
+v-0105,KL41PD9923,silver,two-wheeler,Bajaj,Pulsar,petrol,2024,Kerala
+v-0106,21BH3719KV,white,hatchback,Hyundai,i20,petrol,2021,Telangana (Legacy)
+v-0107,LA33QC1654,black,hatchback,Tata,Altroz,diesel,2019,Ladakh
+v-0108,TS38X5416,white,suv,Toyota,Fortuner,diesel,2014,Telangana (Legacy)
+v-0109,RJ18UP9057,white,two-wheeler,Hero,Splendor,petrol,2021,Rajasthan
+v-0110,GJ22YR5723,silver,sedan,Skoda,Slavia,petrol,2022,Gujarat
+v-0111,DD26X9890,white,hatchback,Tata,Altroz,diesel,2020,Dadra and Nagar Haveli and Daman and Diu
+v-0112,TN41BG5376,silver,hatchback,Renault,Kwid,petrol,2016,Tamil Nadu
+v-0113,DD02YF6092,silver,truck,Tata,407,diesel,2022,Dadra and Nagar Haveli and Daman and Diu
+v-0114,DD30W3523,white,suv,Kia,Seltos,diesel,2018,Dadra and Nagar Haveli and Daman and Diu
+v-0115,TG16TE7285,white,suv,Tata,Nexon,diesel,2023,Telangana
+v-0116,LA27SJ1043,red,suv,Hyundai,Creta,petrol,2018,Ladakh
+v-0117,GA29ML9904,grey,auto-rickshaw,Piaggio,Ape City,cng,2021,Goa
+v-0118,KA37HP1716,red,truck,Eicher,Pro 2049,diesel,2021,Karnataka
+v-0119,GA32E9230,red,two-wheeler,Royal Enfield,Classic 350,petrol,2019,Goa
+v-0120,UK30Z3362,red,auto-rickshaw,Piaggio,Ape City,cng,2024,Uttarakhand
+v-0121,KL22WC6384,white,bus,Eicher,Skyline Pro,diesel,2022,Kerala
+v-0122,TN35V2122,white,suv,Tata,Nexon,diesel,2024,Tamil Nadu
+v-0123,CG28W2647,white,two-wheeler,TVS,Apache,petrol,2016,Chhattisgarh
+v-0124,DL13SK6874,blue,two-wheeler,Honda,Activa,petrol,2020,Delhi
+v-0125,HP11CV7268,grey,hatchback,Renault,Kwid,petrol,2024,Himachal Pradesh
+v-0126,24BH5162QJ,blue,sedan,Skoda,Slavia,petrol,2018,Andaman and Nicobar Islands
+v-0127,MP38WP5098,white,two-wheeler,TVS,Apache,petrol,2018,Madhya Pradesh
+v-0128,KA25UK5838,silver,hatchback,Maruti Suzuki,Swift,petrol,2024,Karnataka
+v-0129,AS39KH6773,white,suv,Tata,Nexon,diesel,2024,Assam
+v-0130,DL41W1646,white,hatchback,Hyundai,i20,petrol,2021,Delhi
+v-0131,23BH6353ZP,silver,hatchback,Maruti Suzuki,Baleno,petrol,2016,Himachal Pradesh
+v-0132,TR18JR5836,red,two-wheeler,Honda,Activa,petrol,2015,Tripura
+v-0133,JK44TM2480,white,suv,Kia,Seltos,diesel,2014,Jammu and Kashmir
+v-0134,KL38WM2776,white,sedan,Hyundai,Verna,petrol,2021,Kerala
+v-0135,CT15W8607,blue,hatchback,Hyundai,i20,petrol,2024,Chhattisgarh (Legacy)
+v-0136,MH32D4847,white,suv,Toyota,Fortuner,diesel,2016,Maharashtra
+v-0137,UP27PW2623,silver,suv,Kia,Seltos,diesel,2023,Uttar Pradesh
+v-0138,DL6CQ8286,yellow,suv,Tata,Nexon,diesel,2019,Delhi
+v-0139,MP04JG3002,black,hatchback,Tata,Altroz,diesel,2015,Madhya Pradesh
+v-0140,AP04HE4363,grey,two-wheeler,Hero,Splendor,petrol,2022,Andhra Pradesh
+v-0141,MN10J3371,white,hatchback,Maruti Suzuki,Baleno,petrol,2022,Manipur
+v-0142,AP09M4899,white,sedan,Volkswagen,Virtus,petrol,2019,Andhra Pradesh
+v-0143,24BH9620DZ,white,hatchback,Tata,Altroz,diesel,2021,Bihar
+v-0144,22BH1711ZX,silver,two-wheeler,Honda,Activa,petrol,2021,Uttarakhand
+v-0145,OD28R8268,white,two-wheeler,Hero,Splendor,petrol,2015,Odisha
+v-0146,23BH7241VS,white,sedan,Skoda,Slavia,petrol,2022,Lakshadweep
+v-0147,WB14QH7780,white,suv,Hyundai,Creta,petrol,2021,West Bengal
+v-0148,ML43ME8771,black,suv,Mahindra,Scorpio,diesel,2015,Meghalaya
+v-0149,DL12CET1983,white,auto-rickshaw,Mahindra,Alfa,diesel,2022,Delhi
+v-0150,PY04VK6762,grey,suv,Mahindra,Scorpio,diesel,2023,Puducherry
+v-0151,CH23DJ4706,white,suv,Kia,Seltos,diesel,2022,Chandigarh
+v-0152,WB02AF5478,red,bus,Eicher,Skyline Pro,diesel,2018,West Bengal
+v-0153,GA37CE1503,silver,truck,Tata,407,diesel,2022,Goa
+v-0154,MZ20UV2392,silver,hatchback,Maruti Suzuki,Swift,petrol,2016,Mizoram
+v-0155,LA29RV8243,grey,hatchback,Tata,Altroz,diesel,2018,Ladakh
+v-0156,DD19SX6054,silver,hatchback,Maruti Suzuki,Swift,petrol,2017,Dadra and Nagar Haveli and Daman and Diu
+v-0157,DL5CE5187,grey,suv,Hyundai,Creta,petrol,2019,Delhi
+v-0158,DL25ST6803,silver,hatchback,Maruti Suzuki,Swift,petrol,2020,Delhi
+v-0159,DL2CUP7627,white,auto-rickshaw,Mahindra,Alfa,diesel,2024,Delhi
+v-0160,DL6CV8539,white,suv,Maruti Suzuki,Brezza,petrol,2019,Delhi
+v-0161,UA26N6084,red,hatchback,Hyundai,i20,petrol,2017,Uttarakhand (Legacy)
+v-0162,DD34MM3420,white,sedan,Hyundai,Verna,petrol,2015,Dadra and Nagar Haveli and Daman and Diu
+v-0163,BR12QU8355,white,hatchback,Renault,Kwid,petrol,2024,Bihar
+v-0164,DN21QC8683,grey,two-wheeler,TVS,Apache,petrol,2024,Dadra and Nagar Haveli (Legacy)
+v-0165,DL9CK8566,white,sedan,Skoda,Slavia,petrol,2014,Delhi
+v-0166,DL14CV9308,red,hatchback,Tata,Altroz,diesel,2021,Delhi
+v-0167,AR29LV8793,yellow,suv,Toyota,Fortuner,diesel,2016,Arunachal Pradesh
+v-0168,MN06BH8173,silver,truck,Tata,Signa,diesel,2022,Manipur
+v-0169,LD25LX1858,white,suv,Maruti Suzuki,Brezza,petrol,2024,Lakshadweep
+v-0170,NL19ZX3464,silver,sedan,Maruti Suzuki,Ciaz,petrol,2015,Nagaland
+v-0171,OD09K7172,white,suv,Maruti Suzuki,Brezza,petrol,2019,Odisha
+v-0172,UK06SM1299,grey,two-wheeler,Honda,Activa,petrol,2018,Uttarakhand
+v-0173,TN13EE2265,white,hatchback,Hyundai,i20,petrol,2015,Tamil Nadu
+v-0174,UK03VE7173,grey,suv,Tata,Nexon,diesel,2016,Uttarakhand
+v-0175,GJ29P6969,black,hatchback,Maruti Suzuki,Baleno,petrol,2021,Gujarat
+v-0176,JK35KR4179,black,suv,Hyundai,Creta,petrol,2024,Jammu and Kashmir
+v-0177,LD25FG3268,green,truck,Eicher,Pro 2049,diesel,2014,Lakshadweep
+v-0178,CH34K2375,red,two-wheeler,Bajaj,Pulsar,petrol,2018,Chandigarh
+v-0179,CG15MA7798,silver,suv,Mahindra,Scorpio,diesel,2020,Chhattisgarh
+v-0180,MZ15L2624,white,suv,Maruti Suzuki,Brezza,petrol,2024,Mizoram
+v-0181,DL14CYE8686,white,sedan,Skoda,Slavia,petrol,2023,Delhi
+v-0182,GA36DK4894,white,hatchback,Hyundai,i20,petrol,2015,Goa
+v-0183,SK05R9783,silver,hatchback,Maruti Suzuki,Swift,petrol,2024,Sikkim
+v-0184,24BH1026VM,white,suv,Toyota,Fortuner,diesel,2020,Karnataka
+v-0185,MZ05N8703,grey,hatchback,Maruti Suzuki,Swift,petrol,2024,Mizoram
+v-0186,MP05HZ2699,silver,suv,Toyota,Fortuner,diesel,2019,Madhya Pradesh
+v-0187,HP44YR3987,silver,hatchback,Maruti Suzuki,Baleno,petrol,2015,Himachal Pradesh
+v-0188,DL4SG1687,yellow,two-wheeler,Honda,Activa,petrol,2018,Delhi
+v-0189,KL03KM1784,green,suv,Maruti Suzuki,Brezza,petrol,2019,Kerala
+v-0190,OD29LF9130,black,sedan,Skoda,Slavia,petrol,2019,Odisha
+v-0191,PY06VF9938,silver,truck,Eicher,Pro 2049,diesel,2019,Puducherry
+v-0192,RJ39FY8273,silver,hatchback,Hyundai,i20,petrol,2021,Rajasthan
+v-0193,PY18C7656,red,hatchback,Hyundai,i20,petrol,2022,Puducherry
+v-0194,GA39BE2102,grey,two-wheeler,Bajaj,Pulsar,petrol,2024,Goa
+v-0195,OR10MM8274,silver,sedan,Honda,City,petrol,2023,Odisha (Legacy)
+v-0196,LA16A4049,silver,hatchback,Tata,Altroz,diesel,2022,Ladakh
+v-0197,KL29VK9048,grey,suv,Tata,Nexon,diesel,2015,Kerala
+v-0198,RJ06XM2064,white,hatchback,Renault,Kwid,petrol,2022,Rajasthan
+v-0199,DN12SH2989,white,sedan,Hyundai,Verna,petrol,2016,Dadra and Nagar Haveli (Legacy)
+v-0200,TS24TE2413,silver,hatchback,Maruti Suzuki,Swift,petrol,2018,Telangana (Legacy)
+v-0201,PB27E6195,black,suv,Maruti Suzuki,Brezza,petrol,2015,Punjab
+v-0202,WB41EP9239,black,suv,Mahindra,Scorpio,diesel,2015,West Bengal
+v-0203,JK23CJ4217,white,suv,Maruti Suzuki,Brezza,petrol,2022,Jammu and Kashmir
+v-0204,CG33UU3527,grey,sedan,Hyundai,Verna,petrol,2024,Chhattisgarh
+v-0205,TS03C1745,blue,two-wheeler,Royal Enfield,Classic 350,petrol,2018,Telangana (Legacy)
+v-0206,DN02WT5746,black,two-wheeler,Honda,Activa,petrol,2021,Dadra and Nagar Haveli (Legacy)
+v-0207,SK05F8203,red,sedan,Skoda,Slavia,petrol,2021,Sikkim
+v-0208,23BH6659NE,silver,suv,Toyota,Fortuner,diesel,2022,Mizoram
+v-0209,24BH5062ED,white,hatchback,Hyundai,i20,petrol,2020,Assam
+v-0210,GJ21GF9164,silver,auto-rickshaw,Mahindra,Alfa,diesel,2021,Gujarat
+v-0211,DL7CHG6782,white,suv,Mahindra,Scorpio,diesel,2014,Delhi
+v-0212,TG19D8061,grey,sedan,Hyundai,Verna,petrol,2018,Telangana
+v-0213,OD04MT5729,black,two-wheeler,Hero,Splendor,petrol,2020,Odisha
+v-0214,CT44E2585,black,suv,Kia,Seltos,diesel,2019,Chhattisgarh (Legacy)
+v-0215,GA13SB1743,silver,two-wheeler,Hero,Splendor,petrol,2016,Goa
+v-0216,GA39LV6219,red,two-wheeler,Bajaj,Pulsar,petrol,2020,Goa
+v-0217,MN33YU5912,black,bus,Ashok Leyland,Viking,diesel,2014,Manipur
+v-0218,UA20V8776,grey,sedan,Maruti Suzuki,Ciaz,petrol,2024,Uttarakhand (Legacy)
+v-0219,AS38FS7230,black,two-wheeler,Bajaj,Pulsar,petrol,2024,Assam
+v-0220,HR02LP3482,grey,sedan,Skoda,Slavia,petrol,2017,Haryana
+v-0221,AS09TL8838,black,suv,Toyota,Fortuner,diesel,2020,Assam
+v-0222,MN35XZ5332,white,sedan,Volkswagen,Virtus,petrol,2021,Manipur
+v-0223,JK20YG9012,white,hatchback,Hyundai,i20,petrol,2021,Jammu and Kashmir
+v-0224,LA19U9900,blue,sedan,Skoda,Slavia,petrol,2020,Ladakh
+v-0225,LD03YC6675,yellow,two-wheeler,TVS,Apache,petrol,2024,Lakshadweep
+v-0226,UP18ED4921,silver,sedan,Hyundai,Verna,petrol,2014,Uttar Pradesh
+v-0227,AS07LY8740,grey,two-wheeler,Hero,Splendor,petrol,2024,Assam
+v-0228,GJ27RW4268,white,two-wheeler,Honda,Activa,petrol,2019,Gujarat
+v-0229,TS15F7847,white,sedan,Hyundai,Verna,petrol,2014,Telangana (Legacy)
+v-0230,LD03K2759,silver,bus,Ashok Leyland,Viking,diesel,2018,Lakshadweep
+v-0231,DL33JG2846,grey,suv,Hyundai,Creta,petrol,2016,Delhi
+v-0232,AN22UX4165,grey,two-wheeler,Bajaj,Pulsar,petrol,2023,Andaman and Nicobar Islands
+v-0233,TR21N2563,blue,auto-rickshaw,Bajaj,RE Compact,cng,2016,Tripura
+v-0234,DL7CQ5375,blue,suv,Hyundai,Creta,petrol,2018,Delhi
+v-0235,MZ45BX2937,grey,suv,Kia,Seltos,diesel,2018,Mizoram
+v-0236,MH45W5834,black,hatchback,Hyundai,i20,petrol,2023,Maharashtra
+v-0237,SK39PY9999,yellow,hatchback,Tata,Altroz,diesel,2022,Sikkim
+v-0238,OR06SY6928,red,two-wheeler,Hero,Splendor,petrol,2023,Odisha (Legacy)
+v-0239,HR37FL9526,red,hatchback,Tata,Altroz,diesel,2015,Haryana
+v-0240,TR29Q3162,black,two-wheeler,Royal Enfield,Classic 350,petrol,2020,Tripura
+v-0241,MH02JA4571,white,suv,Toyota,Fortuner,diesel,2015,Maharashtra
+v-0242,DL1CR1520,silver,hatchback,Hyundai,i20,petrol,2020,Delhi
+v-0243,PB24QN7155,white,hatchback,Maruti Suzuki,Swift,petrol,2024,Punjab
+v-0244,23BH2944FT,red,bus,Eicher,Skyline Pro,diesel,2016,Odisha
+v-0245,DL1SQX9921,white,two-wheeler,TVS,Apache,petrol,2022,Delhi
+v-0246,GA18ZD1528,white,sedan,Skoda,Slavia,petrol,2023,Goa
+v-0247,DL4SD1551,blue,two-wheeler,TVS,Apache,petrol,2023,Delhi
+v-0248,AR26HT4560,red,two-wheeler,Hero,Splendor,petrol,2016,Arunachal Pradesh
+v-0249,TS21HK3348,white,suv,Maruti Suzuki,Brezza,petrol,2022,Telangana (Legacy)
+v-0250,DL10CW8000,white,hatchback,Renault,Kwid,petrol,2021,Delhi
+v-0251,NL34YP7689,silver,hatchback,Maruti Suzuki,Baleno,petrol,2018,Nagaland
+v-0252,JK20QB7762,black,sedan,Skoda,Slavia,petrol,2022,Jammu and Kashmir
+v-0253,MN42Q7080,silver,suv,Mahindra,Scorpio,diesel,2022,Manipur
+v-0254,OR39C4083,white,two-wheeler,Royal Enfield,Classic 350,petrol,2024,Odisha (Legacy)
+v-0255,MN20G4114,silver,suv,Maruti Suzuki,Brezza,petrol,2015,Manipur
+v-0256,OR14HT6270,black,two-wheeler,Honda,Activa,petrol,2020,Odisha (Legacy)
+v-0257,MZ33QD8693,grey,suv,Hyundai,Creta,petrol,2017,Mizoram
+v-0258,JK10J7842,silver,sedan,Maruti Suzuki,Ciaz,petrol,2016,Jammu and Kashmir
+v-0259,KA32JR9038,white,hatchback,Tata,Altroz,diesel,2016,Karnataka
+v-0260,24BH4016TW,silver,two-wheeler,Royal Enfield,Classic 350,petrol,2014,Assam
+v-0261,AS01EW4792,white,auto-rickshaw,Bajaj,RE Compact,cng,2016,Assam
+v-0262,CT41XR1258,silver,hatchback,Maruti Suzuki,Swift,petrol,2022,Chhattisgarh (Legacy)
+v-0263,LA35AS8055,white,suv,Tata,Nexon,diesel,2015,Ladakh
+v-0264,CT34MJ7503,grey,truck,Tata,407,diesel,2019,Chhattisgarh (Legacy)
+v-0265,JK20W1520,silver,truck,Tata,407,diesel,2020,Jammu and Kashmir
+v-0266,DL1CC9190,grey,sedan,Skoda,Slavia,petrol,2024,Delhi
+v-0267,CH34H4464,grey,two-wheeler,Royal Enfield,Classic 350,petrol,2021,Chandigarh
+v-0268,LA35F6153,blue,sedan,Honda,City,petrol,2017,Ladakh
+v-0269,OD05FU4940,black,suv,Toyota,Fortuner,diesel,2020,Odisha
+v-0270,DL45S6667,grey,two-wheeler,Hero,Splendor,petrol,2015,Delhi
+v-0271,CT39LA5479,red,suv,Kia,Seltos,diesel,2021,Chhattisgarh (Legacy)
+v-0272,HP44CV5840,grey,hatchback,Maruti Suzuki,Baleno,petrol,2015,Himachal Pradesh
+v-0273,DN10LM2746,white,hatchback,Maruti Suzuki,Swift,petrol,2014,Dadra and Nagar Haveli (Legacy)
+v-0274,CH09F8062,silver,truck,Tata,Signa,diesel,2022,Chandigarh
+v-0275,DL6CV6316,silver,suv,Kia,Seltos,diesel,2014,Delhi
+v-0276,DL9CU9538,silver,sedan,Hyundai,Verna,petrol,2024,Delhi
+v-0277,TN10F8122,white,suv,Hyundai,Creta,petrol,2020,Tamil Nadu
+v-0278,KA41VV4204,black,sedan,Skoda,Slavia,petrol,2015,Karnataka
+v-0279,CT25QL8056,white,hatchback,Renault,Kwid,petrol,2016,Chhattisgarh (Legacy)
+v-0280,TG21NL5776,grey,sedan,Skoda,Slavia,petrol,2023,Telangana
+v-0281,OD24U4274,silver,two-wheeler,Royal Enfield,Classic 350,petrol,2022,Odisha
+v-0282,DL12CYG8184,black,hatchback,Hyundai,i20,petrol,2015,Delhi
+v-0283,TN09HJ3526,black,two-wheeler,TVS,Apache,petrol,2020,Tamil Nadu
+v-0284,OD35TB6891,brown,hatchback,Renault,Kwid,petrol,2023,Odisha
+v-0285,MP11U7548,white,two-wheeler,Honda,Activa,petrol,2020,Madhya Pradesh
+v-0286,UK36QM7409,white,hatchback,Tata,Altroz,diesel,2024,Uttarakhand
+v-0287,AP31K7816,silver,suv,Mahindra,Scorpio,diesel,2015,Andhra Pradesh
+v-0288,MN30SR6707,black,auto-rickshaw,Piaggio,Ape City,cng,2015,Manipur
+v-0289,MH03A6621,black,suv,Maruti Suzuki,Brezza,petrol,2015,Maharashtra
+v-0290,KA34TF6423,white,two-wheeler,Royal Enfield,Classic 350,petrol,2020,Karnataka
+v-0291,HP12NA4233,white,truck,Tata,Signa,diesel,2023,Himachal Pradesh
+v-0292,LA05T4064,white,suv,Hyundai,Creta,petrol,2019,Ladakh
+v-0293,TN34VN7432,white,hatchback,Renault,Kwid,petrol,2015,Tamil Nadu
+v-0294,MH40X3195,red,sedan,Maruti Suzuki,Ciaz,petrol,2015,Maharashtra
+v-0295,GA33PV3259,white,hatchback,Renault,Kwid,petrol,2020,Goa
+v-0296,HP36RK3299,silver,suv,Tata,Nexon,diesel,2019,Himachal Pradesh
+v-0297,AN32GN9282,grey,auto-rickshaw,Mahindra,Alfa,diesel,2021,Andaman and Nicobar Islands
+v-0298,RJ32CU1506,silver,suv,Tata,Nexon,diesel,2018,Rajasthan
+v-0299,SK37TS2855,white,hatchback,Renault,Kwid,petrol,2015,Sikkim
+v-0300,UP03TG7966,grey,sedan,Honda,City,petrol,2024,Uttar Pradesh
+v-0301,RJ17CQ2924,white,two-wheeler,Bajaj,Pulsar,petrol,2017,Rajasthan
+v-0302,CT41FV3282,grey,two-wheeler,Bajaj,Pulsar,petrol,2017,Chhattisgarh (Legacy)
+v-0303,OR35LY5795,grey,two-wheeler,Honda,Activa,petrol,2023,Odisha (Legacy)
+v-0304,CH09BJ3079,red,sedan,Hyundai,Verna,petrol,2017,Chandigarh
+v-0305,OD32UW5403,silver,hatchback,Tata,Altroz,diesel,2020,Odisha
+v-0306,CG26YM8450,grey,suv,Kia,Seltos,diesel,2019,Chhattisgarh
+v-0307,CG30CT7517,red,suv,Tata,Nexon,diesel,2020,Chhattisgarh
+v-0308,LD22UR6632,silver,auto-rickshaw,Mahindra,Alfa,diesel,2014,Lakshadweep
+v-0309,AP08QQ1012,grey,hatchback,Tata,Altroz,diesel,2017,Andhra Pradesh
+v-0310,MH11CW6906,blue,bus,Ashok Leyland,Viking,diesel,2015,Maharashtra
+v-0311,OD41ZY4837,blue,sedan,Skoda,Slavia,petrol,2024,Odisha
+v-0312,BR09SX8292,white,hatchback,Maruti Suzuki,Swift,petrol,2014,Bihar
+v-0313,PY45RC4752,red,two-wheeler,TVS,Apache,petrol,2015,Puducherry
+v-0314,MH09EW3341,white,two-wheeler,Hero,Splendor,petrol,2022,Maharashtra
+v-0315,MP14PV8249,grey,suv,Tata,Nexon,diesel,2015,Madhya Pradesh
+v-0316,24BH6760PL,white,auto-rickshaw,Bajaj,RE Compact,cng,2018,Delhi
+v-0317,OR19X5943,white,two-wheeler,Bajaj,Pulsar,petrol,2022,Odisha (Legacy)
+v-0318,AS16ND4950,white,suv,Kia,Seltos,diesel,2024,Assam
+v-0319,MZ21NU7896,grey,suv,Hyundai,Creta,petrol,2022,Mizoram
+v-0320,BR02A5296,black,two-wheeler,Bajaj,Pulsar,petrol,2014,Bihar
+v-0321,LD41PY7591,yellow,truck,Tata,407,diesel,2024,Lakshadweep
+v-0322,MH06ET6354,grey,suv,Kia,Seltos,diesel,2023,Maharashtra
+v-0323,BR20ZH1949,red,two-wheeler,Bajaj,Pulsar,petrol,2015,Bihar
+v-0324,AS20DA3249,white,truck,Tata,407,diesel,2016,Assam
+v-0325,KL11EZ5404,silver,suv,Maruti Suzuki,Brezza,petrol,2015,Kerala
+v-0326,LA34J2263,white,two-wheeler,TVS,Apache,petrol,2021,Ladakh
+v-0327,GJ24JD2890,white,suv,Tata,Nexon,diesel,2022,Gujarat
+v-0328,DL1CMN3459,red,hatchback,Maruti Suzuki,Baleno,petrol,2014,Delhi
+v-0329,PB15HP6242,blue,suv,Hyundai,Creta,petrol,2015,Punjab
+v-0330,AS12SB7569,white,suv,Mahindra,Scorpio,diesel,2021,Assam
+v-0331,CG36AM4288,black,auto-rickshaw,Piaggio,Ape City,cng,2023,Chhattisgarh
+v-0332,MZ38GZ9955,black,two-wheeler,Bajaj,Pulsar,petrol,2016,Mizoram
+v-0333,MP41L1024,silver,hatchback,Tata,Altroz,diesel,2018,Madhya Pradesh
+v-0334,TN04YJ2525,grey,hatchback,Maruti Suzuki,Swift,petrol,2017,Tamil Nadu
+v-0335,MZ30U2566,silver,auto-rickshaw,Mahindra,Alfa,diesel,2016,Mizoram
+v-0336,AS28HK5277,silver,two-wheeler,Honda,Activa,petrol,2020,Assam
+v-0337,LA15G3231,black,two-wheeler,Royal Enfield,Classic 350,petrol,2015,Ladakh
+v-0338,PB08GQ6052,white,hatchback,Tata,Altroz,diesel,2018,Punjab
+v-0339,MH45G6371,white,auto-rickshaw,Bajaj,RE Compact,cng,2015,Maharashtra
+v-0340,AS44JF1510,yellow,two-wheeler,TVS,Apache,petrol,2021,Assam
+v-0341,DL2CD1196,grey,suv,Mahindra,Scorpio,diesel,2017,Delhi
+v-0342,DN42U5241,red,hatchback,Maruti Suzuki,Swift,petrol,2014,Dadra and Nagar Haveli (Legacy)
+v-0343,DL06DB8553,white,bus,Tata,Starbus,diesel,2016,Delhi
+v-0344,TN02XP3832,silver,truck,Eicher,Pro 2049,diesel,2017,Tamil Nadu
+v-0345,GA03WK9174,white,truck,Tata,Signa,diesel,2022,Goa
+v-0346,PB13WT1320,white,suv,Kia,Seltos,diesel,2019,Punjab
+v-0347,TS33NJ3947,black,suv,Mahindra,Scorpio,diesel,2019,Telangana (Legacy)
+v-0348,LA04SM4814,white,suv,Tata,Nexon,diesel,2015,Ladakh
+v-0349,AS15MF3886,white,sedan,Hyundai,Verna,petrol,2023,Assam
+v-0350,UA02UU3329,black,sedan,Volkswagen,Virtus,petrol,2017,Uttarakhand (Legacy)
+v-0351,UP20RB2479,red,auto-rickshaw,Bajaj,RE Compact,cng,2017,Uttar Pradesh
+v-0352,MN40EL3908,white,suv,Hyundai,Creta,petrol,2014,Manipur
+v-0353,DD34CM7482,grey,hatchback,Renault,Kwid,petrol,2015,Dadra and Nagar Haveli and Daman and Diu
+v-0354,PY41WL3855,silver,sedan,Volkswagen,Virtus,petrol,2023,Puducherry
+v-0355,HP25ZY5826,white,two-wheeler,Bajaj,Pulsar,petrol,2016,Himachal Pradesh
+v-0356,OD37F6214,yellow,two-wheeler,Royal Enfield,Classic 350,petrol,2017,Odisha
+v-0357,MN05ML3751,white,two-wheeler,Hero,Splendor,petrol,2024,Manipur
+v-0358,KL14YC6743,blue,two-wheeler,Honda,Activa,petrol,2015,Kerala
+v-0359,PB11RN6755,white,two-wheeler,Royal Enfield,Classic 350,petrol,2020,Punjab
+v-0360,JK11CB5832,silver,hatchback,Maruti Suzuki,Swift,petrol,2019,Jammu and Kashmir
+v-0361,NL11T2526,white,sedan,Maruti Suzuki,Ciaz,petrol,2023,Nagaland
+v-0362,PY42VP3574,blue,bus,Tata,Starbus,diesel,2015,Puducherry
+v-0363,WB35XK5873,green,sedan,Hyundai,Verna,petrol,2015,West Bengal
+v-0364,GA04AP2436,grey,hatchback,Hyundai,i20,petrol,2024,Goa
+v-0365,DL4SW5782,silver,two-wheeler,Hero,Splendor,petrol,2021,Delhi
+v-0366,TN43CW9915,white,auto-rickshaw,Piaggio,Ape City,cng,2016,Tamil Nadu
+v-0367,AR17QJ4707,silver,sedan,Maruti Suzuki,Ciaz,petrol,2023,Arunachal Pradesh
+v-0368,CG43TP4728,black,hatchback,Renault,Kwid,petrol,2014,Chhattisgarh
+v-0369,UP44UH8804,red,auto-rickshaw,Piaggio,Ape City,cng,2015,Uttar Pradesh
+v-0370,DL10CD8358,red,suv,Tata,Nexon,diesel,2016,Delhi
+v-0371,24BH2284XP,red,bus,Eicher,Skyline Pro,diesel,2016,Haryana
+v-0372,BR06TN6344,white,auto-rickshaw,Piaggio,Ape City,cng,2022,Bihar
+v-0373,CT38DP3452,red,suv,Tata,Nexon,diesel,2023,Chhattisgarh (Legacy)
+v-0374,CH37K9776,black,suv,Hyundai,Creta,petrol,2020,Chandigarh
+v-0375,TG03JN3357,grey,sedan,Volkswagen,Virtus,petrol,2023,Telangana
+v-0376,MN45BZ8786,silver,two-wheeler,Honda,Activa,petrol,2019,Manipur
+v-0377,LA32H3202,red,hatchback,Hyundai,i20,petrol,2021,Ladakh
+v-0378,OR42G8238,silver,two-wheeler,Bajaj,Pulsar,petrol,2020,Odisha (Legacy)
+v-0379,AS33CK9304,black,two-wheeler,TVS,Apache,petrol,2016,Assam
+v-0380,HP13BH1542,grey,two-wheeler,TVS,Apache,petrol,2014,Himachal Pradesh
+v-0381,SK33WD1501,black,truck,Ashok Leyland,Dost,diesel,2019,Sikkim
+v-0382,TG38MF5238,silver,suv,Maruti Suzuki,Brezza,petrol,2015,Telangana
+v-0383,TS14WH4388,silver,sedan,Maruti Suzuki,Ciaz,petrol,2024,Telangana (Legacy)
+v-0384,AN31WF1139,white,suv,Tata,Nexon,diesel,2018,Andaman and Nicobar Islands
+v-0385,LA28MQ5129,yellow,suv,Tata,Nexon,diesel,2021,Ladakh
+v-0386,UA07S7132,grey,sedan,Volkswagen,Virtus,petrol,2024,Uttarakhand (Legacy)
+v-0387,TG05JW6328,white,suv,Hyundai,Creta,petrol,2018,Telangana
+v-0388,HR10BV7621,yellow,two-wheeler,Honda,Activa,petrol,2024,Haryana
+v-0389,LD17NN1579,white,hatchback,Renault,Kwid,petrol,2023,Lakshadweep
+v-0390,UP41XM9312,silver,two-wheeler,Honda,Activa,petrol,2016,Uttar Pradesh
+v-0391,CH31ZJ4000,red,auto-rickshaw,Mahindra,Alfa,diesel,2019,Chandigarh
+v-0392,MH27MJ5818,white,two-wheeler,TVS,Apache,petrol,2015,Maharashtra
+v-0393,CT05GS2964,red,suv,Maruti Suzuki,Brezza,petrol,2020,Chhattisgarh (Legacy)
+v-0394,GA09LP8497,silver,suv,Tata,Nexon,diesel,2019,Goa
+v-0395,DL6CL1951,white,auto-rickshaw,Bajaj,RE Compact,cng,2021,Delhi
+v-0396,GJ32E8106,black,sedan,Skoda,Slavia,petrol,2020,Gujarat
+v-0397,DL9CZ7113,silver,suv,Mahindra,Scorpio,diesel,2019,Delhi
+v-0398,DL1SH6642,grey,two-wheeler,Honda,Activa,petrol,2016,Delhi
+v-0399,BR03KQ9525,silver,hatchback,Renault,Kwid,petrol,2022,Bihar
+v-0400,MN32GF7610,blue,sedan,Honda,City,petrol,2017,Manipur
+v-0401,AP38DM1613,green,hatchback,Tata,Altroz,diesel,2024,Andhra Pradesh
+v-0402,DL1CW1324,grey,sedan,Honda,City,petrol,2015,Delhi
+v-0403,TG45GY1153,silver,suv,Hyundai,Creta,petrol,2020,Telangana
+v-0404,OR45PD9382,grey,two-wheeler,Royal Enfield,Classic 350,petrol,2015,Odisha (Legacy)
+v-0405,OR13SG6865,black,sedan,Skoda,Slavia,petrol,2018,Odisha (Legacy)
+v-0406,TG22AA2459,grey,hatchback,Maruti Suzuki,Swift,petrol,2023,Telangana
+v-0407,DL9SZ2660,white,two-wheeler,Honda,Activa,petrol,2024,Delhi
+v-0408,SK04F1647,green,hatchback,Hyundai,i20,petrol,2019,Sikkim
+v-0409,CH03E3794,white,two-wheeler,Honda,Activa,petrol,2019,Chandigarh
+v-0410,CG24FD7567,yellow,auto-rickshaw,Piaggio,Ape City,cng,2021,Chhattisgarh
+v-0411,PB42DE1961,silver,sedan,Hyundai,Verna,petrol,2015,Punjab
+v-0412,RJ12MV1473,grey,suv,Maruti Suzuki,Brezza,petrol,2016,Rajasthan
+v-0413,RJ03J6149,silver,suv,Mahindra,Scorpio,diesel,2024,Rajasthan
+v-0414,JK43SS2561,black,suv,Kia,Seltos,diesel,2024,Jammu and Kashmir
+v-0415,NL10A3572,silver,two-wheeler,Royal Enfield,Classic 350,petrol,2021,Nagaland
+v-0416,DL8CHL5558,red,auto-rickshaw,Bajaj,RE Compact,cng,2022,Delhi
+v-0417,KA06QU8342,grey,hatchback,Maruti Suzuki,Swift,petrol,2021,Karnataka
+v-0418,AP07PB9997,white,suv,Mahindra,Scorpio,diesel,2015,Andhra Pradesh
+v-0419,TR36WX8475,yellow,two-wheeler,Honda,Activa,petrol,2019,Tripura
+v-0420,MN36YX6953,red,auto-rickshaw,Mahindra,Alfa,diesel,2021,Manipur
+v-0421,MN23TS7126,black,hatchback,Maruti Suzuki,Swift,petrol,2014,Manipur
+v-0422,PB07VG4073,silver,auto-rickshaw,Bajaj,RE Compact,cng,2020,Punjab
+v-0423,MN07BW3019,red,hatchback,Tata,Altroz,diesel,2021,Manipur
+v-0424,24BH1072SZ,yellow,two-wheeler,Royal Enfield,Classic 350,petrol,2020,Assam
+v-0425,HP45ZE2697,silver,auto-rickshaw,Piaggio,Ape City,cng,2024,Himachal Pradesh
+v-0426,NL27JN6618,blue,suv,Hyundai,Creta,petrol,2021,Nagaland
+v-0427,TR20YZ4561,white,two-wheeler,Bajaj,Pulsar,petrol,2017,Tripura
+v-0428,DL42ST6282,white,two-wheeler,Hero,Splendor,petrol,2019,Delhi
+v-0429,PB44PA9565,grey,suv,Mahindra,Scorpio,diesel,2014,Punjab
+v-0430,DL5CK5106,white,suv,Tata,Nexon,diesel,2014,Delhi
+v-0431,AR23DV4676,white,two-wheeler,Royal Enfield,Classic 350,petrol,2020,Arunachal Pradesh
+v-0432,LD45N7350,black,hatchback,Tata,Altroz,diesel,2024,Lakshadweep
+v-0433,DL5CV8260,grey,sedan,Hyundai,Verna,petrol,2024,Delhi
+v-0434,UP39ZG5820,grey,two-wheeler,TVS,Apache,petrol,2016,Uttar Pradesh
+v-0435,TR08BP5573,white,bus,Eicher,Skyline Pro,diesel,2018,Tripura
+v-0436,MN30BE6286,grey,hatchback,Renault,Kwid,petrol,2014,Manipur
+v-0437,MH32CY6208,grey,two-wheeler,Royal Enfield,Classic 350,petrol,2017,Maharashtra
+v-0438,GJ27CM4625,grey,truck,Ashok Leyland,Dost,diesel,2024,Gujarat
+v-0439,CT34TW1145,silver,sedan,Honda,City,petrol,2024,Chhattisgarh (Legacy)
+v-0440,CT16X6259,white,sedan,Skoda,Slavia,petrol,2015,Chhattisgarh (Legacy)
+v-0441,UK24RB5857,grey,suv,Maruti Suzuki,Brezza,petrol,2017,Uttarakhand
+v-0442,DL13CW2073,white,sedan,Hyundai,Verna,petrol,2024,Delhi
+v-0443,CH14WC3520,white,two-wheeler,Hero,Splendor,petrol,2021,Chandigarh
+v-0444,DL3STC4730,white,two-wheeler,Honda,Activa,petrol,2020,Delhi
+v-0445,AP25T1097,grey,suv,Maruti Suzuki,Brezza,petrol,2023,Andhra Pradesh
+v-0446,DL14CM9239,black,hatchback,Maruti Suzuki,Swift,petrol,2018,Delhi
+v-0447,DL13SNN1505,white,two-wheeler,TVS,Apache,petrol,2016,Delhi
+v-0448,UP19KX7114,white,suv,Mahindra,Scorpio,diesel,2022,Uttar Pradesh
+v-0449,DL10CTT2395,white,auto-rickshaw,Piaggio,Ape City,cng,2017,Delhi
+v-0450,PB42FF4618,blue,two-wheeler,Royal Enfield,Classic 350,petrol,2018,Punjab
+v-0451,AS36WT2199,white,hatchback,Hyundai,i20,petrol,2024,Assam
+v-0452,TN22EX4843,white,hatchback,Maruti Suzuki,Swift,petrol,2018,Tamil Nadu
+v-0453,RJ22YU3497,blue,suv,Toyota,Fortuner,diesel,2023,Rajasthan
+v-0454,AN21HY8146,white,sedan,Maruti Suzuki,Ciaz,petrol,2019,Andaman and Nicobar Islands
+v-0455,SK29KR2784,black,hatchback,Maruti Suzuki,Baleno,petrol,2024,Sikkim
+v-0456,DL35JZ2253,red,suv,Maruti Suzuki,Brezza,petrol,2015,Delhi
+v-0457,UA38UG1601,red,auto-rickshaw,Mahindra,Alfa,diesel,2018,Uttarakhand (Legacy)
+v-0458,GA24HU5768,brown,suv,Tata,Nexon,diesel,2021,Goa
+v-0459,AN43VX3718,white,suv,Toyota,Fortuner,diesel,2016,Andaman and Nicobar Islands
+v-0460,GA31BH8990,white,suv,Tata,Nexon,diesel,2015,Goa
+v-0461,UK24RQ1761,white,sedan,Honda,City,petrol,2024,Uttarakhand
+v-0462,LA17NW7202,black,sedan,Maruti Suzuki,Ciaz,petrol,2023,Ladakh
+v-0463,NL15MM8977,red,two-wheeler,TVS,Apache,petrol,2023,Nagaland
+v-0464,JK05GE4063,blue,hatchback,Maruti Suzuki,Baleno,petrol,2019,Jammu and Kashmir
+v-0465,PB22R8845,red,suv,Kia,Seltos,diesel,2017,Punjab
+v-0466,KA03UU3640,grey,suv,Tata,Nexon,diesel,2024,Karnataka
+v-0467,22BH5232FS,blue,suv,Toyota,Fortuner,diesel,2023,Odisha
+v-0468,LD06QV8724,red,two-wheeler,TVS,Apache,petrol,2016,Lakshadweep
+v-0469,22BH9370JF,silver,hatchback,Tata,Altroz,diesel,2023,Manipur
+v-0470,CH02SS7878,white,suv,Tata,Nexon,diesel,2023,Chandigarh
+v-0471,AR35C8902,silver,hatchback,Maruti Suzuki,Baleno,petrol,2023,Arunachal Pradesh
+v-0472,PY34MB9681,white,suv,Kia,Seltos,diesel,2017,Puducherry
+v-0473,MP38P3194,silver,truck,Eicher,Pro 2049,diesel,2021,Madhya Pradesh
+v-0474,DL10SJG1090,blue,two-wheeler,Hero,Splendor,petrol,2023,Delhi
+v-0475,JH45PM2747,silver,suv,Tata,Nexon,diesel,2020,Jharkhand
+v-0476,PY37VJ7512,white,two-wheeler,Bajaj,Pulsar,petrol,2020,Puducherry
+v-0477,WB36JK6642,grey,suv,Maruti Suzuki,Brezza,petrol,2020,West Bengal
+v-0478,JK29DG9329,red,two-wheeler,TVS,Apache,petrol,2019,Jammu and Kashmir
+v-0479,AS11WA2493,grey,two-wheeler,Bajaj,Pulsar,petrol,2021,Assam
+v-0480,DL4CCV1619,silver,truck,Tata,Signa,diesel,2020,Delhi
+v-0481,OR04WR8193,grey,suv,Mahindra,Scorpio,diesel,2017,Odisha (Legacy)
+v-0482,HR03VF1591,blue,auto-rickshaw,Piaggio,Ape City,cng,2017,Haryana
+v-0483,DL5SMX7475,green,two-wheeler,TVS,Apache,petrol,2023,Delhi
+v-0484,CG36ZT6704,white,hatchback,Hyundai,i20,petrol,2018,Chhattisgarh
+v-0485,OD37J3868,yellow,hatchback,Tata,Altroz,diesel,2022,Odisha
+v-0486,DD33TU5099,white,hatchback,Tata,Altroz,diesel,2020,Dadra and Nagar Haveli and Daman and Diu
+v-0487,SK44UA8897,black,suv,Mahindra,Scorpio,diesel,2018,Sikkim
+v-0488,JK21MS9777,grey,hatchback,Maruti Suzuki,Swift,petrol,2018,Jammu and Kashmir
+v-0489,MN05RL6793,white,sedan,Hyundai,Verna,petrol,2023,Manipur
+v-0490,HR32HZ4966,yellow,sedan,Maruti Suzuki,Ciaz,petrol,2017,Haryana
+v-0491,MP10D2286,red,hatchback,Tata,Altroz,diesel,2023,Madhya Pradesh
+v-0492,TG24RU5502,red,hatchback,Tata,Altroz,diesel,2016,Telangana
+v-0493,JK37BS7934,blue,bus,Ashok Leyland,Viking,diesel,2022,Jammu and Kashmir
+v-0494,HP30Y9491,silver,hatchback,Tata,Altroz,diesel,2019,Himachal Pradesh
+v-0495,UA07MV5255,white,two-wheeler,Bajaj,Pulsar,petrol,2022,Uttarakhand (Legacy)
+v-0496,MN24RP4450,white,sedan,Skoda,Slavia,petrol,2019,Manipur
+v-0497,TS09DZ5423,silver,sedan,Hyundai,Verna,petrol,2022,Telangana (Legacy)
+v-0498,22BH8750AF,silver,suv,Kia,Seltos,diesel,2016,Punjab
+v-0499,ML32JT1782,red,bus,Ashok Leyland,Viking,diesel,2015,Meghalaya

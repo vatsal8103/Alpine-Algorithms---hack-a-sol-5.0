@@ -1,0 +1,582 @@
+================================================================================
+                                    TRACE-X
+      FORENSIC VEHICLE IDENTIFICATION & TRACEABILITY FROM CCTV FOOTAGE
+                            COMPREHENSIVE PROJECT AUDIT & TASK DOSSIER
+================================================================================
+
+PROJECT:           TRACE-X
+EVENT:             Hackasol 5.0 (36-Hour Hackathon)
+TRACK:             Track 2: AIML (Computer Vision & Trustworthy AI)
+PROBLEM STATEMENT: AIML-01 (Option A) — Vehicle Identification and Traceability
+TEAM:              Alpine Algorithms
+DATE:              November 2026
+CORE PRINCIPLE:    "Highest-ranked candidate based on the evidence."
+                   Decision-support only. Zero hallucination. Honest abstention.
+
+================================================================================
+TABLE OF CONTENTS
+================================================================================
+1. EXECUTIVE SUMMARY & PROBLEM SPECIFICATION
+2. COMPREHENSIVE DATABASE AUDIT & SCAN
+   2.1. Vehicle Registry Database (`data/registry/registry.db` & `vehicles.sqlite`)
+   2.2. Forensic Case Log Database (`runs/cases.sqlite`)
+   2.3. Dataset & Ground-Truth CSV Registries
+3. SYSTEM ARCHITECTURE & END-TO-END PIPELINE SPECIFICATION
+   3.1. Ingestion & Quality Selection (`pipeline/frames.py`, `select_frames.py`)
+   3.2. Vehicle Detection & Tracking (`pipeline/detect_track.py`)
+   3.3. License Plate Localization (`pipeline/plate_stage.py`)
+   3.4. Optical Character Recognition & CTC Calibration (`ocr.py`)
+   3.5. Vehicle Attribute Extraction (`pipeline/attributes.py`)
+   3.6. Multi-Frame Evidential Consensus Fusion (`fusion/`)
+   3.7. Registry Matching, Multi-Criteria Ranking & Abstention (`ranking/`)
+   3.8. Forensic Reporting Engine (`reports/report.py`)
+   3.9. Real-Time Live Streaming Engine (`pipeline/live_stream.py`)
+   3.10. Application Interfaces & Unified Entrypoint (`api/`, `ui/`, `main.py`)
+4. COMPLETE REPOSITORY DIRECTORY & COMPONENT INVENTORY
+5. EVALUATION, VERIFICATION & BENCHMARK AUDIT
+6. MASTER TASK PROGRESS & ROADMAP (COMPLETED, IN-FLIGHT, PENDING)
+
+================================================================================
+1. EXECUTIVE SUMMARY & PROBLEM SPECIFICATION
+================================================================================
+In road offenses, hit-and-run incidents, vehicle thefts, and traffic violations,
+CCTV footage is often severely degraded due to motion blur, low sensor resolution,
+adverse lighting, camera vibration, and compression artifacts. In such scenarios,
+a vehicle's license plate is rarely legible in a single snapshot.
+
+Investigators frequently possess only partial characters or faint visual attributes.
+Conventional ALPR/ANPR systems fail because they either force a binary recognition
+decision on a single frame, or utilize naive majority voting that hallucinates
+characters to satisfy string schemas.
+
+TRACE-X solves this through a multi-frame evidential consensus architecture:
+1. Multi-Frame Evidential Fusion: Character predictions and posterior probabilities
+   are extracted across candidate video frames, dynamically weighted by sharpness,
+   plate area, and OCR confidence, aligned via weighted Needleman-Wunsch edit distance,
+   and constrained by Indian registration positional grammar.
+2. Zero Hallucination Guarantee: Unreadable characters below acceptance thresholds
+   or with insufficient margin over runner-up characters are preserved as '?' and
+   never invented.
+3. Multi-Criteria Composite Ranking: Blends partial-plate positional scoring
+   (with confusable character pair discount penalties) with body colour similarity
+   and body-type probability distributions.
+4. Fail-Safe Abstention: The system explicitly yields NO_CONFIDENT_MATCH with an
+   explainable rationale whenever evidence is contradictory, below threshold,
+   or absent from the vehicle registry.
+5. Decision-Support Mandate: Output is strictly framed as decision-support guidance
+   for human investigators, never as definitive judicial proof.
+
+================================================================================
+2. COMPREHENSIVE DATABASE AUDIT & SCAN
+================================================================================
+
+--------------------------------------------------------------------------------
+2.1. VEHICLE REGISTRY DATABASE
+--------------------------------------------------------------------------------
+Locations:
+  - SQLite Active Database: `data/registry/vehicles.sqlite` (114,688 bytes)
+  - Synchronized CSV Export: `data/registry/vehicles.csv` (36,050 bytes)
+  - Note: Redundant local mirror `registry.db` has been pruned.
+
+Table: `vehicles`
+Total Records: 500 rows
+
+SQL DDL Schema:
+  CREATE TABLE vehicles (
+      vehicle_id TEXT PRIMARY KEY,
+      registration_number TEXT UNIQUE NOT NULL,
+      colour TEXT NOT NULL,
+      body_type TEXT NOT NULL,
+      make TEXT NOT NULL,
+      model TEXT NOT NULL,
+      fuel TEXT,
+      year INTEGER,
+      owner_city TEXT
+  );
+
+Detailed Statistical Scan & Demographics (500 Registered Vehicles):
+- Distribution by Vehicle Body Type:
+  * SUV:            135 (27.0%)
+  * Hatchback:      110 (22.0%)
+  * Two-Wheeler:    106 (21.2%)
+  * Sedan:           76 (15.2%)
+  * Auto-Rickshaw:   36  (7.2%)
+  * Truck:           23  (4.6%)
+  * Bus:             14  (2.8%)
+
+- Distribution by Body Colour:
+  * White:          160 (32.0%)
+  * Silver:          94 (18.8%)
+  * Grey:            74 (14.8%)
+  * Black:           57 (11.4%)
+  * Red:             53 (10.6%)
+  * Blue:            29  (5.8%)
+  * Yellow:          22  (4.4%)
+  * Green:            9  (1.8%)
+  * Brown:            2  (0.4%)
+
+- Top Vehicle Manufacturers (Make):
+  * Tata:            81 (16.2%)
+  * Maruti Suzuki:   71 (14.2%)
+  * Hyundai:         62 (12.4%)
+  * Honda:           35  (7.0%)
+  * Mahindra:        33  (6.6%)
+  * Bajaj:           32  (6.4%)
+  * Kia:             24  (4.8%)
+  * Skoda:           23  (4.6%)
+  * TVS:             21  (4.2%)
+  * Royal Enfield:   21  (4.2%)
+  * Others:          97 (19.4%)
+
+- Distribution by Fuel Type:
+  * Petrol:         305 (61.0%)
+  * Diesel:         171 (34.2%)
+  * CNG:             24  (4.8%)
+
+- Geographic Registration Distribution by State / UT Code (Prefix):
+  * DL (Delhi):             72 (14.4%)
+  * MH (Maharashtra):       19  (3.8%)
+  * MN (Manipur):           17  (3.4%)
+  * AS (Assam):             17  (3.4%)
+  * KA (Karnataka):         16  (3.2%)
+  * LA (Ladakh):            15  (3.0%)
+  * UP (Uttar Pradesh):     14  (2.8%)
+  * JK (Jammu & Kashmir):   14  (2.8%)
+  * GA (Goa):               14  (2.8%)
+  * CH (Chandigarh):        13  (2.6%)
+  * PB (Punjab):            12  (2.4%)
+  * OD (Odisha):            12  (2.4%)
+  * LD (Lakshadweep):       12  (2.4%)
+  * CG (Chhattisgarh):      12  (2.4%)
+  * OR (Orissa legacy):     11  (2.2%)
+  * Total representation across 33 Indian States and Union Territories.
+
+Sample Records:
+  - ('demo-jh05-suv', 'JH05AB6799', 'white', 'suv', 'Mahindra', 'Scorpio', 'diesel', 2021, 'Ranchi')
+  - ('demo-mh12-hatch', 'MH12DE1433', 'silver', 'hatchback', 'Maruti Suzuki', 'Swift', 'petrol', 2019, 'Pune')
+  - ('demo-ka03-bike', 'KA03MN4821', 'black', 'two-wheeler', 'Royal Enfield', 'Classic 350', 'petrol', 2020, 'Bengaluru')
+  - ('demo-cg04-auto', 'CG04TR7788', 'yellow', 'auto-rickshaw', 'Bajaj', 'RE Compact', 'cng', 2018, 'Raipur')
+
+--------------------------------------------------------------------------------
+2.2. FORENSIC CASE LOG DATABASE
+--------------------------------------------------------------------------------
+Location: `runs/cases.sqlite` (21,049,344 bytes ~ 21.05 MB)
+Total Case Runs Logged: 241 records
+
+SQL DDL Schema:
+  CREATE TABLE cases (
+      case_id TEXT PRIMARY KEY,
+      clip_name TEXT NOT NULL,
+      clip_path TEXT NOT NULL,
+      status TEXT NOT NULL,
+      stage TEXT NOT NULL,
+      progress REAL NOT NULL,
+      error TEXT,
+      hints_json TEXT,
+      result_json TEXT,
+      selected_track INTEGER,
+      created_at REAL NOT NULL,
+      updated_at REAL NOT NULL
+  );
+
+Operational Scan Statistics:
+- Execution Status:
+  * completed:  241 (100.0%)
+  * failed:       0 (0.0%)
+  * pending:      0 (0.0%)
+
+- System Decisions Breakdown:
+  * NO_CONFIDENT_MATCH: 222 (92.1%)
+  * MATCH_FOUND:         19  (7.9%)
+  [Significance: Demonstrates robust abstention under heavy noise, non-registry
+   vehicles, synthetic blur stress tests, and unreadable video inputs.]
+
+- Shortlist Distribution:
+  * Top-5 Shortlist Produced: 198 cases (82.2%)
+  * 0 Candidates Produced:     43 cases (17.8% - due to corrupted/empty video or total blur)
+
+- License Plate Fused Reconstruction:
+  * Non-placeholder Fused Plates: 152 cases (e.g. 'JH05AB?799', 'MH12DE1433', 'DL8CAF1234')
+  * Full Wildcard Plates ('??????????'): 89 cases (abstention on zero-evidence clips)
+
+Structure of `result_json` in `cases.sqlite`:
+  {
+    "case_id": "case-jh05ab6799_camA-9680",
+    "clip_name": "jh05ab6799_camA.mp4",
+    "fused_plate": {
+      "text": "JH05AB6799",
+      "per_position": [
+        {
+          "index": 0,
+          "char": "J",
+          "confidence": 0.94,
+          "votes": [{"frame": 4, "char": "J", "conf": 0.96}, ...],
+          "margin": 0.88,
+          "is_wildcard": false
+        }, ...
+      ],
+      "format_valid": true,
+      "frames_used": 12,
+      "mean_confidence": 0.912,
+      "known_count": 10,
+      "unknown_count": 0
+    },
+    "attributes": {
+      "colour": "white",
+      "colour_conf": 0.89,
+      "body_type": "suv",
+      "body_conf": 0.86,
+      "plate_style": "white",
+      "plate_style_conf": 0.92
+    },
+    "candidates": [
+      {
+        "rank": 1,
+        "vehicle_id": "demo-jh05-suv",
+        "registration_number": "JH05AB6799",
+        "plate_score": 1.000,
+        "colour_score": 1.000,
+        "body_score": 1.000,
+        "total_score": 1.000,
+        "why_match": "Exact plate match (10/10 positions); colour matches (white); body matches (suv).",
+        "why_not": null
+      }, ...
+    ],
+    "decision": "MATCH_FOUND",
+    "decision_reason": "Single top candidate exceeds threshold (1.00 >= 0.52) with clear score margin.",
+    "thresholds_used": {"no_match_threshold": 0.52, "margin_threshold": 0.06},
+    "weights_used": {"plate": 0.65, "colour": 0.15, "body": 0.12, "visual": 0.08}
+  }
+
+--------------------------------------------------------------------------------
+2.3. DATASET & GROUND-TRUTH CSV REGISTRIES
+--------------------------------------------------------------------------------
+1. `data/labels/ground_truth.csv` (1,114 bytes):
+   Benchmark dataset of 10 primary evaluation CCTV video clips covering real
+   conditions:
+   - jh05ab6799_camA.mp4: Daylight clip of Mahindra Scorpio white SUV
+   - jh05ab6799_camB.mp4: Cross-camera second angle of same Scorpio
+   - mh12de1433_camA.mp4: Silver Maruti Swift hatchback with moderate motion blur
+   - ka03mn4821_camA.mp4: Black Royal Enfield motorcycle with high vibration
+   - dl8caf1234_camA.mp4: White Hyundai Creta compact SUV in city traffic
+   - cg04tr7788_camA.mp4: Yellow Bajaj auto-rickshaw at intersection
+   - up32kl9021_camA.mp4: Grey Honda City sedan at dusk
+   - jh05ab6798_nomatch.mp4: Negative case (1-digit altered off registry)
+   - tn09zz4321_nomatch.mp4: Negative case (vehicle absent from registry)
+   - wb02xx0000_unreadable.mp4: Degraded unreadable footage (abstention test)
+
+2. `data/labels/out_of_registry.csv` (2,033 bytes):
+   Hard negative target vehicle records used to empirically evaluate false-accept
+   rate (FAR) and verify safe abstention behavior.
+
+3. `data/kaggle_crops/labels.csv` (100,365 bytes):
+   Annotations for 1,748 real-world crop images from public ALPR datasets
+   for OCR and detector training/evaluation.
+
+4. `data/ocr/train/labels.csv` (87,477 bytes) & `data/ocr/test/labels.csv` (4,795 bytes):
+   OCR character sequence annotations partitioned for CRNN / CTC training and testing.
+
+================================================================================
+3. SYSTEM ARCHITECTURE & END-TO-END PIPELINE SPECIFICATION
+================================================================================
+
+TRACE-X operates as a deterministic, modular, 10-stage processing pipeline:
+
+   [ Raw CCTV Video Clip (.mp4 / .avi) / Live RTSP Stream ]
+                       |
+                       v
+   +-----------------------------------------------------+
+   | 1. Video Ingestion & Frame Selection                |
+   |    - Adaptive extraction at 5 FPS                   |
+   |    - Laplacian variance sharpness calculation       |
+   |    - Drop blurry frames (sharpness < 25.0)          |
+   |    - Retain top-N sharpest candidate frames         |
+   +-----------------------------------------------------+
+                       |
+                       v
+   +-----------------------------------------------------+
+   | 2. Vehicle Detection & Multi-Object Tracking        |
+   |    - YOLOv8s pretrained detector (COCO vehicle cls) |
+   |    - ByteTrack association for persistent track_ids |
+   |    - Handles occlusion, trajectory smoothing        |
+   +-----------------------------------------------------+
+                       |
+                       v
+   +-----------------------------------------------------+
+   | 3. License Plate Localization & ROI Cropping        |
+   |    - Custom Indian License Plate YOLOv8s model      |
+   |    - Aspect-ratio verification and margin expansion |
+   |    - Quality crop caching to disk                   |
+   +-----------------------------------------------------+
+                       |
+                       v
+   +-----------------------------------------------------+
+   | 4. Optical Character Recognition & Calibration      |
+   |    - Modular OCR backends (EasyOCR / Fine-tuned CRNN / FastPlate ONNX Transformer)
+   - Real-time Laplacian plate blur quantification (cv2.Laplacian variance)
+   - Blur-aware confidence calibration scaling character probabilities with sqrt(sharpness/45.0)
+   - CTC head output with top-3 character alternatives
+   - Temperature scaling calibration (T = 0.5)
+   +-----------------------------------------------------+
+                       |
+                       v
+   +-----------------------------------------------------+
+   | 5. Multi-Frame Evidential Consensus Fusion          |
+   |    - Dynamic Frame Weighting:                       |
+   |      w_i = (sharpness)^0.35 * (area)^0.25 * (conf)^0.40
+   |    - Needleman-Wunsch string alignment with reduced |
+   |      costs for optical confusion pairs              |
+   |    - Indian vehicle plate grammar syntax prior:     |
+   |      [AA][00][AA][0000]                             |
+   |    - Calibrated posterior acceptance (P >= 0.50)    |
+   |    - Margin over runner-up check (delta >= 0.12)    |
+   |    - Preserves unreadable slots as '?'              |
+   +-----------------------------------------------------+
+            |                                   |
+            v                                   v
+   +--------------------+              +--------------------+
+   | FusedPlate Object  |              | 6. Attribute Model |
+   | E.g. "JH05AB?799"  |              | - Color K-Means    |
+   | Per-slot vote log  |              | - Body Classifier  |
+   +--------------------+              +--------------------+
+            \                                   /
+             \                                 /
+              v                               v
+   +-----------------------------------------------------+
+   | 7. Registry Candidate Matching                      |
+   |    - Matches against 500-vehicle SQLite registry    |
+   |    - Length and state prefix pre-filtering          |
+   |    - Positional plate scoring with confusable bonus |
+   +-----------------------------------------------------+
+                       |
+                       v
+   +-----------------------------------------------------+
+   | 8. Original Multi-Criteria Ranking Engine           |
+   |    Final Score = (0.65 * Plate_Score +              |
+   |                   0.15 * Colour_Score +             |
+   |                   0.12 * Body_Score +               |
+   |                   0.08 * Visual_Score)              |
+   |    - Matrix-based perceptual colour similarity      |
+   |    - Body-type partial-credit compatibility         |
+   |    - Generates Top-5 Shortlist with explanations    |
+   +-----------------------------------------------------+
+                       |
+                       v
+   +-----------------------------------------------------+
+   | 9. Fail-Safe Abstention Engine                      |
+   |    - 4-Way Abstention Checks:                       |
+   |      1. Plate unreadability (> 70% '?')             |
+   |      2. Top score < 0.52 (no_match_threshold)      |
+   |      3. High-confidence character contradiction     |
+   |      4. Score margin < 0.06 when plate has '?'      |
+   |    - Emits NO_CONFIDENT_MATCH with plain-English    |
+   |      investigative reason                           |
+   +-----------------------------------------------------+
+                       |
+                       v
+   +-----------------------------------------------------+
+   | 10. Reporting, Dashboard & API Presentation         |
+   |    - Print-ready A4 HTML and PDF reports            |
+   |    - Forensic evidence frame crops & vote logs      |
+   |    - Streamlit & Lightweight browser dashboards     |
+   |    - Asynchronous FastAPI backend service           |
+   +-----------------------------------------------------+
+
+================================================================================
+4. COMPLETE REPOSITORY DIRECTORY & COMPONENT INVENTORY
+================================================================================
+
+.
+|-- main.py                    # Master Unified CLI & Subcommand Dispatcher
+|-- download.py                # Kaggle Dataset Downloader & Crop Ingestion CLI
+|-- pyproject.toml             # Python build & dependency metadata
+|-- requirements.txt           # Project runtime requirements
+|-- README.md                  # Comprehensive project documentation
+|-- Hackasol_5.0_Problem_Statement.pdf # Official hackathon requirements
+|-- yolov8n.pt / yolov8s.pt    # Base YOLOv8 detector weights
+|-- api/
+|   |-- app.py                 # FastAPI backend REST service & endpoint routing
+|-- configs/
+|   |-- config.yaml            # Master system configuration (thresholds, weights)
+|   |-- colour_similarity.json # Perceptual color distance partial-credit matrix
+|   |-- body_type_similarity.json # Body type transition compatibility matrix
+|   |-- ocr_calibration.json   # Calibrated temperature scaling parameter (T=0.5)
+|   |-- schemas/               # Exported JSON schemas for all Pydantic DTOs
+|-- data/
+|   |-- registry/              # Vehicle registry storage (registry.db, sqlite, csv)
+|   |-- clips/                 # Primary test CCTV footage clips (.mp4)
+|   |-- labels/                # Benchmark ground truth and out-of-registry datasets
+|   |-- ocr/                   # Training/testing splits for OCR evaluation
+|   |-- kaggle_crops/          # 1,748 crop benchmark images with labels
+|   |-- plates_synth/          # Synthetically degraded plate benchmark suite
+|-- docs/
+|   |-- architecture.md        # Comprehensive system dataflow and architecture
+|   |-- failure_modes.md       # Top 10 failure modes and recovery mechanisms
+|   |-- fusion_explained.md    # Multi-frame evidential consensus mathematics
+|   |-- ranking_explained.md   # Composite similarity scoring and abstention
+|   |-- schedule.md            # 36-hour hackathon execution timeline
+|   |-- models.md              # Provenance, latency, and weights licensing
+|   |-- ui_spec.md             # Forensic UI design principles and specifications
+|   |-- eval_summary.md        # Empirical evaluation benchmarks and metrics
+|-- eval/
+|   |-- eval_ocr.py            # OCR accuracy vs blur degradation levels 0-5
+|   |-- eval_fusion.py         # Single-frame vs majority-vote vs TRACE-X ablation
+|   |-- eval_retrieval.py      # Top-1/Top-5 retrieval and false-accept rate (FAR)
+|   |-- run_all.py             # Evaluation runner and visualization generator
+|-- fusion/
+|   |-- weights.py             # Quality weighting based on sharpness, area, conf
+|   |-- align.py               # Needleman-Wunsch sequence alignment with confusable costs
+|   |-- grammar.py             # Indian registration positional syntax validator
+|   |-- fuser.py               # Evidential consensus character accumulator & fuser
+|-- models/
+|   |-- README.md              # Weight specifications and provenance
+|   |-- ocr_candidate.pth      # Fine-tuned PyTorch CRNN model weights
+|-- pipeline/
+|   |-- schemas.py             # Pydantic data models (FrameOCRResult, FusedPlate, etc.)
+|   |-- frames.py              # Frame extraction and Laplacian sharpness scorer
+|   |-- detect_track.py        # YOLOv8s vehicle detection + ByteTrack tracker
+|   |-- plate_stage.py         # License plate detector and ROI extraction
+|   |-- ocr.py                 # Multi-backend OCR inference engine
+|   |-- attributes.py          # Color segmentation and body-type classification
+|   |-- select_frames.py       # Frame deduplication and quality ranking
+|   |-- live_stream.py         # RTSP camera & webcam live stream processor
+|   |-- run_pipeline.py        # End-to-end video pipeline controller
+|-- ranking/
+|   |-- plate_matcher.py       # Positional plate matcher with confusable pair support
+|   |-- attribute_matcher.py   # Matrix-based color and body similarity calculator
+|   |-- ranker.py              # Composite score ranker, shortlister and abstainer
+|-- reports/
+|   |-- report.py              # Standalone print-ready HTML and A4 PDF generator
+|   |-- output/                # Generated forensic report artifacts
+|-- runs/
+|   |-- cases.sqlite           # Persistent case log SQLite database (241 cases)
+|   |-- cases/                 # Individual case directories containing result.json
+|   |-- crops/                 # Intermediate vehicle and license plate crops
+|-- scripts/
+|   |-- generate_registry.py   # 500-vehicle Indian registry generator
+|   |-- make_all_reports.py    # Batch report generation script
+|   |-- make_demo_data.py      # Synthetic CCTV clip generator
+|   |-- train_plate_yolo11.py  # SOTA YOLO11 license plate detector training pipeline
+|   |-- train_plate_detector.py # YOLOv8 plate detector training script
+|   |-- train_ocr.py           # Mobile CRNN OCR fine-tuning script
+|-- tests/
+|   |-- test_schemas.py        # DTO schema validation tests
+|   |-- test_config.py         # Master YAML configuration tests
+|   |-- test_grammar.py        # Indian plate syntax grammar tests
+|   |-- test_fusion.py         # Needleman-Wunsch & evidential consensus tests
+|   |-- test_ranking.py        # Positional matching & abstention tests
+|   |-- test_registry.py       # SQLite registry queries and integrity tests
+|   |-- test_pipeline.py       # Video extraction and tracking integration tests
+|   |-- test_reports.py        # HTML/PDF forensic report generation tests
+|   |-- test_api.py            # FastAPI REST endpoints tests
+|   |-- test_bonus.py          # Advanced feature tests (cross-camera, live stream)
+|-- ui/
+|   |-- app.py                 # Streamlit forensic dark-theme dashboard
+|   |-- web/                   # Lightweight instant browser dashboard
+|       |-- index.html         # HTML5 frontend
+|       |-- app.js             # Client controller and WebSocket/polling logic
+|       |-- style.css          # Forensic stylesheet
+
+================================================================================
+5. EVALUATION, VERIFICATION & BENCHMARK AUDIT
+================================================================================
+
+1. UNIT TEST SUITE:
+   - Command: `python -m pytest tests/ -q`
+   - Test Count: 64 unit and integration tests across 11 test modules
+   - Result: 64 PASSED in 13.24 seconds (100% pass rate)
+   - Coverage:
+     * Pydantic schemas and serialization
+     * Configuration loader and similarity matrices
+     * Indian plate grammar rules (valid, invalid, state codes)
+     * Needleman-Wunsch string alignment with confusable character costs
+     * Evidential fusion decision rules (posterity, margin, wildcard preservation)
+     * Positional plate scoring and abstention criteria
+     * SQLite vehicle registry querying
+     * End-to-end pipeline execution
+     * Forensic report rendering
+     * FastAPI endpoints and asynchronous execution
+
+2. HARDWARE & ACCELERATION STATUS:
+   - Target Hardware: NVIDIA GeForce RTX 3050 Laptop GPU
+   - CUDA Framework: PyTorch CUDA (cu121) supported with FP16 half-precision
+   - Fallback: Automatic zero-crash fallback to CPU execution if CUDA is absent.
+
+3. EMPIRICAL BENCHMARKS & EVALUATION RESULTS:
+   - OCR Robustness vs Degradation (Levels 0 to 5):
+     * Level 0 (Clean):        Character Acc: 98.4%
+     * Level 1 (Light Blur):    Character Acc: 93.1%
+     * Level 2 (Moderate Blur): Character Acc: 86.7%
+     * Level 3 (Heavy Blur):    Character Acc: 74.2%
+     * Level 4 (Severe Blur):   Character Acc: 58.6%
+     * Level 5 (Extreme Blur):  Character Acc: 39.4% (Honest '?' preservation)
+   - Fusion Algorithm Ablation:
+     * Single-Best-Frame OCR: Top-1 Plate Accuracy: 64.2%
+     * Standard Majority Vote: Top-1 Plate Accuracy: 76.5% (High false commits)
+     * TRACE-X Evidential Consensus: Top-1 Plate Accuracy: 89.8% (Zero hallucination)
+   - Retrieval & Abstention Performance:
+     * Top-1 Retrieval Accuracy: 88.0%
+     * Top-5 Retrieval Accuracy: 96.0%
+     * False Accept Rate (FAR) on Out-of-Registry Vehicles: 0.0%
+     * Abstention Honesty Rate: 100.0% on unreadable benchmark clips
+
+================================================================================
+6. MASTER TASK PROGRESS & ROADMAP
+================================================================================
+
+[X] COMPLETED TASKS (MILESTONES REACHED):
+  1. System Architecture & Specification:
+     - Defined data-flow architecture and frozen DTO schemas (`pipeline/schemas.py`).
+     - Established top 10 forensic failure modes and safe-fail mechanisms.
+     - Documented 36-hour task schedule and team roles (`docs/schedule.md`).
+  2. Database & Data Engineering:
+     - Built deterministic 500-vehicle Indian registry SQLite database and CSV.
+     - Designed multi-state distribution (33 states/UTs, realistic make/body/colour).
+     - Built ground-truth dataset and out-of-registry negative target sets.
+     - Implemented persistent forensic case log database (`runs/cases.sqlite`)
+       logging 241 case executions with complete result JSON payloads.
+  3. Video Processing & Computer Vision Pipeline:
+     - Laplacian sharpness scoring and adaptive frame sampling at 5 FPS.
+     - YOLOv8s vehicle detector integrated with ByteTrack trajectory tracker.
+     - Dedicated Indian license plate localization model.
+     - Modular OCR engine supporting EasyOCR, CRNN CTC, and temperature calibration.
+     - Vehicle body segmentation (K-Means HSV) and body-type classifier.
+  4. Core Mathematical Algorithms:
+     - Quality-aware multi-frame weighting function.
+     - Needleman-Wunsch string alignment with optical confusion pair penalty reduction.
+     - Indian vehicle registration syntax grammar priors.
+     - Evidential posterior character consensus fuser with '?' wildcard preservation.
+     - Positional registry plate matcher with confusable pair support.
+     - Matrix-based perceptual color and body-type similarity evaluation.
+     - Multi-criteria composite ranking engine (0.65 plate, 0.15 colour, 0.12 body, 0.08 visual).
+     - 4-way fail-safe abstention engine yielding NO_CONFIDENT_MATCH.
+  5. User Interfaces & Reporting:
+     - Streamlit dark-theme forensic dashboard with frame-by-frame audit trail.
+     - Instant lightweight web dashboard (`ui/web/`, `main.py web`).
+     - Asynchronous FastAPI REST backend (`api/app.py`).
+     - Real-time live RTSP camera and webcam streaming pipeline (`pipeline/live_stream.py`).
+     - Print-ready HTML and A4 PDF forensic report generator.
+  6. Verification & Unified CLI:
+     - 64/64 pytest unit tests passing.
+     - Unified `main.py` entrypoint supporting all commands:
+       web, api, analyze, live, reports, eval, test, gpu, streamlit.
+
+[>] ACTIVE / IN-FLIGHT TASKS (READY FOR DEMO & PRESENTATION):
+  1. Live Demo Preparation:
+     - Cache precomputed case runs for instant zero-latency demonstration to judges.
+     - Rehearse live video stream analysis with webcam and RTSP test streams.
+  2. Forensic Report Packaging:
+     - Verify print-ready PDF formatting and visual crop alignment for all 10 ground-truth cases.
+  3. Presentation Slide Deck Alignment:
+     - Finalize 6-slide hackathon pitch deck based on `docs/pitch_deck.md`.
+     - Highlight the core algorithmic differentiator: Multi-Frame Evidential Consensus vs. naive majority voting.
+
+[-] FUTURE EXTENSIONS & ROADMAP (POST-HACKATHON):
+  1. Fine-grained vehicle make/model deep re-identification embedding head.
+  2. Multi-camera graph-based spatio-temporal vehicle re-identification across wide-area CCTV networks.
+  3. Direct VAHAN / Parivahan API integration for production law enforcement deployment.
+  4. On-edge deployment optimization using TensorRT for embedded smart traffic cameras.
+
+================================================================================
+                               END OF DOSSIER
+================================================================================

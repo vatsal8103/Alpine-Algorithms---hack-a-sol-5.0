@@ -1,0 +1,25 @@
+crop_id,filename,track_id,ground_truth_plate,vehicle_type,vehicle_color,notes
+01,track_12_f0144_plate.png,12,,,,
+02,track_15_f0048_plate.png,15,,,,
+03,track_1_f0000_plate.png,1,,,,
+04,track_29_f0216_plate.png,29,MP13ZU2058,,,White SUV
+05,track_2_f0000_plate.png,2,,,,
+06,track_37_f0384_plate.png,37,,,,
+07,track_3_f0012_plate.png,3,,,,
+08,track_49_f0252_plate.png,49,,,,
+09,track_5_f0000_plate.png,5,,,,
+10,track_60_f0288_plate.png,60,,,,
+11,track_61_f0288_plate.png,61,,,,
+12,track_72_f0372_plate.png,72,MP04ZK6184,,,Silver Sedan
+13,track_7_f0468_plate.png,7,,,,
+14,track_8_f0000_plate.png,8,,,,
+15,track_98_f0468_plate.png,98,,,,
+16,track_12_f0252_plate.png,12,,,,
+17,track_12_f0276_plate.png,12,,,,
+18,track_15_f0072_plate.png,15,,,,
+19,track_15_f0084_plate.png,15,,,,
+20,track_1_f0012_plate.png,1,,,,
+21,track_1_f0024_plate.png,1,,,,
+22,track_29_f0348_plate.png,29,MP13ZU2058,,,White SUV
+23,track_29_f0408_plate.png,29,MP13ZU2058,,,White SUV
+24,track_2_f0024_plate.png,2,,,,

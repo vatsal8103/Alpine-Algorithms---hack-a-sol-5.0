@@ -14,6 +14,23 @@ data/demo/frames/
 *.avi
 *.mov
 *.mkv
+*.zip
+*.tar
+*.gz
+*.bz2
+
+# Datasets (large raw and processed splits)
+data/raw/
+data/ocr/
+data/plate_det/
+data/bodytype/
+data/kaggle_crops/
+data/plates_synth/
+data/real_crops/
+data/test_gen/
+try/data/
+try/*.png
+try/*.zip
 
 # Model weights
 *.pt
@@ -26,3 +43,5 @@ models/*.pt
 Thumbs.db
 .idea/
 .vscode/
+sandbox/
+scratch/

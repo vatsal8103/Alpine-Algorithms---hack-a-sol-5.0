@@ -80,7 +80,7 @@ def cmd_web(host: str = "127.0.0.1", port: int = 8000) -> None:
             pass
 
     threading.Thread(target=open_browser, daemon=True).start()
-    subprocess.run([sys.executable, "-m", "uvicorn", "api.app:app", "--host", host, "--port", str(active_port)])
+    subprocess.run([sys.executable, "-m", "uvicorn", "api.app:app", "--host", host, "--port", str(active_port), "--reload"])
 
 
 def cmd_streamlit(port: int = 8501) -> None:

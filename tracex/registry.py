@@ -54,7 +54,7 @@ class Registry:
 
 
 def _entry_from_dict(row: dict) -> RegistryEntry | None:
-    plate = clean_text(row.get("plate", ""))
+    plate = clean_text(row.get("plate") or row.get("registration_number") or "")
     if not plate or not is_valid_plate(plate):
         return None
     state = (row.get("state") or plate[:2]).strip().upper()
@@ -80,7 +80,7 @@ def _entry_from_dict(row: dict) -> RegistryEntry | None:
         plate=plate,
         make=(row.get("make") or "unknown").strip(),
         model=(row.get("model") or "unknown").strip(),
-        color=(row.get("color") or "unknown").strip().lower(),
+        color=(row.get("color") or row.get("colour") or "unknown").strip().lower(),
         body_type=body_type,
         plate_style=plate_style,
         category=category,

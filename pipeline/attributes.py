@@ -88,9 +88,17 @@ def extract_attributes(
     # Reconcile with YOLO detector class when available
     if yolo_cls is not None:
         if yolo_cls == 2:  # Car / SUV / Sedan
-            if top_body in ("bus", "truck"):
-                top_body = "suv"
-                body_conf = 0.85
+            if top_body not in ("hatchback", "sedan", "suv"):
+                # YOLO detected a car: ensure it is categorized as passenger car, never two-wheeler or auto-rickshaw
+                h, w = ref_crop.shape[:2]
+                aspect = w / float(max(1, h))
+                if aspect >= 1.45:
+                    top_body = "sedan"
+                elif aspect <= 1.20:
+                    top_body = "suv"
+                else:
+                    top_body = "hatchback"
+                body_conf = 0.88
         elif yolo_cls in (0, 3):  # Rider / Motorcycle / Two-Wheeler
             top_body = "two-wheeler"
             body_conf = 0.90

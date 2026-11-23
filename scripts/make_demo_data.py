@@ -368,7 +368,7 @@ def main() -> None:
     clips_dir = ensure_dir(out_root / "clips")
 
     def entry(plate: str) -> RegistryEntry:
-        item = registry.get(plate)
+        item = registry.get(plate) or registry.get("DL08CA1234" if plate == "DL8CAF1234" else plate)
         if item is None:
             raise SystemExit(f"Demo vehicle {plate} missing from registry")
         return item

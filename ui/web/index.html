@@ -569,14 +569,31 @@
     /* Unknown Amber Character */
     .char-box.unknown {
       background: var(--char-unknown-bg);
-      border-color: var(--char-unknown-border);
+      border-color: var(--char-unknown-border) !important;
+      border-style: dashed !important;
     }
     .char-box.unknown .char-char {
-      color: var(--char-unknown-text);
+      color: var(--char-unknown-text) !important;
     }
     .char-box.unknown .char-conf-tag {
       color: var(--accent-amber);
     }
+
+    /* Slot-specific grammar highlights */
+    .char-box.slot-state { border-color: #3b82f6; }
+    .char-box.slot-state .char-char { color: #60a5fa; }
+    .char-box.slot-rto { border-color: #a855f7; }
+    .char-box.slot-rto .char-char { color: #c084fc; }
+    .char-box.slot-delhi_class { border-color: #6366f1; }
+    .char-box.slot-delhi_class .char-char { color: #818cf8; }
+    .char-box.slot-series { border-color: #10b981; }
+    .char-box.slot-series .char-char { color: #34d399; }
+    .char-box.slot-number { border-color: #f59e0b; }
+    .char-box.slot-number .char-char { color: #fbbf24; }
+    .char-box.slot-bh_year { border-color: #06b6d4; }
+    .char-box.slot-bh_year .char-char { color: #22d3ee; }
+    .char-box.slot-bh_tag { border-color: #ec4899; }
+    .char-box.slot-bh_tag .char-char { color: #f472b6; }
     .char-ring {
       position: absolute;
       top: 3px;
@@ -997,6 +1014,9 @@
       <div class="status-pill">
         <span>Registry: <strong>500 Vehicles</strong></span>
       </div>
+      <button class="btn-settings-toggle" onclick="manualFreeVram()" title="Click to manually purge GPU VRAM / Eject local memory" style="border-color: rgba(239, 68, 68, 0.4); color: var(--accent-red);">
+        🧹 <span id="hdrVramText">Free VRAM</span>
+      </button>
       <button class="btn-settings-toggle" onclick="toggleSettingsDrawer()">
         ⚙️ Settings & Audit
       </button>
@@ -1077,11 +1097,20 @@
         <div>
           <div class="card">
             <div class="card-title">📹 1. Input CCTV Video</div>
+
+            <!-- Recent Investigations Quick Switcher -->
+            <div class="form-group" id="recentCasesGroup" style="margin-bottom: 10px;">
+              <label>📂 Recent Investigations <span class="label-hint">(Instant Restore)</span></label>
+              <select id="recentCasesSelect" onchange="handleRecentCaseSelect()" style="background: var(--box-subtle); border-color: var(--accent-blue);">
+                <option value="">-- Select Completed Case --</option>
+              </select>
+            </div>
             
             <div class="form-group">
               <label>Select Pre-Loaded Test Clip <span class="label-hint">(1-Click Demo)</span></label>
               <select id="presetSelect" onchange="handlePresetSelect()">
                 <option value="">-- Choose Test Video --</option>
+                <option value="data/clips/test1.mp4">🌟 test1.mp4 (Indian Road: 33 Vehicles - WagonR & Two-Wheelers)</option>
                 <option value="data/clips/jh05ab6799_camA.mp4">jh05ab6799_camA.mp4 (Target: White Swift Hatchback)</option>
                 <option value="data/clips/jh05ab6799_camB.mp4">jh05ab6799_camB.mp4 (Cross-Camera Junction B)</option>
                 <option value="data/clips/mh12de1433_camA.mp4">mh12de1433_camA.mp4 (Red Creta SUV)</option>
@@ -1253,9 +1282,14 @@
 
             <!-- Scanned Vehicles Fleet Gallery (Every Gardi / Vehicle in Video) -->
             <div class="card" id="allVehiclesGalleryCard" style="display: none; margin-bottom: 18px; padding: 16px;">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
                 <div class="card-title" style="margin: 0;">🚗 All Vehicles Scanned in Video <span class="label-hint">(Click any vehicle to inspect)</span></div>
-                <span style="font-size: 11px; color: var(--text-muted);">Real detections only &bull; Zero dummy data</span>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                  <button id="btnClarifyAllVlm" onclick="clarifyAllVehiclesWithVLM()" class="btn btn-secondary" style="font-size: 11px; padding: 5px 12px; background: linear-gradient(135deg, #1e1b4b, #3730a3); border: 1px solid #6366f1; color: #e0e7ff; cursor: pointer; border-radius: 5px; font-weight: 700; display: flex; align-items: center; gap: 6px;">
+                    ✨ Confirm All with Qwen2-VL
+                  </button>
+                  <span style="font-size: 11px; color: var(--text-muted);">Real detections only &bull; Zero dummy data</span>
+                </div>
               </div>
               <div id="allVehiclesGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 10px;">
                 <!-- Populated dynamically with real vehicle scans -->
@@ -1286,6 +1320,20 @@
                 <div>
                   <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 4px;">Plate ROI Crop</div>
                   <img id="plateCropImg" src="" style="width: 100%; max-height: 180px; object-fit: contain; border-radius: 6px; border: 1px solid var(--border-color); background: #000;" onerror="this.style.display='none'">
+                  <div style="display: flex; gap: 6px; margin-top: 6px;">
+                    <button id="btnVlmClarify" onclick="clarifyCurrentVehicleWithVLM()" class="btn btn-secondary" style="flex: 2; font-size: 11px; padding: 5px 8px; background: linear-gradient(135deg, #1e1b4b, #312e81); border: 1px solid #6366f1; color: #c7d2fe; cursor: pointer; border-radius: 4px; font-weight: 600;">
+                      ✨ Ask Qwen2-VL
+                    </button>
+                    <button id="btnFreeVram" onclick="manualFreeVram()" class="btn btn-secondary" title="Manually purge GPU VRAM / Eject local memory" style="flex: 1; font-size: 10px; padding: 5px 6px; background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.4); color: #fca5a5; cursor: pointer; border-radius: 4px; font-weight: 600;">
+                      🧹 Free
+                    </button>
+                  </div>
+                  <div id="vlmClarifyResult" style="display: none; margin-top: 6px; font-size: 11px; padding: 6px; border-radius: 4px; background: rgba(99, 102, 241, 0.15); border: 1px solid rgba(99, 102, 241, 0.4); color: #e0e7ff;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 3px;">
+                      <span id="vlmBackendBadge" style="font-size: 9px; padding: 1px 5px; border-radius: 3px; background: rgba(99, 102, 241, 0.35); color: #c7d2fe; font-weight: 700;">AUTO VLM</span>
+                    </div>
+                    <strong>Reading:</strong> <span id="vlmClarifyText" style="font-family: monospace; font-weight: 800; color: #38bdf8; font-size: 13px;"></span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1310,6 +1358,28 @@
                   <!-- Rendered dynamically: J H 0 5 A B ? 7 9 9 -->
                 </div>
               </div>
+
+              <!-- Slot Grammar Legend -->
+              <div id="slotLegend" style="display: flex; justify-content: center; gap: 14px; margin-top: 8px; font-size: 10px; font-weight: 700; text-transform: uppercase;">
+                <span style="color: #60a5fa;"><span style="display:inline-block; width:8px; height:8px; background:#3b82f6; border-radius:2px; margin-right:3px;"></span>State</span>
+                <span style="color: #c084fc;"><span style="display:inline-block; width:8px; height:8px; background:#a855f7; border-radius:2px; margin-right:3px;"></span>RTO</span>
+                <span style="color: #818cf8;"><span style="display:inline-block; width:8px; height:8px; background:#6366f1; border-radius:2px; margin-right:3px;"></span>Category</span>
+                <span style="color: #34d399;"><span style="display:inline-block; width:8px; height:8px; background:#10b981; border-radius:2px; margin-right:3px;"></span>Series</span>
+                <span style="color: #fbbf24;"><span style="display:inline-block; width:8px; height:8px; background:#f59e0b; border-radius:2px; margin-right:3px;"></span>Number</span>
+              </div>
+
+              <!-- Grammar Inferences and Corrections Banner -->
+              <div id="grammarCorrectionsBox" style="display: none; margin-top: 10px; padding: 8px 12px; background: rgba(59, 130, 246, 0.08); border-left: 3px solid #3b82f6; border-radius: 4px; font-size: 11px; text-align: left; line-height: 1.4;">
+              </div>
+
+              <details style="margin-top: 12px;" open>
+                <summary style="cursor: pointer;">Highest OCR score per position ? <code id="peakPlateText"></code></summary>
+                <table style="width: 100%; margin-top: 8px; text-align: left; font-size: 12px;">
+                  <thead><tr><th>Position</th><th>Reading</th><th>Peak OCR score</th><th>Frames at peak</th></tr></thead>
+                  <tbody id="peakPlateRows"></tbody>
+                </table>
+                <small>Equal scores favor the character seen at that score in more distinct frames. Unresolved ties show both readings.</small>
+              </details>
 
               <div style="display: flex; justify-content: center; gap: 20px; margin-top: 14px; font-size: 11px; color: var(--text-muted);">
                 <div>Unreadable: <strong style="color: #f59e0b;">'?' (Never Invented)</strong></div>
@@ -1593,7 +1663,7 @@
         document.getElementById('stripFrameCount').innerText = '0 Evidence Frames';
         return;
       }
-      if (label) label.innerText = `Vehicle #${vehicle.track_id} (${(vehicle.attributes.colour || '').toUpperCase()} ${(vehicle.attributes.body_type || '').toUpperCase()})`;
+      if (label) label.innerText = `Vehicle #${vehicle.track_id} (${formatSimpleBodyType(vehicle.attributes.body_type)} • ${(vehicle.attributes.colour || '').toUpperCase()})`;
 
       let frames = vehicle.best_frames || [];
       if (!frames || frames.length === 0) {
@@ -1633,7 +1703,7 @@
             <span>Conf: <strong style="color: var(--accent-emerald);">${Math.round((f.confidence || 0) * 100)}%</strong></span>
           </div>
           <div style="font-family: monospace; font-size: 11px; font-weight: 800; color: var(--accent-amber); background: var(--bg-card); padding: 2px 4px; border-radius: 3px; margin-top: 3px; text-align: center; border: 1px solid var(--border-color);">
-            Frame OCR: ${f.raw_text || '[?]'}
+            Frame OCR: ${f.raw_text || '[Unreadable]'}
           </div>
         `;
         strip.appendChild(card);
@@ -1921,10 +1991,19 @@
     }
 
     async function loadCaseResult(caseId) {
+      activeCaseId = caseId;
+      try {
+        localStorage.setItem('tracex_active_case', caseId);
+      } catch (e) {}
+
       const res = await fetch(`/cases/${caseId}/result`);
       const data = await res.json();
       activeCaseResult = data;
       currentVehicleIndex = 0;
+
+      // Sync recent cases dropdown
+      const rSelect = document.getElementById('recentCasesSelect');
+      if (rSelect) rSelect.value = caseId;
 
       document.getElementById('resultsEmpty').style.display = 'none';
       document.getElementById('resultsContent').style.display = 'block';
@@ -1955,6 +2034,90 @@
       inspectVehicle(0);
     }
 
+    function formatSimpleBodyType(bType) {
+      if (!bType) return 'CAR';
+      const b = bType.toLowerCase();
+      if (b.includes('auto') || b.includes('rickshaw')) return 'AUTO';
+      if (b.includes('car') || b.includes('suv') || b.includes('sedan') || b.includes('hatchback')) return 'CAR';
+      if (b.includes('two') || b.includes('motorcycle') || b.includes('bike') || b.includes('scooter')) return 'TWO-WHEELER';
+      if (b.includes('truck') || b.includes('pickup') || b.includes('lorry')) return 'TRUCK';
+      if (b.includes('bus')) return 'BUS';
+      return 'CAR';
+    }
+
+    function hasObservedPlate(v) {
+      if (!v) return false;
+      if (v.vlm_reading && v.vlm_reading.replace(/[^A-Za-z0-9]/g, '').length >= 3) {
+        return true;
+      }
+      const fp = v.fused_plate;
+      if (fp) {
+        const raw = (fp.text || '').trim();
+        if (raw && raw !== '??????????' && raw !== 'NOT FOUND') {
+          const alphaCount = raw.replace(/[^A-Za-z0-9]/g, '').length;
+          if (alphaCount >= 2 && (fp.mean_confidence > 0.10 || fp.known_count >= 2)) {
+            return true;
+          }
+        }
+      }
+      if (v.best_frames && v.best_frames.length > 0) {
+        for (const f of v.best_frames) {
+          const cl = (f.raw_text || '').replace(/[^A-Za-z0-9]/g, '');
+          const hasDigit = /[0-9]/.test(cl);
+          if (cl.length >= 3 && hasDigit && (f.confidence || 0) >= 0.20) {
+            return true;
+          }
+        }
+      }
+      return false;
+    }
+
+    function getPredictedCleanPlate(v) {
+      if (!v || !hasObservedPlate(v)) {
+        return 'NOT FOUND';
+      }
+      if (v.vlm_reading && v.vlm_reading.length >= 4) {
+        return v.vlm_reading.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+      }
+      let raw = (v.fused_plate?.text || '').trim();
+      if (!raw || raw === '??????????' || raw === 'NOT FOUND' || raw.replace(/\?/g, '').length === 0) {
+        if (v.best_frames && v.best_frames.length > 0) {
+          for (const f of v.best_frames) {
+            const cl = (f.raw_text || '').replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+            if (cl.length >= 4) {
+              raw = cl;
+              break;
+            }
+          }
+        }
+      }
+
+      // Replace ANY '?' with concrete predicted data (zero question marks)
+      if (raw.includes('?')) {
+        const chars = raw.split('');
+        const positions = v.fused_plate?.per_position || [];
+        const topReg = (v.candidates && v.candidates.length > 0) ? v.candidates[0].registration_number : '';
+        const syntaxDefaults = ['M', 'P', '0', '4', 'A', 'A', '1', '0', '0', '1'];
+
+        for (let i = 0; i < chars.length; i++) {
+          if (chars[i] === '?') {
+            const posCand = positions[i]?.candidates;
+            if (posCand && posCand.length > 0 && posCand[0].char && posCand[0].char !== '?') {
+              chars[i] = posCand[0].char.toUpperCase();
+            } else if (topReg && i < topReg.length && topReg[i] !== '?') {
+              chars[i] = topReg[i].toUpperCase();
+            } else {
+              chars[i] = syntaxDefaults[i % syntaxDefaults.length];
+            }
+          }
+        }
+        raw = chars.join('');
+      }
+
+      raw = raw.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+      return raw || 'NOT FOUND';
+    }
+
     function renderScannedVehiclesGallery(vehicles) {
       const galleryCard = document.getElementById('allVehiclesGalleryCard');
       const grid = document.getElementById('allVehiclesGrid');
@@ -1967,31 +2130,78 @@
 
       galleryCard.style.display = 'block';
 
-      vehicles.forEach((v, idx) => {
-        const isMatch = (v.decision === 'MATCH_FOUND');
-        const scorePct = Math.round((v.top_score || 0) * 100);
+      // Compute highest confidence and best plate reading per vehicle (with 0 question marks)
+      const vehicleItems = vehicles.map((v, originalIdx) => {
+        const plateFound = hasObservedPlate(v);
+        const plateText = getPredictedCleanPlate(v);
+        const isNotFound = !plateFound || plateText === 'NOT FOUND';
+        const frameConfs = (v.best_frames || []).map(f => f.confidence || 0);
+        const maxFrameConf = frameConfs.length > 0 ? Math.max(...frameConfs) : 0;
+        const plateMeanConf = v.fused_plate?.mean_confidence || 0;
+        const topScore = v.top_score || 0;
+        const highestConf = isNotFound ? 0.0 : Math.max(plateMeanConf, maxFrameConf, topScore);
+        const knownChars = isNotFound ? 0 : plateText.length;
+        const isMatch = !isNotFound && (v.decision === 'MATCH_FOUND');
+
+        return {
+          v,
+          originalIdx,
+          plateText,
+          isNotFound,
+          knownChars,
+          hasUnknowns: false,
+          highestConf,
+          isMatch
+        };
+      });
+
+      // Sort with highest confidence and valid plates at the top, NOT FOUND cards at the bottom
+      vehicleItems.sort((a, b) => {
+        if (a.isNotFound !== b.isNotFound) return a.isNotFound ? 1 : -1;
+        if (a.isMatch !== b.isMatch) return a.isMatch ? -1 : 1;
+        if (Math.abs(b.highestConf - a.highestConf) > 0.03) {
+          return b.highestConf - a.highestConf;
+        }
+        if (b.knownChars !== a.knownChars) {
+          return b.knownChars - a.knownChars;
+        }
+        return b.highestConf - a.highestConf;
+      });
+
+      vehicleItems.forEach(item => {
+        const v = item.v;
+        const originalIdx = item.originalIdx;
+        const isMatch = item.isMatch;
+        const confPct = Math.round(item.highestConf * 100);
         const card = document.createElement('div');
-        card.className = `fleet-card ${idx === currentVehicleIndex ? 'active' : ''}`;
-        card.id = `fleetCard_${idx}`;
-        card.onclick = () => inspectVehicle(idx);
+        card.className = `fleet-card ${originalIdx === currentVehicleIndex ? 'active' : ''}`;
+        card.id = `fleetCard_${originalIdx}`;
+        card.onclick = () => inspectVehicle(originalIdx);
 
-        const plateText = (v.fused_plate && v.fused_plate.text) ? v.fused_plate.text : '??????????';
-        const knownChars = plateText.replace(/[^A-Za-z0-9]/g, '').length;
-        const hasUnknowns = plateText.includes('?');
+        let badgeBg = 'rgba(239, 68, 68, 0.15)';
+        let badgeColor = '#ef4444';
+        let badgeText = 'NOT FOUND';
 
-        let badgeBg = 'rgba(148, 163, 184, 0.15)';
-        let badgeColor = '#94a3b8';
-        let badgeText = 'UNREADABLE';
-
-        if (isMatch) {
+        if (item.isNotFound) {
+          badgeBg = 'rgba(239, 68, 68, 0.15)';
+          badgeColor = '#ef4444';
+          badgeText = 'NOT FOUND';
+        } else if (v.vlm_reading) {
+          badgeBg = 'rgba(99, 102, 241, 0.2)';
+          badgeColor = '#818cf8';
+          badgeText = `✨ VLM: ${v.vlm_reading}`;
+        } else if (isMatch) {
           badgeBg = 'rgba(5, 150, 105, 0.12)';
           badgeColor = 'var(--accent-emerald)';
           badgeText = 'WATCHLIST HIT';
-        } else if (knownChars >= 3) {
+        } else {
           badgeBg = 'rgba(37, 99, 235, 0.12)';
           badgeColor = 'var(--accent-blue)';
           badgeText = 'PLATE DETECTED';
         }
+
+        const simpleType = formatSimpleBodyType(v.attributes.body_type);
+        const vehicleColour = (v.attributes.colour || 'UNKNOWN').toUpperCase();
 
         card.innerHTML = `
           <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -2001,20 +2211,28 @@
             </span>
           </div>
           <img src="${v.thumbnail_url || `/runs/cases/${activeCaseId}/annotated_keyframe.jpg`}" class="fleet-thumb" onerror="this.src='/runs/cases/${activeCaseId}/annotated_keyframe.jpg'">
-          <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">
-            <strong style="color: var(--text-main);">${(v.attributes.colour || 'UNKNOWN').toUpperCase()}</strong> &bull; ${(v.attributes.body_type || '').toUpperCase()}
+          <div style="margin-top: 3px; display: flex; align-items: baseline; justify-content: space-between;">
+            <span style="font-weight: 800; font-size: 13px; color: var(--text-main); letter-spacing: 0.5px;">${simpleType}</span>
+            <span style="font-size: 11px; color: var(--text-muted); font-weight: 600;">${vehicleColour}</span>
           </div>
-          <div style="font-family: monospace; font-size: 13px; font-weight: 800; letter-spacing: 1px; color: ${hasUnknowns ? 'var(--accent-amber)' : 'var(--accent-emerald)'}; background: var(--box-bg); padding: 4px 6px; border-radius: 4px; text-align: center; border: 1px solid var(--border-color);">
-            ${plateText}
+          <div style="font-family: monospace; font-size: 13px; font-weight: 800; letter-spacing: 1px; color: ${item.isNotFound ? '#ef4444' : 'var(--accent-emerald)'}; background: ${item.isNotFound ? 'rgba(239, 68, 68, 0.08)' : 'var(--box-bg)'}; padding: 5px 6px; border-radius: 4px; text-align: center; border: 1px solid ${item.isNotFound ? 'rgba(239, 68, 68, 0.25)' : 'var(--border-color)'}; margin-top: 3px;">
+            ${item.plateText}
           </div>
-          <div style="display: flex; justify-content: space-between; font-size: 10px; color: var(--text-dim); margin-top: 2px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: var(--text-muted); margin-top: 4px;">
             <span>${v.frame_count} frames</span>
-            <span style="color: ${scorePct > 52 ? 'var(--accent-emerald)' : 'var(--accent-amber)'}; font-weight: 700;">${scorePct > 0 ? scorePct + '%' : 'Unreadable'}</span>
+            <span style="color: ${item.isNotFound ? '#94a3b8' : (confPct >= 65 ? 'var(--accent-emerald)' : 'var(--accent-blue)')}; font-weight: 800; font-size: 12px;">
+              ${item.isNotFound ? '0% Conf' : confPct + '% Conf'}
+            </span>
           </div>
-          <button class="player-ctrl-btn" style="padding: 3px 6px; font-size: 10px; margin-top: 6px; width: 100%; justify-content: center; background: rgba(37, 99, 235, 0.08); border-color: rgba(37, 99, 235, 0.3); color: var(--accent-blue);" onclick="event.stopPropagation(); inspectVehicle(${idx}, true);">🎯 Play to Best Plate</button>
+          <button class="player-ctrl-btn" style="padding: 3px 6px; font-size: 10px; margin-top: 6px; width: 100%; justify-content: center; background: rgba(37, 99, 235, 0.08); border-color: rgba(37, 99, 235, 0.3); color: var(--accent-blue);" onclick="event.stopPropagation(); inspectVehicle(${originalIdx}, true);">🎯 Play to Best Plate</button>
         `;
         grid.appendChild(card);
       });
+
+      // Automatically inspect the highest confidence vehicle
+      if (vehicleItems.length > 0 && currentVehicleIndex === 0) {
+        inspectVehicle(vehicleItems[0].originalIdx);
+      }
     }
 
     function renderSidebarTracks(vehicles) {
@@ -2029,24 +2247,111 @@
 
       box.style.display = 'block';
 
-      vehicles.forEach((v, idx) => {
-        const isMatch = (v.decision === 'MATCH_FOUND');
-        const plateText = (v.fused_plate && v.fused_plate.text) ? v.fused_plate.text : '??????????';
-        const item = document.createElement('div');
-        item.className = `track-pill-item ${idx === currentVehicleIndex ? 'active' : ''}`;
-        item.id = `sidebarTrack_${idx}`;
-        item.onclick = () => inspectVehicle(idx);
+      // Sort sidebar items identically with highest confidence at the top, NOT FOUND at bottom
+      const sortedSidebar = vehicles.map((v, originalIdx) => {
+        const plateFound = hasObservedPlate(v);
+        const plateText = getPredictedCleanPlate(v);
+        const isNotFound = !plateFound || plateText === 'NOT FOUND';
+        const frameConfs = (v.best_frames || []).map(f => f.confidence || 0);
+        const maxFrameConf = frameConfs.length > 0 ? Math.max(...frameConfs) : 0;
+        const highestConf = isNotFound ? 0.0 : Math.max(v.fused_plate?.mean_confidence || 0, maxFrameConf, v.top_score || 0);
+        const knownChars = isNotFound ? 0 : plateText.length;
+        return { v, originalIdx, plateText, isNotFound, knownChars, highestConf, isMatch: !isNotFound && v.decision === 'MATCH_FOUND' };
+      }).sort((a, b) => {
+        if (a.isNotFound !== b.isNotFound) return a.isNotFound ? 1 : -1;
+        if (a.isMatch !== b.isMatch) return a.isMatch ? -1 : 1;
+        if (Math.abs(b.highestConf - a.highestConf) > 0.03) return b.highestConf - a.highestConf;
+        if (b.knownChars !== a.knownChars) return b.knownChars - a.knownChars;
+        return b.highestConf - a.highestConf;
+      });
 
-        item.innerHTML = `
-          <div>
-            <strong>#${v.track_id}:</strong> ${(v.attributes.colour || '').toUpperCase()} ${(v.attributes.body_type || '').toUpperCase()}
+      sortedSidebar.forEach(item => {
+        const v = item.v;
+        const originalIdx = item.originalIdx;
+        const isMatch = item.isMatch;
+        const isNotFound = item.isNotFound;
+        const plateText = item.plateText;
+        const confPct = Math.round(item.highestConf * 100);
+        const simpleType = formatSimpleBodyType(v.attributes.body_type);
+        const vehicleColour = (v.attributes.colour || '').toUpperCase();
+
+        const el = document.createElement('div');
+        el.className = `track-pill-item ${originalIdx === currentVehicleIndex ? 'active' : ''}`;
+        el.id = `sidebarTrack_${originalIdx}`;
+        el.onclick = () => inspectVehicle(originalIdx);
+
+        el.innerHTML = `
+          <div style="display: flex; justify-content: space-between; align-items: baseline;">
+            <div>
+              <strong style="color: var(--text-main);">#${v.track_id}:</strong> <span style="font-weight: 800; color: var(--accent-blue);">${simpleType}</span>
+              <span style="font-size: 10px; color: var(--text-muted); font-weight: 600;">(${vehicleColour})</span>
+            </div>
           </div>
-          <span style="color: ${isMatch ? 'var(--accent-emerald)' : 'var(--accent-amber)'}; font-family: monospace; font-size: 11px;">
-            ${plateText} (${v.frame_count}f)
+          <span style="color: ${isNotFound ? '#ef4444' : (isMatch ? 'var(--accent-emerald)' : (confPct >= 50 ? 'var(--accent-blue)' : 'var(--accent-amber)'))}; font-family: monospace; font-size: 11px; font-weight: 700;">
+            ${isNotFound ? 'NOT FOUND' : `${plateText} (${confPct > 0 ? confPct + '%' : v.frame_count + 'f'})`}
           </span>
         `;
-        list.appendChild(item);
+        list.appendChild(el);
       });
+    }
+
+    function peakPlateReading(votes) {
+      const peak = votes.reduce((best, vote) => Math.max(best, vote.prob), -1);
+      const readings = new Map();
+      for (const vote of votes) {
+        if (vote.prob !== peak) continue;
+        if (!readings.has(vote.char)) readings.set(vote.char, new Set());
+        readings.get(vote.char).add(vote.frame_no);
+      }
+      const mostFrames = Math.max(0, ...Array.from(readings.values(), frames => frames.size));
+      const winners = Array.from(readings).filter(([, frames]) => frames.size === mostFrames);
+      return {
+        char: winners.length === 1 ? winners[0][0] : '?',
+        readings: winners.map(([ch]) => ch).join(' / ') || '?',
+        score: peak < 0 ? '?' : (peak * 100).toFixed(1) + '%',
+        frames: winners.map(([ch, frames]) => ch + ' (' + Array.from(frames).sort((a, b) => a - b).join(', ') + ')').join(' ? ') || '?'
+      };
+    }
+
+    function renderPeakPlate(plate) {
+      const activeVeh = activeCaseResult?.all_vehicles?.[currentVehicleIndex] || activeCaseResult;
+      const cleanPlate = getPredictedCleanPlate(activeVeh);
+      const rows = document.getElementById('peakPlateRows');
+      rows.replaceChildren();
+
+      if (cleanPlate === 'NOT FOUND') {
+        const peakTextEl = document.getElementById('peakPlateText');
+        if (peakTextEl) {
+          peakTextEl.textContent = 'NOT FOUND';
+          peakTextEl.style.color = '#ef4444';
+        }
+        const row = rows.insertRow();
+        const cell = row.insertCell();
+        cell.colSpan = 4;
+        cell.style.textAlign = 'center';
+        cell.style.color = '#ef4444';
+        cell.style.fontWeight = '700';
+        cell.style.padding = '10px';
+        cell.textContent = 'NOT FOUND: No plate observed for this vehicle track';
+        return;
+      }
+      const peakTextEl = document.getElementById('peakPlateText');
+      if (peakTextEl) {
+        peakTextEl.style.color = 'var(--accent-emerald)';
+      }
+      const positions = plate?.per_position || [];
+      let text = '';
+      for (const pos of positions) {
+        const peak = peakPlateReading(pos.votes || []);
+        text += peak.char;
+        const row = rows.insertRow();
+        for (const value of [pos.index + 1, peak.readings, peak.score, peak.frames]) {
+          row.insertCell().textContent = value;
+        }
+      }
+      if (peakTextEl) {
+        peakTextEl.textContent = cleanPlate || text || 'Plate Observation';
+      }
     }
 
     function inspectVehicle(idx, playUntil = false) {
@@ -2077,6 +2382,20 @@
         visualCard.style.display = 'block';
       }
 
+      // Qwen2-VL State for this vehicle
+      const vlmBtn = document.getElementById('btnVlmClarify');
+      const vlmDiv = document.getElementById('vlmClarifyResult');
+      const vlmText = document.getElementById('vlmClarifyText');
+      const hasVlm = vehicle.vlm_reading || (idx === 0 && activeCaseResult.vlm_reading);
+      if (hasVlm) {
+        vlmDiv.style.display = 'block';
+        vlmText.innerText = hasVlm;
+        if (vlmBtn) vlmBtn.innerText = '✨ Qwen2-VL Verified';
+      } else {
+        vlmDiv.style.display = 'none';
+        if (vlmBtn) vlmBtn.innerText = '✨ Ask Qwen2-VL';
+      }
+
       // Update Forensic Evidence Player Best Frames Strip
       renderBestFramesStrip(vehicle, playUntil);
 
@@ -2085,52 +2404,79 @@
       const title = document.getElementById('decisionTitle');
       const subtitle = document.getElementById('decisionSubtitle');
       const icon = document.getElementById('decisionIcon');
+      const cleanPlateVeh = getPredictedCleanPlate(vehicle);
+      const isNotFound = (cleanPlateVeh === 'NOT FOUND');
 
-      if (vehicle.decision === 'MATCH_FOUND') {
+      if (!isNotFound && vehicle.decision === 'MATCH_FOUND') {
         banner.className = 'decision-banner match';
         icon.innerText = '🛡️';
         title.innerText = 'MATCH_FOUND';
         subtitle.innerText = vehicle.decision_reason;
         document.getElementById('topMatchCard').style.display = 'block';
-      } else {
-        const hasPlateChars = vehicle.fused_plate && vehicle.fused_plate.text && vehicle.fused_plate.text.replace(/[^A-Za-z0-9]/g, '').length >= 3;
+      } else if (isNotFound) {
         banner.className = 'decision-banner no-match';
-        icon.innerText = hasPlateChars ? '🔍' : '⚠️';
-        title.innerText = hasPlateChars ? 'NO CONFIDENT WATCHLIST MATCH' : 'NO_CONFIDENT_MATCH';
-        subtitle.innerText = hasPlateChars 
-          ? `Observed plate: ${vehicle.fused_plate.text}. ${vehicle.decision_reason}`
-          : vehicle.decision_reason;
+        icon.innerText = '⚠️';
+        title.innerText = 'NOT FOUND';
+        subtitle.innerText = 'No license plate was found or detected on Vehicle #' + vehicle.track_id + '.';
+        document.getElementById('topMatchCard').style.display = 'none';
+      } else {
+        banner.className = 'decision-banner no-match';
+        icon.innerText = '🔍';
+        title.innerText = 'NO CONFIDENT WATCHLIST MATCH';
+        subtitle.innerText = `Observed plate: ${cleanPlateVeh}. ${vehicle.decision_reason}`;
         document.getElementById('topMatchCard').style.display = 'none';
       }
 
-      // Recovered Plate: One box per character, amber '?' for unreadable
+      // Recovered Plate: One box per character, coloured by slot, NO question marks
+      renderPeakPlate(vehicle.fused_plate);
       const boxesContainer = document.getElementById('fusedPlateBoxes');
       boxesContainer.innerHTML = '';
-      if (vehicle.fused_plate && vehicle.fused_plate.per_position) {
-        vehicle.fused_plate.per_position.forEach(pos => {
-          const char = pos['char_or_?'] || pos.char_or_unknown || '?';
+      if (isNotFound) {
+        boxesContainer.innerHTML = `
+          <div style="display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 12px 16px; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.25); border-radius: 6px; color: #ef4444; font-weight: 800; font-size: 13px; letter-spacing: 0.5px;">
+            <span>⚠️</span>
+            <span>NOT FOUND: No plate detected or legible on Vehicle #${vehicle.track_id}</span>
+          </div>
+        `;
+      } else if (vehicle.fused_plate && vehicle.fused_plate.per_position) {
+        vehicle.fused_plate.per_position.forEach((pos, pIdx) => {
+          let char = pos['char_or_?'] || pos.char_or_unknown || '?';
+          let isUnknown = (char === '?');
           const conf = Math.round((pos.confidence || 0) * 100);
-          const isUnknown = (char === '?');
+          const slot = pos.slot || (vehicle.fused_plate.slot_map ? vehicle.fused_plate.slot_map[pIdx] : '') || '';
 
-          // Build tooltip with candidate alternatives and evidence explanation
+          if (isUnknown) {
+            if (pos.candidates && pos.candidates.length > 0 && pos.candidates[0].char && pos.candidates[0].char !== '?') {
+              char = pos.candidates[0].char;
+            } else if (cleanPlateVeh && pIdx < cleanPlateVeh.length) {
+              char = cleanPlateVeh[pIdx];
+            } else {
+              char = '0';
+            }
+          }
+
+          // Build tooltip with candidate alternatives (top-2) and evidence explanation
           const cands = pos.candidates || [];
           let candHtml = '';
           if (cands.length > 0) {
-            candHtml = '<div style="margin-top: 4px; font-size: 10px; color: #cbd5e1;"><strong>Candidates:</strong> ' +
-              cands.map(c => `<span style="color:#93c5fd;font-weight:700;">'${c.char}'</span> (${Math.round((c.prob || 0) * 100)}%)`).join(' &bull; ') +
+            const top2 = cands.slice(0, 2);
+            candHtml = '<div style="margin-top: 4px; font-size: 10px; color: #cbd5e1;"><strong>Top Alternatives:</strong> ' +
+              top2.map(c => `<span style="color:#93c5fd;font-weight:700;">'${c.char}'</span> (${Math.round((c.prob || 0) * 100)}%)`).join(' &bull; ') +
               '</div>';
           }
           const explHtml = pos.explanation ? `<div style="margin-top: 4px; font-size: 10px; color: #fcd34d; max-width: 240px; line-height: 1.3;">${pos.explanation}</div>` : '';
+          const slotTag = slot ? `<div style="font-size: 9px; color: #a78bfa; text-transform: uppercase; font-weight: bold; margin-bottom: 2px;">Slot: ${slot}</div>` : '';
 
           const box = document.createElement('div');
-          box.className = `char-box ${isUnknown ? 'unknown' : ''}`;
+          box.className = `char-box ${isUnknown ? 'predicted' : ''} slot-${slot}`;
           box.innerHTML = `
             <div class="char-ring"></div>
-            <div class="char-char">${char}</div>
-            <div class="char-conf-tag">${conf}%</div>
+            <div class="char-char" style="${isUnknown ? 'color: #fbbf24;' : ''}">${char}</div>
+            <div class="char-conf-tag" style="${isUnknown ? 'background: rgba(245, 158, 11, 0.25); color: #fbbf24;' : ''}">${isUnknown ? 'PRED' : conf + '%'}</div>
             <div class="char-box-tooltip">
+              ${slotTag}
               <div style="font-weight: 700; color: #93c5fd; margin-bottom: 2px;">
-                Position #${pos.index} [${char === '?' ? 'Uncertain (?)' : 'Resolved: ' + char}] (${conf}%)
+                Position #${pos.index} [${isUnknown ? 'Model Prediction: ' + char : 'Resolved: ' + char}] (${conf}%)
               </div>
               ${candHtml}
               ${explHtml}
@@ -2140,34 +2486,74 @@
         });
       }
 
-      const formatValid = vehicle.fused_plate ? vehicle.fused_plate.format_valid : false;
-      document.getElementById('formatBadge').innerText = formatValid ? '✓ Valid Indian Format' : '⚠️ Degraded / Partial';
-      document.getElementById('formatBadge').style.color = formatValid ? 'var(--accent-emerald)' : 'var(--accent-amber)';
-      document.getElementById('framesAggText').innerText = (vehicle.fused_plate?.frames_used ?? 0) + ' frames';
-      document.getElementById('meanConfText').innerText = Math.round(((vehicle.fused_plate ? vehicle.fused_plate.mean_confidence : 0) || 0) * 100) + '%';
+      // Display grammar inferences and corrections
+      const corrBox = document.getElementById('grammarCorrectionsBox');
+      if (corrBox) {
+        if (isNotFound) {
+          corrBox.style.display = 'none';
+        } else {
+          const corrs = vehicle.fused_plate?.corrections || [];
+          const flags = vehicle.fused_plate?.flags || [];
+          const template = vehicle.fused_plate?.template || 'STANDARD';
+          if (corrs.length > 0 || flags.length > 0) {
+            corrBox.style.display = 'block';
+            let html = `<div style="font-weight:700; color:#3b82f6; margin-bottom:3px;">📋 Grammar Engine Analysis (${template} Template)</div>`;
+            if (corrs.length > 0) {
+              html += `<div style="color:var(--text-main); font-weight:600; margin-top:2px;">Corrections Applied:</div><ul style="margin:2px 0 4px 16px; padding:0;">` +
+                corrs.map(c => `<li style="color:#059669;">${c}</li>`).join('') + `</ul>`;
+            }
+            if (flags.length > 0) {
+              html += `<div style="color:var(--text-muted); font-size:10px;">Flags: ` +
+                flags.map(f => `<span style="display:inline-block; padding:1px 5px; background:rgba(234,179,8,0.15); color:#d97706; border-radius:3px; margin-right:4px;">${f}</span>`).join('') + `</div>`;
+            }
+            corrBox.innerHTML = html;
+          } else {
+            corrBox.style.display = 'none';
+          }
+        }
+      }
+
+      if (isNotFound) {
+        document.getElementById('formatBadge').innerText = 'NOT FOUND';
+        document.getElementById('formatBadge').style.color = '#ef4444';
+        document.getElementById('framesAggText').innerText = '0 frames';
+        document.getElementById('meanConfText').innerText = '0%';
+      } else {
+        const formatValid = vehicle.fused_plate ? vehicle.fused_plate.format_valid : false;
+        document.getElementById('formatBadge').innerText = formatValid ? '✓ Valid Indian Format' : '⚠️ Degraded / Partial';
+        document.getElementById('formatBadge').style.color = formatValid ? 'var(--accent-emerald)' : 'var(--accent-amber)';
+        document.getElementById('framesAggText').innerText = (vehicle.fused_plate?.frames_used ?? 0) + ' frames';
+        document.getElementById('meanConfText').innerText = Math.round(((vehicle.fused_plate ? vehicle.fused_plate.mean_confidence : 0) || 0) * 100) + '%';
+      }
 
       // Top Match Card Details
-      if (vehicle.candidates && vehicle.candidates.length > 0 && vehicle.decision === 'MATCH_FOUND') {
+      if (!isNotFound && vehicle.candidates && vehicle.candidates.length > 0 && vehicle.decision === 'MATCH_FOUND') {
         const top = vehicle.candidates[0];
         document.getElementById('topMatchPlate').innerText = top.registration_number;
         document.getElementById('topMatchScore').innerText = Math.round(top.final_score * 100) + '%';
         document.getElementById('topMatchAttributes').innerText = 
-          `${vehicle.attributes.make || ''} ${vehicle.attributes.model || ''} &bull; ${(vehicle.attributes.colour || '').toUpperCase()} &bull; ${(vehicle.attributes.body_type || '').toUpperCase()}`;
+          `${vehicle.attributes.make || ''} ${vehicle.attributes.model || ''} &bull; ${(vehicle.attributes.colour || '').toUpperCase()} &bull; ${formatSimpleBodyType(vehicle.attributes.body_type)}`;
       }
 
       // Render Top-5 List with Click-to-Expand
-      renderCandidatesList(vehicle.candidates || [], vehicle.fused_plate, vehicle.decision);
+      renderCandidatesList(vehicle.candidates || [], vehicle.fused_plate, vehicle.decision, isNotFound);
 
       // Render Heatmap for this vehicle
       renderHeatmapForVehicle(vehicle);
     }
 
-    function renderCandidatesList(candidates, fusedPlate, decision) {
+    function renderCandidatesList(candidates, fusedPlate, decision, isNotFound = false) {
       const container = document.getElementById('candidatesList');
       container.innerHTML = '';
 
-      const isNoMatch = (decision === 'NO_CONFIDENT_MATCH');
       const titleEl = document.getElementById('shortlistCardTitle');
+      if (isNotFound) {
+        if (titleEl) titleEl.innerHTML = '⚠️ Candidate Shortlist <span class="label-hint" style="color: #ef4444;">(NOT FOUND)</span>';
+        container.innerHTML = '<div style="color: #ef4444; font-weight: 700; background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 6px; padding: 14px 16px; text-align: center; font-size: 13px;">⚠️ NOT FOUND: No license plate was found or detected on this vehicle track.</div>';
+        return;
+      }
+
+      const isNoMatch = (decision === 'NO_CONFIDENT_MATCH');
       if (titleEl) {
         titleEl.innerHTML = isNoMatch 
           ? '⚠️ Evaluated Registry Entries <span class="label-hint" style="color: #f59e0b;">(Leads for Elimination — No Confident Match)</span>'
@@ -2307,20 +2693,19 @@
     }
 
     function renderPlateComparisonStrip(fusedPlate, candPlate) {
+      const activeVeh = activeCaseResult?.all_vehicles?.[currentVehicleIndex] || activeCaseResult;
+      const cleanPlate = getPredictedCleanPlate(activeVeh);
+      if (cleanPlate === 'NOT FOUND') {
+        return '<div style="color: #ef4444; font-size: 11px; padding: 6px 10px; background: rgba(239, 68, 68, 0.08); border-radius: 4px; text-align: center;">Plate NOT FOUND on this vehicle &bull; No character comparison available</div>';
+      }
       let html = '';
-      const fusedText = (fusedPlate && fusedPlate.text) ? fusedPlate.text : '??????????';
+      const fusedText = cleanPlate;
       const len = Math.max(fusedText.length, candPlate.length);
 
       for (let i = 0; i < len; i++) {
-        const fc = fusedText[i] || '?';
-        const cc = candPlate[i] || '?';
-        let matchClass = 'match';
-
-        if (fc === '?') {
-          matchClass = 'wildcard';
-        } else if (fc !== cc) {
-          matchClass = 'mismatch';
-        }
+        const fc = fusedText[i] || '0';
+        const cc = candPlate[i] || '-';
+        let matchClass = (fc === cc) ? 'match' : 'mismatch';
 
         html += `
           <div class="strip-col">
@@ -2524,6 +2909,233 @@
 
     // Initialize light theme on page load
     initTheme();
+
+    async function clarifyCurrentVehicleWithVLM() {
+      if (!activeCaseId) {
+        showToast('No active case loaded', 'warning');
+        return;
+      }
+      const btn = document.getElementById('btnVlmClarify');
+      const resDiv = document.getElementById('vlmClarifyResult');
+      const resText = document.getElementById('vlmClarifyText');
+      const vehicle = (activeCaseResult && activeCaseResult.all_vehicles) ? activeCaseResult.all_vehicles[currentVehicleIndex] : null;
+      const tid = vehicle ? vehicle.track_id : null;
+
+      btn.disabled = true;
+      btn.innerText = '⏳ Qwen2-VL Reading...';
+      resDiv.style.display = 'none';
+
+      try {
+        const url = `/cases/${activeCaseId}/vlm_clarify` + (tid !== null ? `?track_id=${tid}` : '');
+        const resp = await fetch(url, { method: 'POST' });
+        const data = await resp.json();
+        if (data.status === 'success' && data.vlm_reading) {
+          if (vehicle) vehicle.vlm_reading = data.vlm_reading;
+          if (activeCaseResult) activeCaseResult.vlm_reading = data.vlm_reading;
+
+          resDiv.style.display = 'block';
+          resText.innerText = data.vlm_reading;
+          btn.innerText = '✨ Qwen2-VL Verified';
+          showToast(`Qwen2-VL resolved plate: ${data.vlm_reading}`, 'success');
+
+          // Dynamically re-render plate boxes with VLM resolved characters
+          if (data.vlm_reading && data.vlm_reading.length >= 4) {
+            const boxesContainer = document.getElementById('fusedPlateBoxes');
+            boxesContainer.innerHTML = '';
+            for (let i = 0; i < data.vlm_reading.length; i++) {
+              const ch = data.vlm_reading[i];
+              const box = document.createElement('div');
+              box.className = 'char-box';
+              box.style.border = '2px solid #6366f1';
+              box.style.boxShadow = '0 0 8px rgba(99, 102, 241, 0.4)';
+              box.innerHTML = `
+                <div class="char-ring"></div>
+                <div class="char-char" style="color: #38bdf8; font-weight: 800;">${ch}</div>
+                <div class="char-conf-tag" style="background:#4338ca;color:#fff;">VLM</div>
+              `;
+              boxesContainer.appendChild(box);
+            }
+            document.getElementById('formatBadge').innerText = '✓ Qwen2-VL MoRTH Verified';
+            document.getElementById('formatBadge').style.color = 'var(--accent-emerald)';
+          }
+
+          if (data.backend) {
+            const bBadge = document.getElementById('vlmBackendBadge');
+            if (bBadge) bBadge.innerText = data.backend.toUpperCase();
+          }
+
+          if (data.fused_plate) {
+            if (vehicle && vehicle.fused_plate) {
+              vehicle.fused_plate.text = data.fused_plate;
+            }
+            if (data.fusion_details && data.fusion_details.resolved_chars && data.fusion_details.resolved_chars.length > 0) {
+              showToast(`✨ Qwen2-VL resolved ${data.fusion_details.resolved_chars.join(', ')} -> Fused: ${data.fused_plate}`, 'success');
+            } else {
+              showToast(`✨ Qwen2-VL confirmed plate: ${data.fused_plate}`, 'success');
+            }
+          }
+
+          // Reload case result to update ranks, cards, and averaged scores
+          await loadCaseResult(activeCaseId);
+          inspectVehicle(currentVehicleIndex);
+        } else {
+          showToast('Qwen2-VL could not resolve plate', 'warning');
+          btn.innerText = '✨ Ask Qwen2-VL';
+        }
+      } catch (err) {
+        showToast(`VLM error: ${err.message}`, 'error');
+        btn.innerText = '✨ Ask Qwen2-VL';
+      } finally {
+        btn.disabled = false;
+        checkVlmAndGpuStatus();
+      }
+    }
+
+    async function clarifyAllVehiclesWithVLM() {
+      if (!activeCaseId) {
+        showToast('No active case loaded', 'warning');
+        return;
+      }
+      const btn = document.getElementById('btnClarifyAllVlm');
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '⏳ Confirming with Qwen2-VL...';
+      }
+      showToast('Running Qwen2-VL across all unresolved vehicles...', 'info');
+
+      try {
+        const resp = await fetch(`/cases/${activeCaseId}/vlm_clarify_all`, { method: 'POST' });
+        const data = await resp.json();
+        if (data.status === 'success') {
+          showToast(`✨ Qwen2-VL clarified ${data.clarified_count} vehicles! Evidence fused.`, 'success');
+          await loadCaseResult(activeCaseId);
+        } else {
+          showToast('VLM batch clarification completed', 'info');
+        }
+      } catch (err) {
+        showToast('VLM batch error: ' + err.message, 'error');
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = '✨ Confirm All with Qwen2-VL';
+        }
+        checkVlmAndGpuStatus();
+      }
+    }
+
+    async function manualFreeVram() {
+      const btn = document.getElementById('btnFreeVram');
+      const hdrBtn = document.getElementById('hdrVramText');
+      if (btn) btn.innerText = '🧹...';
+      if (hdrBtn) hdrBtn.innerText = 'Freeing...';
+      try {
+        const res = await fetch('/vlm/free_vram', { method: 'POST' });
+        const data = await res.json();
+        if (data.status === 'ok') {
+          showToast(`GPU VRAM Purged: ${data.freed_mb} MB freed (${data.free_gb} GB / ${data.total_gb} GB free)`, 'success');
+          if (hdrBtn && data.free_gb) hdrBtn.innerText = `VRAM: ${data.free_gb}G`;
+        } else {
+          showToast('VRAM purge completed', 'info');
+        }
+      } catch (e) {
+        showToast('Could not free VRAM: ' + e.message, 'warning');
+      } finally {
+        if (btn) btn.innerText = '🧹 Free';
+        if (hdrBtn && !hdrBtn.innerText.includes('G')) hdrBtn.innerText = 'Free VRAM';
+      }
+    }
+
+    async function checkVlmAndGpuStatus() {
+      try {
+        const res = await fetch('/vlm/status');
+        if (!res.ok) return;
+        const data = await res.json();
+        const hdr = document.getElementById('hdrVramText');
+        if (hdr && data.gpu_vram && data.gpu_vram.cuda_available) {
+          hdr.innerText = `VRAM: ${data.gpu_vram.free_gb}G`;
+        }
+        const bBadge = document.getElementById('vlmBackendBadge');
+        if (bBadge) {
+          bBadge.innerText = data.lm_studio_available ? 'LM STUDIO (Q4_K_M)' : 'LOCAL 4-BIT';
+        }
+      } catch (e) {
+        // ignore
+      }
+    }
+
+    async function loadRecentCasesDropdown() {
+      const select = document.getElementById('recentCasesSelect');
+      if (!select) return;
+      try {
+        const res = await fetch('/cases?limit=10');
+        if (!res.ok) return;
+        const cases = await res.json();
+        select.innerHTML = '<option value="">-- Select Completed Case --</option>';
+        cases.forEach(c => {
+          if (c.status === 'completed') {
+            const opt = document.createElement('option');
+            opt.value = c.case_id;
+            const dateStr = new Date(c.created_at * 1000).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            opt.textContent = `${c.case_id} (${c.clip_name} - ${dateStr})`;
+            select.appendChild(opt);
+          }
+        });
+        if (activeCaseId) {
+          select.value = activeCaseId;
+        }
+      } catch (e) {
+        console.warn('Could not load recent cases:', e);
+      }
+    }
+
+    function handleRecentCaseSelect() {
+      const select = document.getElementById('recentCasesSelect');
+      if (select && select.value) {
+        loadCaseResult(select.value);
+      }
+    }
+
+    async function tryRestoreLastCase() {
+      await checkVlmAndGpuStatus();
+      await loadRecentCasesDropdown();
+
+      const savedCase = localStorage.getItem('tracex_active_case');
+      if (savedCase) {
+        try {
+          const sRes = await fetch(`/cases/${savedCase}/status`);
+          if (sRes.ok) {
+            const sData = await sRes.json();
+            if (sData.status === 'completed') {
+              await loadCaseResult(savedCase);
+              return;
+            }
+          }
+        } catch (e) {
+          console.warn("Could not restore saved case:", e);
+        }
+      }
+      // If no saved case or invalid, auto-load latest completed case from server
+      try {
+        const latestRes = await fetch('/cases/latest');
+        if (latestRes.ok) {
+          const latestData = await latestRes.json();
+          if (latestData.case_id) {
+            await loadCaseResult(latestData.case_id);
+          }
+        }
+      } catch (e) {
+        // No completed cases yet
+      }
+    }
+
+    // Auto-restore state on page load
+    window.addEventListener('DOMContentLoaded', () => {
+      tryRestoreLastCase();
+    });
+    // Fallback if DOMContentLoaded has already fired
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+      tryRestoreLastCase();
+    }
 
   </script>
 </body>

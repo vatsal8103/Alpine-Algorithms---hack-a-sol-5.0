@@ -1,0 +1,5 @@
+name,url,licence,date,count,used_for
+Indian License Plates with Labels (Kedar Sai),https://www.kaggle.com/datasets/kedarsai/indian-license-plates-with-labels,CC0 (Public Domain),2026-11-23,2021,Plate Detector (YOLOv8) & Real Plate Verification
+Indian License Plates HR/LR Mirror,https://huggingface.co/datasets/adityamangal98/HR-LR-images-of-the-Indian-License-plates,Open Academic Mirror,2026-11-23,10273,Authentic Plate Crop Resolution Benchmark & Real Crops Pool
+Real Labeled Indian Plate Crops (Kaggle Verified),data/kaggle_crops,Apache 2.0 / CC0 Verified Indian Plates,2026-11-23,1626,"100% Real Indian OCR Training, Validation, and Test Sets"
+User CCTV Video Clips (Held-Out Benchmark),data/clips,Hackathon Competition Real Evaluation Set,2026-11-23,10,"Final Real Evaluation Benchmark (Held-Out, NEVER trained on)"

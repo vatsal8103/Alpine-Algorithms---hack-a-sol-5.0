@@ -43,7 +43,7 @@ def test_registry_size_and_no_duplicates():
     assert len(plates) == len(unique_plates), "Registry contains duplicate registration numbers!"
 
     for p in plates:
-        assert bool(INDIAN_PLATE_PATTERN.match(p)), f"Invalid Indian plate format: {p}"
+        assert is_valid_plate(p), f"Invalid Indian plate format: {p}"
 
 
 def test_out_of_registry_disjoint():

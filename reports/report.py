@@ -72,10 +72,17 @@ REPORT_HTML_TEMPLATE = """<!DOCTYPE html>
             border-radius: 4px;
             margin-right: 4px;
         }
+        .char-tile.slot-state { border-color: #3b82f6; color: #1d4ed8; background: #eff6ff; }
+        .char-tile.slot-rto { border-color: #a855f7; color: #6d28d9; background: #faf5ff; }
+        .char-tile.slot-delhi_class { border-color: #6366f1; color: #4338ca; background: #e0e7ff; }
+        .char-tile.slot-series { border-color: #10b981; color: #047857; background: #ecfdf5; }
+        .char-tile.slot-number { border-color: #f59e0b; color: #b45309; background: #fffbeb; }
+        .char-tile.slot-bh_year { border-color: #06b6d4; color: #0891b2; background: #ecfeff; }
+        .char-tile.slot-bh_tag { border-color: #ec4899; color: #db2777; background: #fdf2f8; }
         .char-unknown {
-            color: #d97706;
-            border: 2px dashed #d97706;
-            background: #fef3c7;
+            color: #d97706 !important;
+            border: 2px dashed #d97706 !important;
+            background: #fef3c7 !important;
         }
         .section-title {
             color: #1e3a8a;
@@ -147,14 +154,33 @@ REPORT_HTML_TEMPLATE = """<!DOCTYPE html>
 
     <div class="section-title">1. Consensus Plate Recovery Evidence</div>
     <div class="plate-box">
-        {% for ch in case.fused_plate.text %}
+        {% for pos in case.fused_plate.per_position %}
+            {% set ch = pos.char_or_unknown %}
+            {% set slot = pos.slot or (case.fused_plate.slot_map[loop.index0] if case.fused_plate.slot_map else "") %}
             {% if ch == '?' %}
-                <span class="char-tile char-unknown">?</span>
+                <span class="char-tile char-unknown" title="Unresolved (?)">?</span>
             {% else %}
-                <span class="char-tile">{{ ch }}</span>
+                <span class="char-tile slot-{{ slot }}" title="Slot: {{ slot|upper }} ({{ (pos.confidence * 100)|round }}%)">{{ ch }}</span>
             {% endif %}
         {% endfor %}
     </div>
+    <div style="font-size: 8.5pt; color: #64748b; margin-top: 4px;">
+        <span style="color:#1d4ed8; font-weight:bold;">■ State</span> &nbsp;|&nbsp;
+        <span style="color:#6d28d9; font-weight:bold;">■ RTO</span> &nbsp;|&nbsp;
+        <span style="color:#047857; font-weight:bold;">■ Series</span> &nbsp;|&nbsp;
+        <span style="color:#b45309; font-weight:bold;">■ Number</span> &nbsp;|&nbsp;
+        <span style="color:#d97706; font-weight:bold;">■ Unresolved (?)</span>
+    </div>
+    {% if case.fused_plate.corrections %}
+    <div style="margin-top: 8px; padding: 6px 10px; background: #f0fdf4; border-left: 3px solid #10b981; border-radius: 4px; font-size: 9pt; max-width: 600px;">
+        <strong>Grammar Engine Rules Applied:</strong>
+        <ul style="margin: 2px 0 0 16px; padding: 0;">
+        {% for corr in case.fused_plate.corrections %}
+            <li>{{ corr }}</li>
+        {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
     <p style="font-size: 9.5pt; color: #475569;">
         Mean Known Confidence: <strong>{{ "%.1f"|format(case.fused_plate.mean_confidence * 100) }}%</strong> |
         Resolved Slots: <strong>{{ case.fused_plate.known_count }}/10</strong> |

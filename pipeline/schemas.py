@@ -110,6 +110,10 @@ class PositionVote(BaseModel):
         default_factory=list,
         description="Top candidate characters and posterior probabilities for UI inspection/tooltips"
     )
+    slot: str = Field(
+        default="",
+        description="Assigned grammar slot: state, rto, delhi_class, series, number, etc."
+    )
 
 
 class TrackFrameEvidence(BaseModel):
@@ -155,6 +159,12 @@ class FusedPlate(BaseModel):
     )
     known_count: int = Field(default=0, ge=0, description="Number of resolved characters")
     unknown_count: int = Field(default=0, ge=0, description="Number of '?' positions")
+    template: str = Field(default="STANDARD", description="Matched Indian plate template")
+    slot_map: list[str] = Field(default_factory=list, description="Slot label for each character position")
+    corrections: list[str] = Field(default_factory=list, description="List of grammar corrections applied")
+    flags: list[str] = Field(default_factory=list, description="Grammar validation flags")
+    format_confidence: float = Field(default=1.0, ge=0.0, le=1.0, description="Confidence of template grammar fit")
+    slots: dict[str, str] = Field(default_factory=dict, description="Parsed slot dictionary e.g. state, rto, series, number")
 
 
 # ============================================================================
@@ -267,6 +277,14 @@ class VehicleScanItem(BaseModel):
         default_factory=list,
         description="Top 5 forensic frames ranked by plate sharpness, area, and OCR confidence"
     )
+    vlm_reading: str | None = Field(
+        default=None,
+        description="Vision-Language Model (Qwen2-VL) independent forensic plate reading"
+    )
+    vlm_consulted: bool = Field(
+        default=False,
+        description="Whether Qwen2-VL forensic engine was escalated for this vehicle"
+    )
 
 
 class CaseResult(BaseModel):
@@ -277,6 +295,14 @@ class CaseResult(BaseModel):
     clip_name: str = Field(..., description="Source video file basename")
     fused_plate: FusedPlate = Field(..., description="Multi-frame fused plate result for target vehicle")
     attributes: VehicleAttributes = Field(..., description="Extracted vehicle visual attributes")
+    vlm_reading: str | None = Field(
+        default=None,
+        description="Vision-Language Model (Qwen2-VL) independent forensic plate reading"
+    )
+    vlm_consulted: bool = Field(
+        default=False,
+        description="Whether Qwen2-VL forensic engine was escalated for primary target"
+    )
     candidates: list[Candidate] = Field(
         default_factory=list,
         max_length=5,

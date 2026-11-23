@@ -1,0 +1,9 @@
+path: E:\2. Learning\1. Projects\1. Group\10. IIIT naya raipur\Alpine-Algorithms---hack-a-sol-5.0
+  updated on 20.50
+train:
+- data/plate_det/images/train
+- data/raw/truck_plates/images
+val: data/plate_det/images/val
+test: data/plate_det/images/test
+names:
+  0: license_plate

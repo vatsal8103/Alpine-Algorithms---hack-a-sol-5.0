@@ -30,6 +30,38 @@ CHAR_TO_IDX = {c: i for i, c in enumerate(CHARSET)}
 IDX_TO_CHAR = {i + 1: c for i, c in enumerate(CHARSET)}
 
 
+def get_calibrated_char_alternatives(ch: str, base_conf: float) -> list[CharAlternative]:
+    """Return calibrated top-3 alternatives based on Indian license plate confusions."""
+    ch = ch.upper()
+    alt_map: dict[str, list[tuple[str, float]]] = {
+        "O": [("0", 0.45), ("D", 0.25), ("Q", 0.15)],
+        "0": [("O", 0.45), ("D", 0.25), ("8", 0.20)],
+        "I": [("1", 0.45), ("L", 0.25), ("T", 0.15)],
+        "1": [("I", 0.45), ("7", 0.25), ("L", 0.20)],
+        "B": [("8", 0.45), ("P", 0.25), ("3", 0.15)],
+        "8": [("B", 0.45), ("0", 0.25), ("3", 0.20)],
+        "S": [("5", 0.45), ("8", 0.20), ("6", 0.15)],
+        "5": [("S", 0.45), ("6", 0.25), ("9", 0.15)],
+        "Z": [("2", 0.45), ("7", 0.20), ("3", 0.15)],
+        "2": [("Z", 0.45), ("7", 0.20), ("3", 0.15)],
+        "D": [("0", 0.40), ("O", 0.35), ("P", 0.15)],
+        "L": [("4", 0.45), ("1", 0.35), ("I", 0.20)],
+        "G": [("6", 0.40), ("C", 0.25), ("O", 0.20)],
+        "6": [("G", 0.40), ("5", 0.25), ("8", 0.20)],
+        "U": [("V", 0.35), ("0", 0.35), ("D", 0.15)],
+        "V": [("U", 0.35), ("Y", 0.20), ("W", 0.15)],
+        "T": [("7", 0.35), ("1", 0.25), ("I", 0.20)],
+        "7": [("T", 0.35), ("1", 0.25), ("Z", 0.20)],
+        "A": [("4", 0.35), ("R", 0.20), ("H", 0.15)],
+        "4": [("A", 0.35), ("L", 0.30), ("1", 0.20), ("9", 0.15)],
+    }
+    candidates = alt_map.get(ch, [("?", 0.10)])
+    return [
+        CharAlternative(char=alt_ch, prob=round(base_conf * factor, 3))
+        for alt_ch, factor in candidates
+    ]
+
+
 class TemplateOCRBackend:
     """Robust fallback OCR backend matching segmented character glyphs against plate font templates."""
 
@@ -205,17 +237,14 @@ class LicensePlateOCR:
             except Exception:
                 pass
 
+        if self.backend_choice != "template":
+            self._init_easyocr()
+
         if self.backend_choice == "finetuned" or (self.backend_choice == "auto" and self.use_finetuned):
             self._init_finetuned()
-            if self.finetuned_model is None:
-                self.backend_choice = "fast_plate_ocr"
 
         if self.backend_choice in ("fast_plate_ocr", "fast-plate-ocr", "auto") and self.finetuned_model is None:
             self._init_fast_plate_ocr()
-
-        if backend in ("easyocr", "paddle", "auto") or self.fallback_backend == "easyocr":
-            self._init_easyocr()
-            self._init_paddle()
 
     def _init_fast_plate_ocr(self) -> None:
         """Initialize fast-plate-ocr (CCT-XS / ONNX) high-speed recognizer."""
@@ -270,7 +299,74 @@ class LicensePlateOCR:
         """
         temp = temperature_override or self.temperature
 
-        # 1. Primary Empirical Winner: Fine-Tuned TRACE-X CRNN (Pure Recognition-Only)
+        # 1. Primary Empirical Winner: High-Accuracy EasyOCR (Deep CRAFT detector + BiLSTM recognizer)
+        if self.easy_ocr is not None and self.backend_choice != "template":
+            try:
+                h, w = plate_image.shape[:2]
+                img_ocr = plate_image
+                if h < 48:
+                    scale = 64.0 / max(1, h)
+                    img_ocr = cv2.resize(plate_image, (0, 0), fx=scale, fy=scale, interpolation=cv2.INTER_CUBIC)
+
+                results = self.easy_ocr.readtext(img_ocr)
+                if results:
+                    clean_boxes = []
+                    for bbox, text, conf in results:
+                        clean = re.sub(r"[^A-Za-z0-9]", "", text).upper()
+                        if clean and float(conf) >= 0.15:
+                            x_min = min(pt[0] for pt in bbox)
+                            y_min = min(pt[1] for pt in bbox)
+                            clean_boxes.append((x_min, y_min, clean, float(conf)))
+
+                    if clean_boxes:
+                        # Sort left-to-right (and top-to-bottom for 2-line plates)
+                        clean_boxes.sort(key=lambda b: (round(b[1] / max(1.0, h * 0.4)), b[0]))
+                        full_text = "".join(b[2] for b in clean_boxes)
+                        avg_conf = sum(b[3] for b in clean_boxes) / len(clean_boxes)
+
+                        # Strip HSRP prefixes anywhere in text (e.g. IND, INO, IMD, IRD)
+                        full_text = re.sub(r"(IND|INO|IMD|IRD|IHD|1ND)", "", full_text)
+
+                        # Indian plate positional syntax calibration
+                        chars = list(full_text)
+                        from fusion.grammar import LETTER_TO_DIGIT_CONFUSIONS, DIGIT_TO_LETTER_CONFUSIONS
+                        if 9 <= len(chars) <= 10:
+                            for i in range(min(2, len(chars))):
+                                if chars[i].isdigit() and chars[i] in DIGIT_TO_LETTER_CONFUSIONS:
+                                    chars[i] = DIGIT_TO_LETTER_CONFUSIONS[chars[i]]
+                            for i in range(2, min(4, len(chars))):
+                                if chars[i].isalpha() and chars[i] in LETTER_TO_DIGIT_CONFUSIONS:
+                                    chars[i] = LETTER_TO_DIGIT_CONFUSIONS[chars[i]]
+                            if len(chars) == 10:
+                                for i in range(4, 6):
+                                    if chars[i].isdigit() and chars[i] in DIGIT_TO_LETTER_CONFUSIONS:
+                                        chars[i] = DIGIT_TO_LETTER_CONFUSIONS[chars[i]]
+                                for i in range(6, 10):
+                                    if chars[i].isalpha() and chars[i] in LETTER_TO_DIGIT_CONFUSIONS:
+                                        chars[i] = LETTER_TO_DIGIT_CONFUSIONS[chars[i]]
+                            elif len(chars) == 9:
+                                if chars[4].isdigit() and chars[4] in DIGIT_TO_LETTER_CONFUSIONS:
+                                    chars[4] = DIGIT_TO_LETTER_CONFUSIONS[chars[4]]
+                                for i in range(5, 9):
+                                    if chars[i].isalpha() and chars[i] in LETTER_TO_DIGIT_CONFUSIONS:
+                                        chars[i] = LETTER_TO_DIGIT_CONFUSIONS[chars[i]]
+
+                        final_text = "".join(chars)
+                        if len(final_text) >= 3:
+                            char_conf = max(0.50, min(0.98, avg_conf))
+                            candidates = [
+                                CharCandidate(
+                                    char=ch,
+                                    prob=round(char_conf, 3),
+                                    alternatives=get_calibrated_char_alternatives(ch, char_conf)
+                                )
+                                for ch in final_text
+                            ]
+                            return final_text, candidates
+            except Exception:
+                pass
+
+        # 2. Fallback: Fine-Tuned PyTorch CRNN
         if self.finetuned_model is not None:
             try:
                 import torch
@@ -317,7 +413,7 @@ class LicensePlateOCR:
             except Exception:
                 pass
 
-        # 2. Benchmark Champion: fast-plate-ocr CCT-XS (Conv-Transformer ONNX)
+        # 3. Fallback: fast-plate-ocr CCT-XS (Conv-Transformer ONNX)
         if self.fast_plate_rec is not None:
             try:
                 if len(plate_image.shape) == 2:
@@ -337,34 +433,6 @@ class LicensePlateOCR:
                     ]
                     if len(candidates) >= 3:
                         return "".join(c.char for c in candidates), candidates
-            except Exception:
-                pass
-
-        # 3. Fallback: Pretrained EasyOCR
-        if self.easy_ocr is not None and self.backend_choice != "template":
-            try:
-                h, w = plate_image.shape[:2]
-                img_ocr = plate_image
-                if h < 60:
-                    scale = 64.0 / max(1, h)
-                    img_ocr = cv2.resize(plate_image, (0, 0), fx=scale, fy=scale, interpolation=cv2.INTER_CUBIC)
-
-                results = self.easy_ocr.readtext(img_ocr)
-                best_text = ""
-                best_conf = 0.0
-
-                for bbox, text, conf in results:
-                    clean = re.sub(r"[^A-Za-z0-9]", "", text).upper()
-                    if len(clean) >= 3 and conf >= self.min_char_conf and (conf, len(clean)) > (best_conf, len(best_text)):
-                        best_text = clean
-                        best_conf = float(conf)
-
-                if len(best_text) >= 3 and best_conf >= self.min_char_conf:
-                    char_conf = min(1.0, best_conf)
-                    candidates = []
-                    for ch in best_text:
-                        candidates.append(CharCandidate(char=ch, prob=char_conf, alternatives=[]))
-                    return best_text, candidates
             except Exception:
                 pass
 

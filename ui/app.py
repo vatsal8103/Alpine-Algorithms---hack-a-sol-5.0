@@ -20,7 +20,7 @@ from pipeline.schemas import CaseResult
 from reports.report import generate_html_report
 
 # -----------------------------------------------------------------------------
-# 1. Page Configuration & Custom CSS (Dark Forensic Theme)
+# 1. Page Configuration & Custom CSS (Forensic Clean Light Theme)
 # -----------------------------------------------------------------------------
 st.set_page_config(
     page_title="TRACE-X | Forensic Vehicle Shortlisting",
@@ -31,17 +31,18 @@ st.set_page_config(
 
 st.markdown("""
 <style>
-    /* Dark Slate Theme */
+    /* Forensic Clean Light Theme */
     .stApp {
-        background-color: #0b1120;
-        color: #f8fafc;
+        background-color: #f8fafc;
+        color: #0f172a;
     }
     .metric-card {
-        background-color: #1e293b;
-        border: 1px solid #334155;
+        background-color: #ffffff;
+        border: 1px solid #e2e8f0;
         border-radius: 8px;
         padding: 16px;
         margin-bottom: 12px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
     }
     .plate-tile-known {
         display: inline-block;
@@ -54,9 +55,10 @@ st.markdown("""
         font-family: 'Courier New', Courier, monospace;
         font-size: 28px;
         font-weight: 800;
+        border: 2px solid #0f172a;
         border-radius: 6px;
         margin-right: 6px;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
     .plate-tile-unknown {
         display: inline-block;
@@ -64,8 +66,8 @@ st.markdown("""
         height: 56px;
         line-height: 56px;
         text-align: center;
-        background: #1e293b;
-        color: #f59e0b;
+        background: #fef3c7;
+        color: #b45309;
         border: 2px dashed #f59e0b;
         font-family: 'Courier New', Courier, monospace;
         font-size: 28px;
@@ -74,31 +76,31 @@ st.markdown("""
         margin-right: 6px;
     }
     .banner-match {
-        background: rgba(16, 185, 129, 0.15);
+        background: #ecfdf5;
         border: 1px solid #10b981;
         border-left: 6px solid #10b981;
         padding: 14px 18px;
         border-radius: 6px;
-        color: #34d399;
+        color: #065f46;
         font-weight: 600;
         margin: 14px 0;
     }
     .banner-nomatch {
-        background: rgba(239, 68, 68, 0.15);
+        background: #fef2f2;
         border: 1px solid #ef4444;
         border-left: 6px solid #ef4444;
         padding: 14px 18px;
         border-radius: 6px;
-        color: #f87171;
+        color: #991b1b;
         font-weight: 600;
         margin: 14px 0;
     }
     .disclaimer-box {
         margin-top: 40px;
         padding: 12px;
-        border-top: 1px solid #334155;
+        border-top: 1px solid #e2e8f0;
         font-size: 11px;
-        color: #94a3b8;
+        color: #64748b;
     }
 </style>
 """, unsafe_allow_html=True)

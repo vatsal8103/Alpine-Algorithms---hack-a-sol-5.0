@@ -11,6 +11,7 @@ Guarantees:
 
 from __future__ import annotations
 
+import math
 import os
 import re
 import time
@@ -19,8 +20,8 @@ from typing import Any
 import cv2
 import numpy as np
 
-from pipeline.ocr import LicensePlateOCR
-from pipeline.schemas import CharCandidate, FrameOCRResult
+from pipeline.ocr import LicensePlateOCR, get_calibrated_char_alternatives
+from pipeline.schemas import CharAlternative, CharCandidate, FrameOCRResult
 
 
 def deskew_plate(img: np.ndarray) -> np.ndarray:
@@ -49,12 +50,157 @@ def deskew_plate(img: np.ndarray) -> np.ndarray:
     return img
 
 
+def unroll_two_line_plate(plate_crop: np.ndarray) -> tuple[np.ndarray, bool]:
+    """If plate crop is square/two-line (e.g. Indian scooter/bike with w/h < 2.2), unroll into a single horizontal strip.
+
+    Line 1 (State + RTO, top) is horizontally stitched before Line 2 (Series + Number, bottom)
+    to prevent character collision when processed by 1D sequence OCR models.
+    """
+    if plate_crop is None or plate_crop.size == 0:
+        return plate_crop, False
+    h, w = plate_crop.shape[:2]
+    aspect = float(w) / max(1, h)
+    if aspect >= 2.2 or h < 24:
+        return plate_crop, False
+
+    try:
+        gray = cv2.cvtColor(plate_crop, cv2.COLOR_BGR2GRAY) if len(plate_crop.shape) == 3 else plate_crop
+        # Compute horizontal edge gradient activity to find the inter-line gap
+        sobel_y = cv2.Sobel(gray, cv2.CV_64F, 0, 1, ksize=3)
+        grad_mag = np.abs(sobel_y)
+        row_activity = np.mean(grad_mag, axis=1)
+
+        mid_min = int(h * 0.38)
+        mid_max = int(h * 0.62)
+        if mid_max > mid_min:
+            split_y = mid_min + int(np.argmin(row_activity[mid_min:mid_max]))
+        else:
+            split_y = h // 2
+
+        top_crop = plate_crop[:split_y, :]
+        bottom_crop = plate_crop[split_y:, :]
+        if top_crop.size == 0 or bottom_crop.size == 0:
+            return plate_crop, False
+
+        target_h = 48
+        top_w = max(1, int(top_crop.shape[1] * (target_h / max(1, top_crop.shape[0]))))
+        bot_w = max(1, int(bottom_crop.shape[1] * (target_h / max(1, bottom_crop.shape[0]))))
+
+        top_resized = cv2.resize(top_crop, (top_w, target_h), interpolation=cv2.INTER_CUBIC)
+        bot_resized = cv2.resize(bottom_crop, (bot_w, target_h), interpolation=cv2.INTER_CUBIC)
+
+        pad_w = int(target_h * 0.25)
+        spacer_color = 240 if float(np.mean(gray)) > 120 else 20
+        if len(plate_crop.shape) == 3:
+            spacer = np.full((target_h, pad_w, plate_crop.shape[2]), spacer_color, dtype=plate_crop.dtype)
+        else:
+            spacer = np.full((target_h, pad_w), spacer_color, dtype=plate_crop.dtype)
+
+        stitched = np.hstack([top_resized, spacer, bot_resized])
+        return stitched, True
+    except Exception:
+        return plate_crop, False
+
+
+def parse_easyocr_multi_line(results: list) -> tuple[str, float, list[float] | None]:
+    """Parse EasyOCR text box detections, automatically detecting and merging two-line stacked plates.
+
+    In India, two-wheeler plates (and many commercial vehicles) are stacked:
+      - Line 1 (Top): State code + RTO (e.g. MP 04, DL 1C, MH 12)
+      - Line 2 (Bottom): Series + 4-digit number (e.g. CY 2090, 2354, ZK 6184)
+    This function concatenates both lines in topological order and returns the outer bounding box.
+    """
+    valid = []
+    HSRP_TAGS = {"IND", "INO", "IMD", "IRD", "IHD", "1ND", "HSRP", "IN"}
+    INDIAN_STATES = {
+        "MP", "DL", "MH", "KA", "HR", "UP", "GJ", "RJ", "TN", "TS", "AP", "WB",
+        "KL", "PB", "CH", "BR", "JH", "OD", "UK", "GA", "CG", "TR", "MZ", "NL", "SK"
+    }
+
+    for bbox, d_text, d_conf in results:
+        clean = re.sub(r"[^A-Za-z0-9]", "", str(d_text)).upper()
+        if clean in HSRP_TAGS or len(clean) < 2 or float(d_conf) < 0.18:
+            continue
+        pts = np.array(bbox, dtype=np.float32)
+        y_min = float(np.min(pts[:, 1]))
+        y_max = float(np.max(pts[:, 1]))
+        x_min = float(np.min(pts[:, 0]))
+        x_max = float(np.max(pts[:, 0]))
+        valid.append({
+            "clean": clean,
+            "conf": float(d_conf),
+            "y_center": (y_min + y_max) / 2.0,
+            "x_center": (x_min + x_max) / 2.0,
+            "h": max(1.0, y_max - y_min),
+            "w": max(1.0, x_max - x_min),
+            "box_rect": [x_min, y_min, x_max, y_max]
+        })
+
+    if not valid:
+        return "", 0.0, None
+
+    # 1. Single complete plate detection (8 to 11 characters conforming to alphanumeric)
+    full_cands = [
+        v for v in valid
+        if 8 <= len(v["clean"]) <= 11 and any(c.isdigit() for c in v["clean"]) and any(c.isalpha() for c in v["clean"])
+    ]
+    if full_cands:
+        best_full = max(full_cands, key=lambda v: (v["clean"][:2] in INDIAN_STATES, v["conf"]))
+        return best_full["clean"], best_full["conf"], best_full["box_rect"]
+
+    # 2. Two-line stacked plate detection (vertically separated lines)
+    if len(valid) >= 2:
+        by_y = sorted(valid, key=lambda v: v["y_center"])
+        avg_h = (by_y[0]["h"] + by_y[1]["h"]) / 2.0
+        # If the top two detections are vertically separated
+        if (by_y[1]["y_center"] - by_y[0]["y_center"]) > avg_h * 0.30:
+            top = by_y[0]
+            bot = by_y[1]
+            combined_text = top["clean"] + bot["clean"]
+            combined_conf = (top["conf"] * len(top["clean"]) + bot["conf"] * len(bot["clean"])) / max(1, len(top["clean"]) + len(bot["clean"]))
+            outer_box = [
+                min(top["box_rect"][0], bot["box_rect"][0]),
+                min(top["box_rect"][1], bot["box_rect"][1]),
+                max(top["box_rect"][2], bot["box_rect"][2]),
+                max(top["box_rect"][3], bot["box_rect"][3]),
+            ]
+            return combined_text, combined_conf, outer_box
+
+        # Or horizontally separated lines (e.g. unrolled strip)
+        by_x = sorted(valid, key=lambda v: v["x_center"])
+        avg_w = (by_x[0]["w"] + by_x[1]["w"]) / 2.0
+        if (by_x[1]["x_center"] - by_x[0]["x_center"]) > avg_w * 0.30:
+            left = by_x[0]
+            right = by_x[1]
+            combined_text = left["clean"] + right["clean"]
+            combined_conf = (left["conf"] * len(left["clean"]) + right["conf"] * len(right["clean"])) / max(1, len(left["clean"]) + len(right["clean"]))
+            outer_box = [
+                min(left["box_rect"][0], right["box_rect"][0]),
+                min(left["box_rect"][1], right["box_rect"][1]),
+                max(left["box_rect"][2], right["box_rect"][2]),
+                max(left["box_rect"][3], right["box_rect"][3]),
+            ]
+            return combined_text, combined_conf, outer_box
+
+    # 3. Single partial fragment fallback (scored by length and Indian state prefix)
+    best_cand = max(
+        valid,
+        key=lambda v: (
+            v["clean"][:2] in INDIAN_STATES,
+            any(c.isdigit() for c in v["clean"]) and any(c.isalpha() for c in v["clean"]),
+            len(v["clean"]),
+            v["conf"]
+        )
+    )
+    return best_cand["clean"], best_cand["conf"], best_cand["box_rect"]
+
+
 class PlateStage:
     """Localizes license plates within vehicle bounding boxes and runs multi-variant OCR."""
 
     def __init__(
         self,
-        plate_model_path: str = "models/plate_yolov8s.pt",
+        plate_model_path: str = "models/plate_yolo11n.pt",
         char_threshold: float = 0.28,
         crops_dir: str = "runs/crops",
         device: str | None = None
@@ -66,10 +212,16 @@ class PlateStage:
         self.plate_detector = None
         import torch
         self.device = device or ("cuda:0" if torch.cuda.is_available() else "cpu")
-        if plate_model_path and Path(plate_model_path).exists():
+
+        # Prioritize YOLO11n, fallback to YOLOv8s if missing
+        active_path = plate_model_path
+        if not Path(active_path).exists() and Path("models/plate_yolov8s.pt").exists():
+            active_path = "models/plate_yolov8s.pt"
+
+        if active_path and Path(active_path).exists():
             try:
                 from ultralytics import YOLO
-                self.plate_detector = YOLO(plate_model_path)
+                self.plate_detector = YOLO(active_path)
                 if torch.cuda.is_available() and str(self.device).startswith("cuda"):
                     try:
                         self.plate_detector.to(self.device)
@@ -86,13 +238,14 @@ class PlateStage:
         """
         vh, vw = vehicle_crop.shape[:2]
 
-        # 1. Primary Path: YOLO Plate Detector (GPU-accelerated)
+        # 1. Primary Path: YOLO Plate Detector (GPU-accelerated, calibrated high recall)
         if self.plate_detector is not None and vehicle_crop.size > 0:
             try:
-                det_res = self.plate_detector(vehicle_crop, conf=0.25, device=self.device, verbose=False)
+                # Primary pass at conf=0.15 for high recall on distant, angled, or two-wheeler plates
+                det_res = self.plate_detector(vehicle_crop, conf=0.15, device=self.device, verbose=False)
+                best_conf = -1.0
+                best_yolo_box = None
                 if det_res and len(det_res) > 0 and len(det_res[0].boxes) > 0:
-                    best_conf = -1.0
-                    best_yolo_box = None
                     for b in det_res[0].boxes:
                         c = float(b.conf[0])
                         if c > best_conf:
@@ -104,8 +257,23 @@ class PlateStage:
                             bh = min(vh - by, int(y2 - y1))
                             if bw > 15 and bh > 8:
                                 best_yolo_box = (bx, by, bw, bh)
-                    if best_yolo_box is not None:
-                        return best_yolo_box
+
+                # Secondary zoom pass: On large crops where whole-image resize shrinks tiny distant plates
+                if best_yolo_box is None and vh > 180:
+                    lower_y1 = int(vh * 0.35)
+                    lower_crop = vehicle_crop[lower_y1:, :]
+                    if lower_crop.size > 0:
+                        det_lower = self.plate_detector(lower_crop, conf=0.12, device=self.device, verbose=False)
+                        if det_lower and len(det_lower[0].boxes) > 0:
+                            b = det_lower[0].boxes[0]
+                            lx1, ly1, lx2, ly2 = b.xyxy[0].cpu().numpy()
+                            lbw = min(vw, int(lx2 - lx1))
+                            lbh = min(vh - lower_y1, int(ly2 - ly1))
+                            if lbw > 12 and lbh > 8:
+                                best_yolo_box = (max(0, int(lx1)), max(0, int(ly1 + lower_y1)), lbw, lbh)
+
+                if best_yolo_box is not None:
+                    return best_yolo_box
             except Exception:
                 pass
 
@@ -136,7 +304,8 @@ class PlateStage:
             x, y, w, h = cv2.boundingRect(cnt)
             aspect = float(w) / max(1, h)
             area = w * h
-            if 1.4 <= aspect <= 5.8 and (0.008 * roi_area <= area <= 0.48 * roi_area) and w >= 40 and h >= 12:
+            # Accept square two-wheeler plates (aspect >= 0.85) up to elongated car plates (aspect <= 5.8)
+            if 0.85 <= aspect <= 5.8 and (0.008 * roi_area <= area <= 0.48 * roi_area) and w >= 25 and h >= 12:
                 patch_gray = gray[y:y+h, x:x+w]
                 contrast = float(np.std(patch_gray)) if patch_gray.size > 0 else 10.0
                 cx_dev = abs((x + w / 2.0) - (rw / 2.0)) / (rw / 2.0)
@@ -164,7 +333,7 @@ class PlateStage:
             x, y, w, h = cv2.boundingRect(cnt)
             aspect = float(w) / max(1, h)
             area = w * h
-            if 1.4 <= aspect <= 5.8 and (0.008 * roi_area <= area <= 0.48 * roi_area) and w >= 40 and h >= 12:
+            if 0.85 <= aspect <= 5.8 and (0.008 * roi_area <= area <= 0.48 * roi_area) and w >= 25 and h >= 12:
                 patch_gray = gray[y:y+h, x:x+w]
                 contrast = float(np.std(patch_gray)) if patch_gray.size > 0 else 10.0
                 cx_dev = abs((x + w / 2.0) - (rw / 2.0)) / (rw / 2.0)
@@ -229,8 +398,10 @@ class PlateStage:
                 bbox=[0, 0, 0, 0], plate_crop_path="", plate_area_px=0,
                 sharpness=sharpness, chars=[]
             )
+        box_aspect = float(pw) / max(1, ph)
+        is_square_or_two_line = (box_aspect < 2.4)
         mx = max(8, int(pw * 0.20))
-        my = max(6, int(ph * 0.20))
+        my = max(10, int(ph * 0.30)) if is_square_or_two_line else max(6, int(ph * 0.20))
         x1 = max(0, px - mx)
         y1 = max(0, py - my)
         x2 = min(vw, px + pw + mx)
@@ -241,7 +412,14 @@ class PlateStage:
         crop_box = [float(x1), float(y1), float(x2), float(y2)]
 
         deskewed = deskew_plate(plate_crop)
-        text, candidates = self.ocr_engine.recognize(deskewed)
+        unrolled_crop, is_two_line = unroll_two_line_plate(deskewed)
+        target_crop = unrolled_crop if is_two_line else deskewed
+        text, candidates = self.ocr_engine.recognize(target_crop)
+        if is_two_line and len(candidates) < 6:
+            alt_text, alt_candidates = self.ocr_engine.recognize(deskewed)
+            if len(alt_candidates) > len(candidates):
+                text, candidates = alt_text, alt_candidates
+                target_crop = deskewed
 
         # 2. Resilient OCR: If primary recognition yielded fewer than 8 chars or lacks valid plate grammar, try EasyOCR
         needs_better_ocr = (
@@ -252,8 +430,8 @@ class PlateStage:
         )
         if needs_better_ocr and easy_ocr is not None and vh > 40 and vw > 40:
             try:
-                # Fast path: First try EasyOCR directly on deskewed/plate_crop (5ms on GPU vs 150ms on full vehicle)
-                fast_target = deskewed if (deskewed is not None and deskewed.size > 0) else plate_crop
+                # Fast path: First try EasyOCR directly on target_crop (5ms on GPU vs 150ms on full vehicle)
+                fast_target = target_crop if (target_crop is not None and target_crop.size > 0) else plate_crop
                 results = easy_ocr.readtext(fast_target) if (fast_target is not None and fast_target.size > 0) else []
                 is_lower_vehicle = False
                 y_offset = 0
@@ -266,37 +444,17 @@ class PlateStage:
                     results = easy_ocr.readtext(lower_vehicle)
                     is_lower_vehicle = True
 
-                best_text = ""
-                best_bbox = None
-                best_conf = 0.0
-                best_score = -1.0
-                for bbox, d_text, d_conf in results:
-                    clean = re.sub(r"[^A-Za-z0-9]", "", d_text).upper()
-                    if len(clean) >= 3 and d_conf >= 0.20:
-                        score = float(d_conf)
-                        if 8 <= len(clean) <= 11:
-                            score += 4.0
-                        elif len(clean) >= 5:
-                            score += 2.0
-                        if any(c.isdigit() for c in clean) and any(c.isalpha() for c in clean):
-                            score += 2.0
-                        if len(clean) >= 2 and clean[:2] in {"MP", "DL", "MH", "KA", "HR", "UP", "GJ", "RJ", "TN", "TS", "AP", "WB", "KL", "PB", "CH", "BR", "JH", "OD", "UK", "GA", "CG"}:
-                            score += 3.0
-                        if score > best_score:
-                            best_score = score
-                            best_text = clean
-                            best_bbox = bbox
-                            best_conf = float(d_conf)
+                best_text, best_conf, best_bbox = parse_easyocr_multi_line(results)
 
-                if best_bbox is not None and len(best_text) >= 4 and best_score > 2.0:
+                if best_bbox is not None and len(best_text) >= 4 and best_conf >= 0.20:
                     if is_lower_vehicle:
-                        bx1 = int(min(pt[0] for pt in best_bbox))
-                        by1 = int(min(pt[1] for pt in best_bbox)) + y_offset
-                        bx2 = int(max(pt[0] for pt in best_bbox))
-                        by2 = int(max(pt[1] for pt in best_bbox)) + y_offset
+                        bx1 = int(best_bbox[0])
+                        by1 = int(best_bbox[1]) + y_offset
+                        bx2 = int(best_bbox[2])
+                        by2 = int(best_bbox[3]) + y_offset
 
                         pmx = max(8, int((bx2 - bx1) * 0.20))
-                        pmy = max(6, int((by2 - by1) * 0.20))
+                        pmy = max(8, int((by2 - by1) * 0.25))
                         cx1 = max(0, bx1 - pmx)
                         cy1 = max(0, by1 - pmy)
                         cx2 = min(vw, bx2 + pmx)
@@ -312,12 +470,35 @@ class PlateStage:
                         CharCandidate(
                             char=ch,
                             prob=round(char_conf, 3),
-                            alternatives=[]
+                            alternatives=get_calibrated_char_alternatives(ch, char_conf)
                         )
                         for ch in text
                     ]
             except Exception:
                 pass
+
+        # Measure actual Laplacian sharpness directly on plate crop to quantify blur
+        if plate_crop is not None and plate_crop.size > 0:
+            gray_crop = cv2.cvtColor(plate_crop, cv2.COLOR_BGR2GRAY) if len(plate_crop.shape) == 3 else plate_crop
+            measured_sharpness = float(cv2.Laplacian(gray_crop, cv2.CV_64F).var())
+            sharpness = max(1.0, round(measured_sharpness, 2))
+
+        # Blur-aware confidence calibration:
+        # Standard nominal plate sharpness is ~45.0. If crop is blurry (Laplacian variance < 45),
+        # gracefully degrade character confidence to prevent false commitments.
+        blur_scale = min(1.0, max(0.30, math.sqrt(sharpness / 45.0)))
+        if candidates:
+            candidates = [
+                CharCandidate(
+                    char=c.char,
+                    prob=round(min(1.0, c.prob * blur_scale), 3),
+                    alternatives=[
+                        CharAlternative(char=a.char, prob=round(min(1.0, a.prob * blur_scale), 3))
+                        for a in c.alternatives
+                    ]
+                )
+                for c in candidates
+            ]
 
         # Preprocess plate crop image before saving
         base_saved, _ = self.preprocess_plate_image(plate_crop)

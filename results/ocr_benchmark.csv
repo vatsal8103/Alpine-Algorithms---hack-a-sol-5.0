@@ -1,0 +1,9 @@
+model_configuration,char_accuracy_pct,plate_accuracy_pct,honesty_pct,calibration_gap,latency_ms,sharp_plate_acc_pct,blur_plate_acc_pct,samples_evaluated
+fast-plate CCT-XS (Raw),68.09,37.62,87.87,0.2387,2.18,37.76,33.33,101
+fast-plate CCT-XS + Deskew,68.09,37.62,87.87,0.2387,2.24,37.76,33.33,101
+fast-plate CCT-XS + Cubic Upscale,60.75,27.72,84.83,0.2741,2.13,27.55,33.33,101
+fast-plate CCT-XS + Lanczos Upscale,60.96,28.71,84.75,0.2734,2.08,28.57,33.33,101
+fast-plate CCT-XS + Mild CLAHE,66.16,37.62,88.01,0.2484,2.07,37.76,33.33,101
+CRNN Fine-Tuned (Baseline),89.81,85.15,91.94,0.0831,3.89,84.69,100.0,101
+EasyOCR Baseline,48.93,18.81,85.12,0.2914,27.74,19.39,0.0,101
+Template OCR Baseline,3.87,0.0,0.0,0.2017,7.82,0.0,0.0,101
